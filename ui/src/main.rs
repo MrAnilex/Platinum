@@ -2710,7 +2710,7 @@ fn log_panics(capture: Option<&Path>) {
 /// refused), `pending-restart` (two options waiting for the daemon's next start, with
 /// "Redémarrer Platinum…"), `ask-restart` (its question), `startup-blocked` (Task Manager keeping
 /// Platinum from starting with Windows), `ask-streamer` and `ask-classic` (the questions before a
-/// mode switch); streamer mode itself is shown with `PLATINUM_UI_STREAMER=1`, and the language
+/// mode switch); streamer mode itself is shown with `PLATINUM_UI_STREAMER=1` (classic mode with `=0`), and the language
 /// with `PLATINUM_UI_LANG=<fr|en|es|de|it|pt>`. `edit-knob`: the first knob's value (Basses)
 /// being typed. For the equalizer of the open tab: `band:<n>` (filter n, from 1, selected: its
 /// editor and Q handles), `band-menu:<n>` (its right-click menu), `band-type` (the selected

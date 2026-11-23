@@ -6,7 +6,8 @@
 
 <p align="center">
   A lightweight, open-source replacement for SteelSeries GG's <b>Sonar</b> on Windows.<br>
-  Per-channel mixer, effects and presets, microphone effects, streamer mode — without the 1.4 GB suite.
+  Per-channel mixer, effects and presets, microphone effects, streamer mode — without the 1.4 GB suite.<br>
+  Windows for now: macOS and Linux versions will probably follow.
 </p>
 
 <p align="center">
@@ -18,7 +19,9 @@
 > audio driver and audio-effects modules: those already on your PC if SteelSeries GG is installed,
 > otherwise the ones its setup takes from GG's official installer, on your PC (see Install).
 
-![Mixer](docs/screenshots/mixer.png)
+| Normal mode | Streamer mode |
+|---|---|
+| ![Mixer in normal mode](docs/screenshots/mixer-classic.png) | ![Mixer in streamer mode](docs/screenshots/mixer-streamer.png) |
 
 ## Why
 
@@ -61,6 +64,20 @@ microphone effects engine) and a window you only open when you want to change so
 |---|---|
 | ![Channel](docs/screenshots/channel.png) | ![Microphone](docs/screenshots/microphone.png) |
 | ![Settings](docs/screenshots/settings.png) | |
+
+## Normal mode vs streamer mode
+
+The mixer works in two ways, as in GG (the window calls normal mode "classic mode"). Switch at any
+time in Settings → Streamer mode: Platinum asks first, and remembers your normal-mode outputs for
+when you come back.
+
+| | Normal mode | Streamer mode |
+|---|---|---|
+| Made for | Gaming, calls, everyday listening | Streaming and recording |
+| Outputs | Each channel plays on its own output, or all on the Master's | Two mixes: your personal mix (all channels on one output, your headset) and a stream mix sent to "Stream (Platinum)" for OBS, Streamlabs… |
+| Per channel | One volume, one mute | Two volumes (My mix / Stream), two mutes, and a switch for each mix |
+| Master | One output, one level | Two masters, personal and stream, each with its output and level |
+| For example | The game on your speakers, Discord on your headset | Turn the game down for your viewers without changing what you hear |
 
 ## Requirements
 
@@ -203,16 +220,17 @@ Windows APO interfaces.
 
 ## Known limitations
 
-- Windows only, and it needs SteelSeries' Sonar driver (installed by GG, or by Platinum's setup from
-  GG's official installer). A cross-platform core (PipeWire on Linux / Steam Deck, then macOS) is the
-  long-term goal.
+- Windows only for now, and it needs SteelSeries' Sonar driver (installed by GG, or by Platinum's
+  setup from GG's official installer). macOS and Linux versions will probably be worked on: a
+  cross-platform core (PipeWire on Linux / Steam Deck, then macOS) with free effects (equalizer,
+  DeepFilterNet noise reduction, WebRTC echo cancellation).
 - Without GG, GG's presets come from its database migrations; presets GG changes on its servers
   after an install are not followed until the setup is run again with a newer GG installer.
 - In streamer mode, "microphone in the stream mix" and "listen to the stream" are not implemented yet.
 - A remote client's microphone (Moonlight) is not available: stock Sunshine does not forward it.
 - SteelSeries' microphone engine loses memory when its echo-cancellation references are silent.
-  Platinum keeps them fed with an inaudible noise floor (about −120 dBFS) and rebuilds the engine at
-  a quiet moment past `engine_recycle_mb` (300 MB by default).
+  Platinum keeps them fed with an inaudible noise floor (about −120 dBFS) and runs the engine in a
+  separate process, replaced at a quiet moment past `engine_recycle_mb` (400 MB by default).
 
 ## Translations
 

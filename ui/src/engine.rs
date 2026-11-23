@@ -498,9 +498,9 @@ struct Engine {
     master_device: Arc<Mutex<Option<String>>>,
     /// The stream mix's device in streamer mode (`None` otherwise), shared with the meters thread.
     stream_device: Arc<Mutex<Option<String>>>,
-    /// Layout check only (`PLATINUM_UI_STREAMER=1`): the mixer is shown in streamer mode whatever
-    /// platinum.ini says.
-    force_streamer: bool,
+    /// Layout check only: `PLATINUM_UI_STREAMER=1` shows the mixer in streamer mode, `=0` in classic
+    /// mode, whatever platinum.ini says.
+    force_mode: Option<Mode>,
     master: Master,
     /// The Master changed by the user and not saved yet.
     master_dirty: bool,
@@ -612,7 +612,7 @@ impl Engine {
             output_ids: Vec::new(),
             master_device: meter_devices.master,
             stream_device: meter_devices.stream,
-            force_streamer: read_only && std::env::var("PLATINUM_UI_STREAMER").is_ok_and(|v| v == "1"),
+            force_mode: if read_only { forced_mode(std::env::var("PLATINUM_UI_STREAMER").ok().as_deref()) } else { None },
             master: mixer::load_master(),
             master_dirty: false,
             master_stamp: mixer::master_stamp(),
@@ -1715,7 +1715,7 @@ impl Engine {
     /// else the one remembered), the stream mix's menu and device, and the channels of each mix.
     /// Also tells the meters thread which device the Stream master's meter reads.
     fn streamer_data(&mut self, settings: &config::Config, routed: &[Option<String>], endpoints: &[Endpoint], outputs: &mut Vec<String>) -> StreamerData {
-        let mode = if self.force_streamer { Mode::Streamer } else { settings.mode };
+        let mode = self.force_mode.unwrap_or(settings.mode);
         let personal = streamer::personal_device(routed, settings.personal_device.as_deref());
         let personal_index = personal.as_deref().map_or(0, |id| output_index(&mut self.output_ids, outputs, endpoints, id));
         let virtual_name = streamer::virtual_stream(endpoints).map_or_else(|| "Stream (Platinum) (absent)".to_string(), |e| e.name.clone());
@@ -2113,9 +2113,27 @@ pub fn run(commands: Receiver<Command>, meter_devices: MeterDevices, read_only: 
     }
 }
 
+/// The layout check's mixer mode (`PLATINUM_UI_STREAMER`): `1` streamer, `0` classic, anything
+/// else platinum.ini's.
+fn forced_mode(value: Option<&str>) -> Option<Mode> {
+    match value.map(str::trim) {
+        Some("1") => Some(Mode::Streamer),
+        Some("0") => Some(Mode::Classic),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_layout_check_can_show_either_mixer_mode() {
+        assert_eq!(forced_mode(Some("1")), Some(Mode::Streamer));
+        assert_eq!(forced_mode(Some("0")), Some(Mode::Classic));
+        assert_eq!(forced_mode(Some("")), None);
+        assert_eq!(forced_mode(None), None);
+    }
 
     #[test]
     fn absent_outputs_are_listed_once() {
