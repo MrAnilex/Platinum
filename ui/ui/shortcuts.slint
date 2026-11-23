@@ -1,0 +1,355 @@
+// The keyboard shortcuts and the on-screen overlays, after GG's Settings > Sonar ("Raccourcis
+// Sonar" and "Superpositions"), a section of the settings page. The texts are GG's own French
+// where it has them, "Sonar" becoming "Platinum". The daemon registers the shortcuts and shows the
+// overlays; this section only edits platinum.ini, through the Backend global, and shows what Rust
+// put in its properties.
+//
+// A field waits for a combination once clicked: the next key pressed with its modifiers goes to
+// Rust, which keeps it or says why not; Escape stops waiting, as a second click does.
+
+import { Palette, Label, Toggle, IconButton, Button, Select } from "controls.slint";
+import { Icon } from "icons.slint";
+import { Backend } from "backend.slint";
+
+// One action and its combination.
+export struct ShortcutRow {
+    // The action's place in Rust's list.
+    index: int,
+    label: string,
+    // The combination as shown ("Ctrl + Alt + ↑"); empty when none is bound.
+    keys: string,
+    // Another action uses the same combination.
+    conflict: bool,
+    // A heading shown above this row ("MIX DE STREAM" above the stream mix's actions); empty for none.
+    section: string,
+}
+
+// The actions of one channel (or ChatMix, or the device change).
+export struct ShortcutGroup {
+    title: string,
+    icon: string,
+    rows: [ShortcutRow],
+}
+
+// One action: its label, the field that shows (and takes) its combination, and the clear button.
+component ShortcutLine inherits HorizontalLayout {
+    in property <ShortcutRow> entry;
+    in property <int> capturing;
+    callback capture(int);
+    property <bool> waiting: root.capturing == root.entry.index;
+    height: 28px;
+    spacing: 8px;
+    Text {
+        width: 76px;
+        text: root.entry.label;
+        color: Palette.dim;
+        font-size: 12px;
+        vertical-alignment: center;
+        overflow: elide;
+    }
+    Rectangle {
+        horizontal-stretch: 1;
+        border-radius: 4px;
+        background: root.waiting ? Palette.raised : Palette.well;
+        border-width: 1px;
+        border-color: root.waiting ? Palette.light : (root.entry.conflict ? Palette.amber : (area.has-hover ? Palette.edge : Palette.hairline));
+        Text {
+            x: 10px;
+            width: parent.width - 20px;
+            height: parent.height;
+            text: root.waiting ? @tr("Appuyez…") : (root.entry.keys != "" ? root.entry.keys : @tr("Non attribué"));
+            color: root.waiting ? Palette.text : (root.entry.conflict ? Palette.amber : (root.entry.keys != "" ? Palette.text : Palette.faint));
+            font-size: 12px;
+            font-weight: root.entry.keys != "" && !root.waiting ? 600 : 400;
+            vertical-alignment: center;
+            overflow: elide;
+        }
+        area := TouchArea {
+            mouse-cursor: pointer;
+            clicked => { root.capture(root.waiting ? -1 : root.entry.index); }
+        }
+    }
+    IconButton {
+        y: (parent.height - self.height) / 2;
+        width: 26px;
+        height: 26px;
+        icon: "close";
+        enabled: root.entry.keys != "";
+        clicked => { Backend.clear-shortcut(root.entry.index); }
+    }
+}
+
+// The actions of one group, in a card.
+component ShortcutCard inherits Rectangle {
+    in property <ShortcutGroup> group;
+    in property <int> capturing;
+    callback capture(int);
+    border-radius: 6px;
+    background: Palette.panel;
+    border-width: 1px;
+    border-color: Palette.hairline;
+    VerticalLayout {
+        padding: 12px;
+        padding-top: 12px;
+        spacing: 4px;
+        HorizontalLayout {
+            height: 20px;
+            spacing: 8px;
+            Icon {
+                y: (parent.height - self.height) / 2;
+                name: root.group.icon;
+                size: 16px;
+                tint: Palette.text;
+            }
+            Label {
+                text: root.group.title;
+                color: Palette.dim;
+                vertical-alignment: center;
+                overflow: elide;
+            }
+        }
+        for line in root.group.rows: VerticalLayout {
+            spacing: 4px;
+            if line.section != "": Label {
+                height: 22px;
+                text: line.section;
+                vertical-alignment: bottom;
+            }
+            ShortcutLine {
+                entry: line;
+                capturing: root.capturing;
+                capture(index) => { root.capture(index); }
+            }
+        }
+    }
+}
+
+// A labelled switch of the overlays' card.
+component SwitchRow inherits HorizontalLayout {
+    in property <string> text;
+    in property <bool> on;
+    in property <bool> enabled: true;
+    callback toggled(bool);
+    spacing: 12px;
+    Text {
+        text: root.text;
+        color: root.enabled ? Palette.text : Palette.faint;
+        font-size: 12px;
+        vertical-alignment: center;
+        wrap: word-wrap;
+    }
+    VerticalLayout {
+        alignment: center;
+        Toggle {
+            on: root.on;
+            enabled: root.enabled;
+            toggled(on) => { root.toggled(on); }
+        }
+    }
+}
+
+// The section: what the shortcuts do, why the last one was refused, then a card per group of
+// actions and the overlays' card, three to a row. Its width is given (`width-available`): the
+// cards are sized from it, not from what the page's scrolling area makes of them.
+export component ShortcutsSection inherits VerticalLayout {
+    in property <length> width-available;
+    in property <[ShortcutGroup]> groups;
+    // The action whose field waits for a combination; -1 when none does.
+    in-out property <int> capturing: -1;
+    // Why the last combination was refused; empty otherwise.
+    in property <string> note;
+    // Some combination is bound to two actions.
+    in property <bool> conflicts;
+    // The daemon runs (it is the one that hears the shortcuts).
+    in property <bool> daemon-running;
+    in property <bool> overlays-on;
+    in property <int> overlay-position;
+    in property <[string]> positions;
+    in property <bool> overlay-volume;
+    in property <bool> overlay-mute;
+    in property <bool> overlay-device;
+    // The sample overlay can be shown (not in the layout check).
+    in property <bool> can-preview: true;
+    // When a change takes effect.
+    in property <string> applies;
+    // The width of each of the three columns of cards.
+    property <length> cell: (root.width-available - 2 * 10px) / 3;
+
+    function capture(index: int) {
+        root.capturing = index;
+        Backend.shortcut-capture(index);
+        keys.focus();
+    }
+
+    keys := FocusScope {
+        key-pressed(event) => {
+            if (root.capturing >= 0) {
+                if (event.text == Key.Escape) {
+                    root.capture(-1);
+                } else if (Backend.shortcut-pressed(root.capturing, event.text, event.modifiers.control, event.modifiers.alt, event.modifiers.shift, event.modifiers.meta)) {
+                    root.capturing = -1;
+                }
+                return accept;
+            }
+            return reject;
+        }
+        // A click in the section, outside any field, stops waiting for a combination.
+        TouchArea {
+            clicked => { root.capture(-1); }
+        }
+        VerticalLayout {
+            spacing: 10px;
+            Text {
+                text: @tr("Définissez vos raccourcis clavier pour Platinum. Les raccourcis peuvent utiliser des modificateurs tels que Ctrl, Maj, Alt ou une touche unique (F1 à F24, pavé numérique, touches multimédia). Cliquez sur un champ puis appuyez sur la combinaison ; Échap. annule. Ils marchent dans toutes les applications, fenêtre de Platinum fermée. Ceux du mix de stream n'agissent qu'en mode streamer.");
+                color: Palette.dim;
+                font-size: 11px;
+                wrap: word-wrap;
+            }
+            HorizontalLayout {
+                spacing: 6px;
+                Icon {
+                    y: 1px;
+                    name: "info";
+                    size: 12px;
+                    tint: Palette.faint;
+                }
+                Text {
+                    horizontal-stretch: 1;
+                    text: root.applies;
+                    color: Palette.faint;
+                    font-size: 10px;
+                    wrap: word-wrap;
+                }
+            }
+            if root.note != "": Text {
+                text: root.note;
+                color: Palette.amber;
+                font-size: 11px;
+                wrap: word-wrap;
+            }
+            if root.conflicts: Text {
+                text: @tr("Raccourci déjà assigné : les combinaisons en orange servent à plusieurs actions, seule la première fonctionne.");
+                color: Palette.amber;
+                font-size: 11px;
+                wrap: word-wrap;
+            }
+            if !root.daemon-running: Text {
+                text: @tr("Platinum est arrêté : les raccourcis et les superpositions marcheront dès qu'il sera démarré.");
+                color: Palette.faint;
+                font-size: 11px;
+                wrap: word-wrap;
+            }
+            HorizontalLayout {
+                spacing: 10px;
+                for index in [0, 1, 2]: ShortcutCard {
+                    width: root.cell;
+                    group: root.groups[index];
+                    capturing: root.capturing;
+                    capture(action) => { root.capture(action); }
+                }
+            }
+            // The Micro card has no stream mix's actions: shorter than its neighbours.
+            HorizontalLayout {
+                spacing: 10px;
+                for index in [3, 4, 5]: VerticalLayout {
+                    width: root.cell;
+                    alignment: start;
+                    ShortcutCard {
+                        group: root.groups[index];
+                        capturing: root.capturing;
+                        capture(action) => { root.capture(action); }
+                    }
+                }
+            }
+            HorizontalLayout {
+                spacing: 10px;
+                for index in [6, 7]: VerticalLayout {
+                    width: root.cell;
+                    alignment: start;
+                    ShortcutCard {
+                        group: root.groups[index];
+                        capturing: root.capturing;
+                        capture(action) => { root.capture(action); }
+                    }
+                }
+                // GG's "Superpositions".
+                Rectangle {
+                    width: root.cell;
+                    border-radius: 6px;
+                    background: Palette.panel;
+                    border-width: 1px;
+                    border-color: root.overlays-on ? Palette.edge : Palette.hairline;
+                    VerticalLayout {
+                        padding: 14px;
+                        padding-top: 12px;
+                        spacing: 8px;
+                        alignment: start;
+                        HorizontalLayout {
+                            height: 20px;
+                            spacing: 8px;
+                            Icon {
+                                y: (parent.height - self.height) / 2;
+                                name: "info";
+                                size: 16px;
+                                tint: Palette.text;
+                            }
+                            Label {
+                                text: @tr("SUPERPOSITIONS");
+                                color: Palette.dim;
+                                vertical-alignment: center;
+                            }
+                        }
+                        SwitchRow {
+                            text: @tr("Afficher les superpositions");
+                            on: root.overlays-on;
+                            toggled(on) => { Backend.set-overlays(on); }
+                        }
+                        Text {
+                            text: @tr("Platinum affichera une animation pour vous avertir qu'un événement a eu lieu, sans prendre le clavier ni la souris.");
+                            color: Palette.faint;
+                            font-size: 11px;
+                            wrap: word-wrap;
+                        }
+                        Text {
+                            text: @tr("Position de la superposition");
+                            color: root.overlays-on ? Palette.dim : Palette.faint;
+                            font-size: 12px;
+                        }
+                        Select {
+                            model: root.positions;
+                            current: root.overlay-position;
+                            enabled: root.overlays-on;
+                            chosen(index) => { Backend.set-overlay-position(index); }
+                        }
+                        SwitchRow {
+                            text: @tr("Volume");
+                            on: root.overlay-volume;
+                            enabled: root.overlays-on;
+                            toggled(on) => { Backend.set-overlay-kind(0, on); }
+                        }
+                        SwitchRow {
+                            text: @tr("Activer/désactiver la coupure du son");
+                            on: root.overlay-mute;
+                            enabled: root.overlays-on;
+                            toggled(on) => { Backend.set-overlay-kind(1, on); }
+                        }
+                        SwitchRow {
+                            text: @tr("Changement de périphérique");
+                            on: root.overlay-device;
+                            enabled: root.overlays-on;
+                            toggled(on) => { Backend.set-overlay-kind(2, on); }
+                        }
+                        HorizontalLayout {
+                            alignment: start;
+                            Button {
+                                text: @tr("Aperçu");
+                                enabled: root.overlays-on && root.can-preview;
+                                clicked => { Backend.preview-overlay(); }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

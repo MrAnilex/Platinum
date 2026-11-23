@@ -1,0 +1,675 @@
+// The parametric equalizer, after GG's (ParametricEqualizer, BandMarkerTooltip): frequency zones
+// above the graph, frequency grid (log scale, 20 Hz to 20 kHz), gain grid, the response curve
+// computed on the Rust side (boosts included) with the boosts marked, and one point per filter.
+// - dragging a point moves its filter (frequency and gain) and turns it on; a click selects it and
+//   opens its editor (switch, type, gain, frequency, Q); the two side handles of the selected
+//   point and the wheel over any point change its Q;
+// - near the curve, a "+" offers to turn on the first filter that is off, there (GG's behaviour);
+// - a right click on a point offers "Réinitialiser" (the preset's own filter) and "Supprimer"
+//   (the filter turned off).
+// A filter that is off is drawn hollow and left out of the curve. While the equalizer is off the
+// graph only shows. Everything drawn comes from Rust; the selection and the "+" are the graph's
+// own.
+
+import { Palette, Toggle, Select, MenuFrame, MenuLine } from "controls.slint";
+import { Icon } from "icons.slint";
+
+// A filter as the graph draws it and its editor shows it (src/main.rs, band_view).
+export struct BandView {
+    enabled: bool,
+    // Across the graph, 0 (20 Hz) to 1 (20 kHz).
+    x: float,
+    gain: float,
+    frequency: float,
+    q: float,
+    // Its type in GG's menu (EqEditor.kinds); -1 for a type the menu does not offer.
+    kind: int,
+    kind-name: string,
+    gain-text: string,
+    frequency-text: string,
+    q-text: string,
+}
+
+// A playback boost (bass, voice, treble), marked on the graph at its frequency, as GG does.
+export struct MarkerView {
+    x: float,
+    // Its gain when it is on, 0 dB when it is off (GG's boost markers).
+    gain: float,
+    on: bool,
+    // B, V or A (Basses, Voix, Aigus), as the knobs under the graph.
+    letter: string,
+}
+
+// The one equalizer on screen, shared by the tabs like its bands: the filter selected, the curve
+// sampled for the "+", and what the graph and the editor ask for (channel key, filter from 0).
+export global EqEditor {
+    in-out property <int> selected: -1;
+    // The curve's gain in dB at 161 points across the graph (src/main.rs, CURVE_SAMPLES).
+    in property <[float]> curve-samples;
+    // Some filter is off, so the "+" can turn one on.
+    in property <bool> can-add;
+    // GG's six filter types, in French (presets::FILTER_TYPES).
+    in property <[string]> kinds;
+    // Layout check only: the filter whose right-click menu opens, the "+" drawn at that place
+    // across the graph (0..1, -1 for none), the selected filter's type menu opened, the filter
+    // whose reading shows as under the pointer.
+    in property <int> open-menu: -1;
+    in property <float> preview-plus: -1;
+    in property <bool> open-kinds;
+    in property <int> preview-hover: -1;
+    callback moved(string, int, float, float);
+    callback q-changed(string, int, float);
+    // Typed in the editor (0 gain, 1 frequency, 2 Q); Rust reads French numbers and units.
+    callback typed(string, int, int, string);
+    callback kind-chosen(string, int, int);
+    callback enabled-changed(string, int, bool);
+    callback reset(string, int);
+    // The "+" at a place across the graph and a gain: the filter turned on, or -1.
+    callback add(string, float, float) -> int;
+}
+
+// A filter's dot: filled when it is on and the equalizer is on, hollow when it is off.
+component BandDot inherits Rectangle {
+    in property <int> number;
+    in property <bool> enabled;
+    in property <bool> active;
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    background: root.enabled && root.active ? Palette.light : Palette.well;
+    border-width: 1.5px;
+    border-color: root.enabled ? Palette.light : Palette.faint;
+    Text {
+        width: parent.width;
+        height: parent.height;
+        text: root.number;
+        font-size: 8px;
+        font-weight: 700;
+        color: root.enabled && root.active ? Palette.base : (root.enabled ? Palette.text : Palette.dim);
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
+
+// A value of the band editor: what it shows, typed over when clicked. Enter applies what was
+// typed, Escape gives it up (GG's BandParam); the field then shows the filter's value again.
+component NumberField inherits VerticalLayout {
+    in property <string> label;
+    in property <string> value;
+    callback accepted(string);
+    // Gives up what was being typed (the field shows the value again).
+    public function give-up() {
+        input.clear-focus();
+    }
+    // The three fields of the editor share its width equally.
+    preferred-width: 60px;
+    horizontal-stretch: 1;
+    spacing: 3px;
+    Rectangle {
+        height: 24px;
+        border-radius: 3px;
+        background: Palette.well;
+        border-width: 1px;
+        border-color: input.has-focus ? Palette.light : (cell.has-hover ? Palette.edge : Palette.hairline);
+        cell := TouchArea {
+            mouse-cursor: text;
+            clicked => { input.focus(); }
+        }
+        input := TextInput {
+            x: 4px;
+            width: parent.width - 8px;
+            height: parent.height;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            single-line: true;
+            font-size: 11px;
+            color: self.has-focus ? Palette.text : transparent;
+            selection-background-color: #ffffff40;
+            // Typing starts from the value shown, all selected: typing replaces it.
+            changed has-focus => {
+                if (self.has-focus) {
+                    self.text = root.value;
+                    self.select-all();
+                }
+            }
+            accepted => {
+                root.accepted(self.text);
+                self.clear-focus();
+            }
+            key-pressed(event) => {
+                if (event.text == Key.Escape) {
+                    self.clear-focus();
+                    return accept;
+                }
+                return reject;
+            }
+        }
+        if !input.has-focus: Text {
+            width: parent.width;
+            height: parent.height;
+            text: root.value;
+            color: Palette.text;
+            font-size: 11px;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+    }
+    Text {
+        text: root.label;
+        color: Palette.faint;
+        font-size: 10px;
+        horizontal-alignment: center;
+    }
+}
+
+// The selected filter's editor, as GG's band tooltip: its number and switch, its type, and its
+// gain, frequency and Q.
+component BandEditor inherits Rectangle {
+    in property <BandView> band;
+    in property <int> number;
+    in property <bool> active;
+    in property <bool> open-kinds;
+    callback typed(int, string);
+    callback kind-chosen(int);
+    callback enabled-changed(bool);
+    // Another point was clicked: the editor moves to it, and what was typed for the previous one
+    // is given up (clicking a point does not take the focus away, and Enter would send it there).
+    changed number => {
+        gain-field.give-up();
+        frequency-field.give-up();
+        q-field.give-up();
+    }
+    width: 272px;
+    height: 124px;
+    border-radius: 5px;
+    background: Palette.raised;
+    border-width: 1px;
+    border-color: Palette.edge;
+    drop-shadow-blur: 14px;
+    drop-shadow-color: #000000b0;
+    // Clicks on the editor stay on it: on the graph below, they would close it or add a filter.
+    TouchArea { }
+    VerticalLayout {
+        padding: 10px;
+        spacing: 8px;
+        HorizontalLayout {
+            height: 20px;
+            spacing: 8px;
+            BandDot {
+                y: 1px;
+                number: root.number;
+                enabled: root.band.enabled;
+                active: root.active;
+            }
+            Text {
+                text: @tr("Bande {}", root.number);
+                color: Palette.text;
+                font-size: 11px;
+                font-weight: 700;
+                vertical-alignment: center;
+            }
+            Rectangle {
+                horizontal-stretch: 1;
+            }
+            Text {
+                text: root.band.enabled ? @tr("Activé") : @tr("Désactivé");
+                color: root.band.enabled ? Palette.text : Palette.dim;
+                font-size: 11px;
+                vertical-alignment: center;
+            }
+            Toggle {
+                y: 1px;
+                on: root.band.enabled;
+                toggled(on) => { root.enabled-changed(on); }
+            }
+        }
+        Select {
+            height: 26px;
+            model: EqEditor.kinds;
+            current: root.band.kind;
+            placeholder: root.band.kind-name;
+            open-request: root.open-kinds;
+            chosen(index) => { root.kind-chosen(index); }
+        }
+        HorizontalLayout {
+            spacing: 8px;
+            gain-field := NumberField {
+                label: @tr("Gain");
+                value: root.band.gain-text;
+                accepted(text) => { root.typed(0, text); }
+            }
+            frequency-field := NumberField {
+                label: @tr("Fréq.");
+                value: root.band.frequency-text;
+                accepted(text) => { root.typed(1, text); }
+            }
+            q-field := NumberField {
+                label: @tr("Q");
+                value: root.band.q-text;
+                accepted(text) => { root.typed(2, text); }
+            }
+        }
+    }
+}
+
+export component EqGraph inherits Rectangle {
+    in property <string> key;
+    in property <[BandView]> bands;
+    // The bass, voice and treble boosts (playback channels only).
+    in property <[MarkerView]> markers;
+    // The curve as path commands in a 1000 × 240 box, 0 dB in the middle, ±range at the edges.
+    in property <string> curve;
+    // The equalizer is on: the graph is lit and can be edited.
+    in property <bool> active;
+    // The zones above the graph: a voice's (Chat, Micro) or the usual ones.
+    in property <bool> voice-zones;
+    in property <float> range: 12;
+    border-radius: 4px;
+    background: Palette.well;
+    border-width: 1px;
+    border-color: Palette.hairline;
+    clip: true;
+
+    property <length> zones-height: 24px;
+    property <length> plot-top: root.zones-height + 10px;
+    property <length> plot-height: root.height - root.plot-top - 24px;
+    // GG's Q handles: 150 px apart at Q 0.5, 30 px at Q 10, in between in proportion.
+    property <float> q-low: 0.5;
+    property <float> q-high: 10;
+    property <length> span-wide: 150px;
+    property <length> span-narrow: 30px;
+    // The point under the pointer and the one being dragged, for their reading: the selected
+    // filter has its editor instead, except while it is dragged (the editor would move with it).
+    // (The layout check can name the point under the pointer; the first hover replaces it.)
+    property <int> hovered: EqEditor.preview-hover;
+    property <int> dragged: -1;
+    property <int> reading-band: root.dragged >= 0 ? root.dragged : (root.hovered != EqEditor.selected || !root.active ? root.hovered : -1);
+    property <bool> has-selection: root.active && EqEditor.selected >= 0 && EqEditor.selected < root.bands.length;
+    // The zones, from GG's own boundaries (`363.js` and `_ne` in GG's renderer), placed at
+    // log10(f / 20) / 3 across the graph; the names are generic acoustic words.
+    property <[{ from: float, to: float, name: string }]> zones: root.voice-zones ? [
+        { from: 0, to: 0.23299, name: @tr("GRONDEMENTS") },
+        { from: 0.23299, to: 0.45073, name: @tr("CORPS DE LA VOIX") },
+        { from: 0.45073, to: 0.56632, name: @tr("RÉSONANCE") },
+        { from: 0.56632, to: 0.76701, name: @tr("MÉDIUMS") },
+        { from: 0.76701, to: 0.86735, name: @tr("SIBILANTES") },
+        { from: 0.86735, to: 1, name: @tr("AIR") }
+    ] : [
+        { from: 0, to: 0.15904, name: @tr("SUB-BASSES") },
+        { from: 0.15904, to: 0.36564, name: @tr("BASSES") },
+        { from: 0.36564, to: 0.46598, name: @tr("MÉDIUMS BAS") },
+        { from: 0.46598, to: 0.66667, name: @tr("MÉDIUMS") },
+        { from: 0.66667, to: 0.82571, name: @tr("MÉDIUMS HAUTS") },
+        { from: 0.82571, to: 1, name: @tr("AIGUS") }
+    ];
+
+    pure function y-of(gain: float) -> length {
+        return root.plot-top + root.plot-height * (0.5 - max(-root.range, min(root.range, gain)) / root.range / 2);
+    }
+    pure function gain-at(y: length) -> float {
+        return max(-root.range, min(root.range, (0.5 - (y - root.plot-top) / root.plot-height) * 2 * root.range));
+    }
+    pure function q-span(q: float) -> length {
+        return root.span-wide - (max(root.q-low, min(root.q-high, q)) - root.q-low) / (root.q-high - root.q-low) * (root.span-wide - root.span-narrow);
+    }
+    pure function span-q(span: length) -> float {
+        return root.q-low + (root.span-wide - max(root.span-narrow, min(root.span-wide, span))) / (root.span-wide - root.span-narrow) * (root.q-high - root.q-low);
+    }
+    // The curve's gain at a place across the graph, from Rust's samples.
+    pure function curve-gain(x: float) -> float {
+        return EqEditor.curve-samples.length > 0 ? EqEditor.curve-samples[round(max(0, min(1, x)) * (EqEditor.curve-samples.length - 1))] : 0;
+    }
+
+    // The right-click menu: which filter, and where.
+    property <int> menu-band: -1;
+    property <length> menu-x;
+    property <length> menu-y;
+    function open-menu(band: int, x: length, y: length) {
+        root.menu-band = band;
+        root.menu-x = x;
+        root.menu-y = y;
+        menu.show();
+    }
+    // Layout check: the menu of a filter opened from Rust.
+    property <int> menu-request: EqEditor.open-menu;
+    changed menu-request => {
+        if (root.menu-request >= 0 && root.menu-request < root.bands.length) {
+            EqEditor.selected = root.menu-request;
+            root.open-menu(root.menu-request, root.width * root.bands[root.menu-request].x + 6px, root.y-of(root.bands[root.menu-request].gain) + 6px);
+        }
+    }
+
+    // zones
+    Rectangle {
+        y: 0;
+        height: root.zones-height;
+        background: #ffffff05;
+    }
+    for zone[index] in root.zones: Rectangle {
+        x: root.width * zone.from;
+        y: 0;
+        width: root.width * (zone.to - zone.from);
+        height: root.zones-height;
+        if index > 0: Rectangle {
+            x: 0;
+            width: 1px;
+            background: Palette.hairline;
+        }
+        Text {
+            x: 4px;
+            width: parent.width - 8px;
+            height: parent.height;
+            text: zone.name;
+            color: Palette.faint;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            overflow: elide;
+        }
+    }
+    Rectangle {
+        y: root.zones-height;
+        height: 1px;
+        background: Palette.hairline;
+    }
+    // gain grid
+    for line in [{ db: 12, t: "+12" }, { db: 6, t: "+6" }, { db: 0, t: "0" }, { db: -6, t: "-6" }, { db: -12, t: "-12" }]: Rectangle {
+        y: root.y-of(line.db);
+        x: 0;
+        width: root.width;
+        height: 1px;
+        background: line.db == 0 ? Palette.edge : #ffffff08;
+        Text {
+            x: 8px;
+            y: line.db > 0 ? 3px : -14px;
+            text: line.t + " dB";
+            color: Palette.faint;
+            font-size: 9px;
+        }
+    }
+    // frequency grid
+    for mark in [
+        { x: 0.13265, t: "50" }, { x: 0.23299, t: "100" }, { x: 0.33333, t: "200" }, { x: 0.46598, t: "500" },
+        { x: 0.56632, t: "1k" }, { x: 0.66667, t: "2k" }, { x: 0.79931, t: "5k" }, { x: 0.89966, t: "10k" }
+    ]: Rectangle {
+        x: root.width * mark.x;
+        y: root.plot-top;
+        width: 1px;
+        height: root.plot-height;
+        background: #ffffff08;
+        Text {
+            x: -10px;
+            y: root.plot-height + 8px;
+            width: 20px;
+            horizontal-alignment: center;
+            text: mark.t;
+            color: Palette.faint;
+            font-size: 9px;
+        }
+    }
+    // curve
+    Path {
+        x: 0;
+        y: root.plot-top;
+        width: root.width;
+        height: root.plot-height;
+        viewbox-width: 1000;
+        viewbox-height: 240;
+        fit: fill;
+        commands: root.curve;
+        stroke: root.active ? Palette.light : Palette.faint;
+        stroke-width: 2px;
+        fill: transparent;
+    }
+    // boost markers
+    for marker in root.markers: Rectangle {
+        x: root.width * marker.x - self.width / 2;
+        y: root.y-of(marker.gain) - self.height / 2;
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        background: marker.on && root.active ? Palette.panel : Palette.well;
+        border-width: 1.5px;
+        border-color: marker.on && root.active ? Palette.light : Palette.faint;
+        Text {
+            width: parent.width;
+            height: parent.height;
+            text: marker.letter;
+            color: marker.on && root.active ? Palette.text : Palette.faint;
+            font-size: 8px;
+            font-weight: 700;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+    }
+
+    // The graph's own area: near the curve it offers the "+", elsewhere a click closes the editor.
+    property <float> pointer-x: max(0, min(1, area.mouse-x / root.width));
+    property <bool> in-plot: area.mouse-y >= root.plot-top && area.mouse-y <= root.plot-top + root.plot-height;
+    property <bool> near-curve: area.has-hover && root.in-plot && abs((area.mouse-y - root.y-of(root.curve-gain(root.pointer-x))) / 1px) <= 10;
+    property <bool> offers-plus: root.active && EqEditor.can-add && root.near-curve;
+    property <float> plus-x: EqEditor.preview-plus >= 0 ? EqEditor.preview-plus : root.pointer-x;
+    property <float> plus-gain: max(-root.range, min(root.range, root.curve-gain(root.plus-x)));
+    area := TouchArea {
+        enabled: root.active;
+        mouse-cursor: root.offers-plus ? MouseCursor.pointer : MouseCursor.default;
+        clicked => {
+            if (root.offers-plus) {
+                EqEditor.selected = EqEditor.add(root.key, root.plus-x, root.plus-gain);
+            } else {
+                EqEditor.selected = -1;
+            }
+        }
+    }
+    if root.active && EqEditor.can-add && (root.offers-plus || EqEditor.preview-plus >= 0): Rectangle {
+        x: root.width * root.plus-x - 10px;
+        y: root.y-of(root.plus-gain) - 10px;
+        width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        background: Palette.base;
+        border-width: 1.5px;
+        border-color: Palette.light;
+        Icon {
+            x: 3px;
+            y: 3px;
+            name: "plus";
+            size: 14px;
+            tint: Palette.light;
+        }
+        Rectangle {
+            x: root.plus-x > 0.8 ? -self.width - 6px : parent.width + 6px;
+            y: (parent.height - self.height) / 2;
+            width: hint.preferred-width + 14px;
+            height: 22px;
+            border-radius: 3px;
+            background: Palette.raised;
+            border-width: 1px;
+            border-color: Palette.edge;
+            hint := Text {
+                width: parent.width;
+                height: parent.height;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                text: @tr("Ajouter une bande");
+                color: Palette.text;
+                font-size: 10px;
+            }
+        }
+    }
+
+    // the selected filter's Q handles
+    if root.has-selection: handles := Rectangle {
+        property <BandView> band: root.bands[EqEditor.selected];
+        property <length> cx: root.width * self.band.x;
+        property <length> cy: root.y-of(self.band.gain);
+        property <length> span: root.q-span(self.band.q);
+        x: 0;
+        y: 0;
+        width: root.width;
+        height: root.height;
+        Rectangle {
+            x: handles.cx - handles.span / 2;
+            y: handles.cy;
+            width: handles.span;
+            height: 1px;
+            background: #ffffff40;
+        }
+        for side in [-1, 1]: Rectangle {
+            x: handles.cx + side * handles.span / 2 - self.width / 2;
+            y: handles.cy - self.height / 2;
+            width: 14px;
+            height: 26px;
+            Rectangle {
+                x: 5px;
+                y: 4px;
+                width: 4px;
+                height: 18px;
+                border-radius: 2px;
+                background: grip.pressed || grip.has-hover ? Palette.light : Palette.dim;
+            }
+            grip := TouchArea {
+                mouse-cursor: ew-resize;
+                moved => {
+                    if (self.pressed) {
+                        EqEditor.q-changed(root.key, EqEditor.selected, root.span-q(abs((parent.x + self.mouse-x - handles.cx) / 1px) * 2px));
+                    }
+                }
+            }
+        }
+    }
+
+    // points
+    for band[index] in root.bands: Rectangle {
+        // Lit points above unlit ones, the selected one above all: GG's presets often put an
+        // unlit filter on the same spot as a lit one, which would otherwise hide it and take the clicks.
+        z: index == EqEditor.selected ? 2 : (band.enabled ? 1 : 0);
+        property <length> cx: root.width * band.x;
+        property <length> cy: root.y-of(band.gain);
+        x: self.cx - self.width / 2;
+        y: self.cy - self.height / 2;
+        width: 28px;
+        height: 28px;
+        if index == EqEditor.selected && root.active: Rectangle {
+            border-radius: 14px;
+            background: #ffffff14;
+            border-width: 1.5px;
+            border-color: Palette.light;
+        }
+        BandDot {
+            x: 5px;
+            y: 5px;
+            number: index + 1;
+            enabled: band.enabled;
+            active: root.active;
+        }
+        grab := TouchArea {
+            // A press becomes a drag only past a few pixels, so that a click selects a filter that
+            // is off without turning it on.
+            property <bool> dragging;
+            enabled: root.active;
+            mouse-cursor: self.dragging ? MouseCursor.move : MouseCursor.pointer;
+            changed has-hover => {
+                if (self.has-hover) {
+                    root.hovered = index;
+                } else if (root.hovered == index) {
+                    root.hovered = -1;
+                }
+            }
+            pointer-event(event) => {
+                if (event.kind == PointerEventKind.down) {
+                    self.dragging = false;
+                    EqEditor.selected = index;
+                    if (event.button == PointerEventButton.right) {
+                        root.open-menu(index, parent.x + self.mouse-x, parent.y + self.mouse-y);
+                    }
+                }
+                if (event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel) {
+                    self.dragging = false;
+                    if (root.dragged == index) {
+                        root.dragged = -1;
+                    }
+                }
+            }
+            moved => {
+                if (self.pressed) {
+                    if (!self.dragging && (abs((self.mouse-x - self.pressed-x) / 1px) > 3 || abs((self.mouse-y - self.pressed-y) / 1px) > 3)) {
+                        self.dragging = true;
+                        root.dragged = index;
+                    }
+                    if (self.dragging) {
+                        // The point keeps where it was grabbed under the pointer.
+                        EqEditor.moved(root.key, index,
+                            max(0, min(1, (parent.x + self.mouse-x - self.pressed-x + parent.width / 2) / root.width)),
+                            root.gain-at(parent.y + self.mouse-y - self.pressed-y + parent.height / 2));
+                    }
+                }
+            }
+            scroll-event(event) => {
+                EqEditor.selected = index;
+                EqEditor.q-changed(root.key, index, max(root.q-low, min(root.q-high, band.q * (event.delta-y > 0 ? 1.12 : 1 / 1.12))));
+                return accept;
+            }
+        }
+    }
+    // the reading of the point under the pointer or being dragged
+    if root.reading-band >= 0 && root.reading-band < root.bands.length: Rectangle {
+        property <BandView> band: root.bands[root.reading-band];
+        property <length> cx: root.width * self.band.x;
+        x: self.cx + 18px + self.width > root.width ? self.cx - 18px - self.width : self.cx + 18px;
+        y: root.y-of(self.band.gain) - self.height / 2;
+        width: reading.preferred-width + 16px;
+        height: 24px;
+        border-radius: 3px;
+        background: Palette.raised;
+        border-width: 1px;
+        border-color: Palette.edge;
+        reading := Text {
+            width: parent.width;
+            height: parent.height;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            text: parent.band.frequency-text + "   " + parent.band.gain-text + (parent.band.enabled ? "" : "   " + @tr("(désactivée)"));
+            color: Palette.text;
+            font-size: 10px;
+        }
+    }
+    // the selected filter's editor, above its point when there is room, below otherwise
+    if root.has-selection && root.dragged < 0: BandEditor {
+        property <BandView> shown: root.bands[EqEditor.selected];
+        property <length> cx: root.width * self.shown.x;
+        property <length> cy: root.y-of(self.shown.gain);
+        x: max(6px, min(root.width - self.width - 6px, self.cx - self.width / 2));
+        y: self.cy - 26px - self.height >= 4px ? self.cy - 26px - self.height : self.cy + 26px;
+        band: self.shown;
+        number: EqEditor.selected + 1;
+        active: root.active;
+        open-kinds: EqEditor.open-kinds;
+        typed(value, text) => { EqEditor.typed(root.key, EqEditor.selected, value, text); }
+        kind-chosen(kind) => { EqEditor.kind-chosen(root.key, EqEditor.selected, kind); }
+        enabled-changed(on) => { EqEditor.enabled-changed(root.key, EqEditor.selected, on); }
+    }
+    menu := PopupWindow {
+        x: min(root.menu-x, root.width - 190px);
+        y: root.menu-y + 4px;
+        width: 180px;
+        MenuFrame {
+            MenuLine {
+                text: @tr("Réinitialiser");
+                icon: "reset";
+                clicked => { EqEditor.reset(root.key, root.menu-band); }
+            }
+            MenuLine {
+                text: @tr("Supprimer");
+                icon: "trash";
+                enabled: root.menu-band >= 0 && root.menu-band < root.bands.length && root.bands[root.menu-band].enabled;
+                clicked => {
+                    EqEditor.enabled-changed(root.key, root.menu-band, false);
+                    EqEditor.selected = -1;
+                }
+            }
+        }
+    }
+}

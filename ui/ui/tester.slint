@@ -1,0 +1,147 @@
+// The "Tester" row of the channel tabs' header (GG's audio sample player and microphone test):
+// on Gaming, Chat, Media and Aux, one button per test sound, played into the channel; on Micro,
+// record what the virtual microphone carries, then hear it on the Chat output. Rust (src/tester.rs)
+// plays and records; this row only shows its state and asks.
+
+import { Palette, Label, LevelBar } from "controls.slint";
+import { Icon } from "icons.slint";
+import { Backend, TestSample, MicTest } from "backend.slint";
+
+// A button with a transport shape and a word, lit while what it starts is under way.
+component TransportButton inherits Rectangle {
+    in property <string> icon;
+    in property <string> text;
+    in property <bool> lit;
+    in property <bool> enabled: true;
+    callback clicked;
+    width: label.preferred-width + 46px;
+    horizontal-stretch: 0;
+    height: 30px;
+    border-radius: 4px;
+    opacity: root.enabled ? 1 : 0.35;
+    background: root.lit ? Palette.light : (area.has-hover && root.enabled ? Palette.raised : transparent);
+    border-width: 1px;
+    border-color: root.lit ? Palette.light : Palette.edge;
+    HorizontalLayout {
+        padding-left: 12px;
+        padding-right: 14px;
+        spacing: 8px;
+        Icon {
+            y: (parent.height - self.height) / 2;
+            name: root.icon;
+            size: 12px;
+            solid: true;
+            tint: root.lit ? Palette.base : Palette.text;
+        }
+        label := Text {
+            text: root.text;
+            color: root.lit ? Palette.base : Palette.text;
+            font-size: 12px;
+            font-weight: 600;
+            vertical-alignment: center;
+        }
+    }
+    area := TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}
+
+// Why the buttons are dimmed, or what went wrong: one line, cut short when it does not fit.
+component Note inherits HorizontalLayout {
+    in property <string> text;
+    horizontal-stretch: 1;
+    spacing: 8px;
+    if root.text != "": Icon {
+        y: (parent.height - self.height) / 2;
+        name: "info";
+        size: 14px;
+        tint: Palette.dim;
+    }
+    Text {
+        horizontal-stretch: 1;
+        text: root.text;
+        color: Palette.dim;
+        font-size: 12px;
+        vertical-alignment: center;
+        overflow: elide;
+    }
+}
+
+// A channel's test sounds. `ready` is false when the channel has no output or the sounds are
+// missing: the note then says which.
+export component TestBar inherits HorizontalLayout {
+    in property <string> key;
+    in property <[TestSample]> samples;
+    in property <bool> ready;
+    in property <string> note;
+    spacing: 6px;
+    Label {
+        width: 100px;
+        text: @tr("TESTER");
+        vertical-alignment: center;
+    }
+    for sample[index] in root.samples: TransportButton {
+        icon: sample.playing ? "pause" : "play";
+        text: sample.label;
+        lit: sample.playing;
+        enabled: root.ready;
+        clicked => { Backend.play-sample(root.key, index); }
+    }
+    Rectangle {
+        width: 8px;
+    }
+    Note {
+        text: root.note;
+    }
+}
+
+// The microphone test: record, then listen. While recording, a level meter and the time.
+export component MicTestBar inherits HorizontalLayout {
+    in property <MicTest> test;
+    in property <string> note;
+    spacing: 6px;
+    Label {
+        width: 100px;
+        text: @tr("TESTER");
+        vertical-alignment: center;
+    }
+    TransportButton {
+        icon: root.test.phase == 1 ? "stop" : "record";
+        // "Arrêter" and "Enregistrer" also mean "stop Platinum" and "save" elsewhere: a context
+        // gives the microphone test its own translations (record, stop recording).
+        text: root.test.phase == 1 ? @tr("test du micro" => "Arrêter") : @tr("test du micro" => "Enregistrer");
+        lit: root.test.phase == 1;
+        enabled: root.test.phase == 1 || root.test.can-record;
+        clicked => { Backend.mic-test(0); }
+    }
+    TransportButton {
+        icon: root.test.phase == 3 ? "pause" : "play";
+        text: root.test.phase == 3 ? @tr("Pause") : @tr("Écouter");
+        lit: root.test.phase == 3;
+        enabled: root.test.phase != 1;
+        clicked => { Backend.mic-test(1); }
+    }
+    Rectangle {
+        width: 8px;
+    }
+    if root.test.phase == 1: LevelBar {
+        width: 150px;
+        y: (parent.height - self.height) / 2;
+        level: root.test.level;
+    }
+    if root.test.time != "": Text {
+        horizontal-stretch: 0;
+        text: root.test.time;
+        color: root.test.phase == 0 || root.test.phase == 2 ? Palette.dim : Palette.text;
+        font-size: 12px;
+        vertical-alignment: center;
+    }
+    if root.test.time != "": Rectangle {
+        width: 8px;
+    }
+    Note {
+        text: root.note;
+    }
+}

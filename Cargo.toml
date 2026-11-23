@@ -1,0 +1,18 @@
+[package]
+name = "platinum"
+version = "0.1.0"
+edition = "2024"
+description = "Lightweight replacement for SteelSeries GG's Sonar on Windows: per-channel mixer, effects, presets and microphone relay"
+license = "GPL-3.0-only"
+
+[dependencies]
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[workspace]
+members = [".", "ui", "setup"]

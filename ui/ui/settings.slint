@@ -1,0 +1,942 @@
+// The settings page ("Paramètres"), opened by the button next to the daemon's state: every option
+// of Platinum in one place, by section, instead of switches scattered around the window. Each
+// option says when a change takes effect (the notes come from src/settings.rs, which read it in
+// the daemon). Like the rest of the window, it shows what Rust put in its properties and asks for
+// changes through the Backend global; the questions before a change that cuts the sound (a
+// microphone, streamer mode, a restart) are the window's own dialogs.
+
+import { ScrollView } from "std-widgets.slint";
+import { Palette, Label, Toggle, Button, Select, Segmented, Slider, TextField, AppliesNote } from "controls.slint";
+import { Icon } from "icons.slint";
+import { Backend, Section, SettingId, LinkRow, AboutView, CrashRow } from "backend.slint";
+import { PriorityRow, PriorityList } from "devices.slint";
+import { ShortcutGroup, ShortcutsSection } from "shortcuts.slint";
+
+// One line of the navigation.
+component NavItem inherits Rectangle {
+    in property <string> icon;
+    in property <string> text;
+    in property <bool> active;
+    callback clicked;
+    height: 36px;
+    border-radius: 4px;
+    background: root.active ? Palette.raised : (area.has-hover ? #ffffff08 : transparent);
+    Rectangle {
+        x: 0;
+        y: 9px;
+        width: 2px;
+        height: parent.height - 18px;
+        border-radius: 1px;
+        background: root.active ? Palette.light : transparent;
+    }
+    HorizontalLayout {
+        padding-left: 14px;
+        padding-right: 10px;
+        spacing: 10px;
+        Icon {
+            y: (parent.height - self.height) / 2;
+            name: root.icon;
+            size: 16px;
+            tint: root.active ? Palette.text : Palette.dim;
+        }
+        Text {
+            text: root.text;
+            color: root.active ? Palette.text : Palette.dim;
+            font-size: 12px;
+            font-weight: root.active ? 600 : 400;
+            vertical-alignment: center;
+            overflow: elide;
+        }
+    }
+    area := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}
+
+// A card of the page: a heading in small capitals, then its options; outlined when what it holds
+// is on.
+component Card inherits Rectangle {
+    in property <string> title;
+    in property <string> icon;
+    in property <bool> lit;
+    border-radius: 6px;
+    background: Palette.panel;
+    border-width: 1px;
+    border-color: root.lit ? Palette.edge : Palette.hairline;
+    VerticalLayout {
+        padding: 16px;
+        spacing: 12px;
+        HorizontalLayout {
+            height: 20px;
+            spacing: 8px;
+            Icon {
+                y: (parent.height - self.height) / 2;
+                name: root.icon;
+                size: 16px;
+                tint: Palette.text;
+            }
+            Label {
+                text: root.title;
+                color: Palette.dim;
+                vertical-alignment: center;
+            }
+        }
+        @children
+    }
+}
+
+// A thin line between two options of a card.
+component Divider inherits Rectangle {
+    height: 1px;
+    background: Palette.hairline;
+}
+
+// An option: its name, what it does, when a change takes effect, and its control on the right.
+component OptionLine inherits HorizontalLayout {
+    in property <string> title;
+    in property <string> text;
+    in property <string> note;
+    in property <bool> enabled: true;
+    spacing: 24px;
+    VerticalLayout {
+        horizontal-stretch: 1;
+        alignment: center;
+        spacing: 4px;
+        Text {
+            text: root.title;
+            color: root.enabled ? Palette.text : Palette.faint;
+            font-size: 13px;
+            font-weight: 600;
+            wrap: word-wrap;
+        }
+        if root.text != "": Text {
+            text: root.text;
+            color: root.enabled ? Palette.dim : Palette.faint;
+            font-size: 11px;
+            wrap: word-wrap;
+        }
+        if root.note != "": AppliesNote {
+            text: root.note;
+        }
+    }
+    VerticalLayout {
+        horizontal-stretch: 0;
+        alignment: center;
+        @children
+    }
+}
+
+// A line of the "À propos" section: what, then its value.
+component InfoLine inherits HorizontalLayout {
+    in property <string> label;
+    in property <string> value;
+    spacing: 16px;
+    Text {
+        width: 140px;
+        text: root.label;
+        color: Palette.dim;
+        font-size: 12px;
+    }
+    Text {
+        horizontal-stretch: 1;
+        text: root.value;
+        color: Palette.text;
+        font-size: 12px;
+        wrap: word-wrap;
+    }
+}
+
+// A warning under an option.
+component Warning inherits Text {
+    color: Palette.amber;
+    font-size: 11px;
+    wrap: word-wrap;
+}
+
+// One of the user's links of a Gaming preset to a program, with "Dissocier".
+component LinkLine inherits Rectangle {
+    in property <LinkRow> link;
+    height: 48px;
+    border-radius: 4px;
+    background: Palette.well;
+    border-width: 1px;
+    border-color: Palette.hairline;
+    HorizontalLayout {
+        padding-left: 12px;
+        padding-right: 9px;
+        spacing: 12px;
+        Icon {
+            y: (parent.height - self.height) / 2;
+            name: "game";
+            size: 16px;
+            tint: Palette.dim;
+        }
+        VerticalLayout {
+            horizontal-stretch: 1;
+            alignment: center;
+            spacing: 2px;
+            Text {
+                text: root.link.title;
+                color: Palette.text;
+                font-size: 12px;
+                overflow: elide;
+            }
+            Text {
+                text: @tr("{} · préréglage « {} »", root.link.exe, root.link.preset);
+                color: Palette.dim;
+                font-size: 10px;
+                overflow: elide;
+            }
+        }
+        Button {
+            y: (parent.height - self.height) / 2;
+            text: @tr("Dissocier");
+            clicked => { Backend.unlink-game(root.link.exe); }
+        }
+    }
+}
+
+// One crash report of this PC: when, which program, why; "Voir" and "Envoyer le rapport…".
+component CrashLine inherits Rectangle {
+    in property <CrashRow> report;
+    height: 52px;
+    border-radius: 4px;
+    background: Palette.well;
+    border-width: 1px;
+    border-color: Palette.hairline;
+    HorizontalLayout {
+        padding-left: 12px;
+        padding-right: 9px;
+        spacing: 12px;
+        Icon {
+            y: (parent.height - self.height) / 2;
+            name: "alert";
+            size: 16px;
+            tint: Palette.dim;
+        }
+        VerticalLayout {
+            horizontal-stretch: 1;
+            alignment: center;
+            spacing: 2px;
+            Text {
+                text: @tr("{} · {}", root.report.date, root.report.program);
+                color: Palette.text;
+                font-size: 12px;
+                overflow: elide;
+            }
+            Text {
+                text: root.report.reason;
+                color: Palette.dim;
+                font-size: 10px;
+                overflow: elide;
+            }
+        }
+        Button {
+            y: (parent.height - self.height) / 2;
+            text: @tr("Voir");
+            clicked => { Backend.crash-view(root.report.name); }
+        }
+        Button {
+            y: (parent.height - self.height) / 2;
+            text: @tr("Envoyer le rapport…");
+            clicked => { Backend.crash-send(root.report.name); }
+        }
+    }
+}
+
+export component SettingsPage inherits Rectangle {
+    in-out property <int> section;
+    // The daemon runs (shortcuts are heard, a restart can be asked for).
+    in property <bool> daemon-running;
+    // What waits for the daemon's next start, in a sentence; empty when nothing does.
+    in property <string> pending;
+    // When a change of each option takes effect, by SettingId.
+    in property <[string]> notes;
+    // Général
+    in property <bool> start-with-windows;
+    in property <bool> startup-blocked;
+    in property <bool> installed;
+    in property <bool> start-on-open;
+    in property <bool> platinum-names;
+    // The language menu (Windows' language first, then each language in itself) and its choice.
+    in property <[string]> languages;
+    in property <int> language-index;
+    // Micro
+    in property <[string]> mic-inputs;
+    in property <int> mic-current: -1;
+    in property <bool> mic-effects;
+    in property <float> mic-gain;
+    in property <[string]> fallback-inputs;
+    in property <int> fallback-input-index;
+    in property <[PriorityRow]> input-priority;
+    in property <[string]> input-addable;
+    in property <string> preferred-microphone;
+    // Sorties
+    in property <bool> auto-switch;
+    in property <[PriorityRow]> output-priority;
+    in property <[string]> output-addable;
+    in property <[string]> fallback-outputs;
+    in property <int> fallback-output-index;
+    // Mode streamer, streaming à distance
+    in property <bool> streamer;
+    in property <bool> follow-streaming;
+    in property <bool> route-apps;
+    // The streaming outputs' field (the user's while he types), what platinum.ini holds, and the
+    // default list.
+    in-out property <string> sinks-text;
+    in property <string> sinks-saved;
+    in property <string> sinks-default;
+    // Jeux
+    in property <bool> game-presets;
+    in property <bool> arena-speakers;
+    in property <[LinkRow]> links;
+    // Raccourcis et superpositions
+    in property <[ShortcutGroup]> shortcut-groups;
+    in-out property <int> shortcut-capturing: -1;
+    in property <string> shortcut-note;
+    in property <bool> shortcut-conflicts;
+    in property <bool> overlays-on;
+    in property <int> overlay-position;
+    in property <[string]> overlay-positions;
+    in property <bool> overlay-volume;
+    in property <bool> overlay-mute;
+    in property <bool> overlay-device;
+    in property <bool> can-preview-overlay: true;
+    // Rapports de plantage: the offer after a crash (crash_reports = ask), the reports of this PC,
+    // where an issue would go (or why none can be opened), and the reports' folder.
+    in property <bool> crash-ask;
+    in property <[CrashRow]> crash-rows;
+    in property <string> crash-repository;
+    in property <bool> crash-repository-known;
+    in property <string> crash-folder;
+    // À propos
+    in property <AboutView> about;
+    // A microphone picked: the window confirms first when the daemon must restart for it.
+    callback pick-microphone(int);
+    // A question of the window: 6 and 7 streamer mode on and off, 8 restart Platinum, 11 delete
+    // every crash report.
+    callback ask(int);
+    // The content's width inside the scrolling area: the navigation, the gaps and the room left
+    // for the scroll bar taken off.
+    property <length> content-width: root.width - 2 * 24px - 248px - 16px - 12px;
+    // How far the content is scrolled (negative when moved down); Rust puts it back to the top
+    // with each section, and the layout check sets it.
+    in-out property <length> scroll;
+
+    HorizontalLayout {
+        padding-top: 20px;
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-bottom: 24px;
+        spacing: 16px;
+        Rectangle {
+            width: 248px;
+            border-radius: 6px;
+            background: Palette.panel;
+            border-width: 1px;
+            border-color: Palette.hairline;
+            VerticalLayout {
+                padding: 10px;
+                spacing: 2px;
+                alignment: start;
+                HorizontalLayout {
+                    height: 30px;
+                    padding-left: 14px;
+                    Label {
+                        text: @tr("PARAMÈTRES");
+                        vertical-alignment: center;
+                    }
+                }
+                for item[index] in [
+                    { icon: "settings", text: @tr("Général") },
+                    { icon: "mic", text: @tr("Micro") },
+                    { icon: "speaker", text: @tr("Sorties") },
+                    { icon: "broadcast", text: @tr("Mode streamer") },
+                    { icon: "remote", text: @tr("Streaming à distance") },
+                    { icon: "game", text: @tr("Jeux") },
+                    { icon: "keyboard", text: @tr("Raccourcis et superpositions") },
+                    { icon: "alert", text: @tr("Rapports de plantage") },
+                    { icon: "info", text: @tr("À propos") }
+                ]: NavItem {
+                    icon: item.icon;
+                    text: item.text;
+                    active: root.section == index;
+                    clicked => { Backend.open-settings(index); }
+                }
+            }
+        }
+        VerticalLayout {
+            spacing: 12px;
+            // The options changed since the daemon started that it reads only at start; lined up
+            // with the cards (the scrolling area keeps 12 px for its bar).
+            if root.pending != "": HorizontalLayout {
+                padding-right: 12px;
+                Rectangle {
+                    border-radius: 6px;
+                    background: #f2c14e14;
+                    border-width: 1px;
+                    border-color: #f2c14e40;
+                    HorizontalLayout {
+                        padding: 12px;
+                        padding-left: 14px;
+                        spacing: 12px;
+                        Icon {
+                            y: (parent.height - self.height) / 2;
+                            name: "alert";
+                            size: 16px;
+                            tint: Palette.amber;
+                        }
+                        Text {
+                            horizontal-stretch: 1;
+                            text: root.pending;
+                            color: Palette.text;
+                            font-size: 12px;
+                            vertical-alignment: center;
+                            wrap: word-wrap;
+                        }
+                        Button {
+                            y: (parent.height - self.height) / 2;
+                            text: @tr("Redémarrer Platinum…");
+                            enabled: root.daemon-running;
+                            clicked => { root.ask(8); }
+                        }
+                    }
+                }
+            }
+            ScrollView {
+                vertical-stretch: 1;
+                content-y <=> root.scroll;
+                VerticalLayout {
+                    padding-right: 12px;
+                    padding-bottom: 8px;
+                    spacing: 12px;
+                    alignment: start;
+                    VerticalLayout {
+                        spacing: 4px;
+                        padding-bottom: 2px;
+                        Text {
+                            text: root.section == Section.general ? @tr("GÉNÉRAL")
+                                : root.section == Section.microphone ? @tr("MICRO")
+                                : root.section == Section.outputs ? @tr("SORTIES")
+                                : root.section == Section.streamer ? @tr("MODE STREAMER")
+                                : root.section == Section.remote ? @tr("STREAMING À DISTANCE")
+                                : root.section == Section.games ? @tr("JEUX")
+                                : root.section == Section.shortcuts ? @tr("RACCOURCIS ET SUPERPOSITIONS")
+                                : root.section == Section.crashes ? @tr("RAPPORTS DE PLANTAGE")
+                                : @tr("À PROPOS");
+                            color: Palette.text;
+                            font-size: 15px;
+                            font-weight: 700;
+                            letter-spacing: 2px;
+                        }
+                        if root.section != Section.shortcuts: Text {
+                            text: root.section == Section.general ? @tr("Le démarrage de Platinum et le nom de ses canaux dans Windows.")
+                                : root.section == Section.microphone ? @tr("Le micro que Platinum fait passer dans Microphone (Platinum), ses effets et ses micros de secours.")
+                                : root.section == Section.outputs ? @tr("La bascule de secours des sorties et la sortie que Windows retrouve quand Platinum s'arrête.")
+                                : root.section == Section.streamer ? @tr("Un mix pour vous, un autre pour votre public.")
+                                : root.section == Section.remote ? @tr("Sunshine et Moonlight, Steam Remote Play : le son de Platinum suit la session jusqu'à l'appareil distant.")
+                                : root.section == Section.games ? @tr("Le préréglage de Gaming qui suit le jeu lancé, et la règle des enceintes Arena 7.")
+                                : root.section == Section.crashes ? @tr("Ce que Platinum note quand l'un de ses programmes s'arrête brusquement, et comment nous l'envoyer si vous le voulez.")
+                                : @tr("La version de Platinum, sa tâche de fond et ses fichiers.");
+                            color: Palette.dim;
+                            font-size: 12px;
+                            wrap: word-wrap;
+                        }
+                    }
+
+                    // GÉNÉRAL
+                    if root.section == Section.general: Card {
+                        title: @tr("LANGUE");
+                        icon: "info";
+                        OptionLine {
+                            title: @tr("Langue");
+                            text: @tr("La langue de cette fenêtre, de l'icône près de l'horloge et des superpositions. « Automatique » suit la langue d'affichage de Windows, ou l'anglais quand Platinum ne la parle pas.");
+                            note: root.notes[SettingId.language];
+                            Select {
+                                width: 300px;
+                                model: root.languages;
+                                current: root.language-index;
+                                chosen(index) => { Backend.set-language(index); }
+                            }
+                        }
+                    }
+                    if root.section == Section.general: Card {
+                        title: @tr("DÉMARRAGE");
+                        icon: "power";
+                        OptionLine {
+                            title: @tr("Démarrer Platinum avec Windows");
+                            text: @tr("Platinum démarre à l'ouverture de votre session, sans ouvrir la fenêtre : le son et le micro passent par lui dès la connexion.");
+                            note: root.notes[SettingId.start-with-windows];
+                            enabled: root.installed;
+                            Toggle {
+                                on: root.start-with-windows;
+                                enabled: root.installed;
+                                toggled(on) => { Backend.set-start-with-windows(on); }
+                            }
+                        }
+                        if root.installed && root.startup-blocked: Warning {
+                            text: @tr("Platinum est désactivé dans le Gestionnaire des tâches (Applications de démarrage) : activez-le là pour qu'il démarre avec Windows.");
+                        }
+                        if !root.installed: Text {
+                            text: @tr("Possible une fois Platinum installé dans votre dossier personnel.");
+                            color: Palette.faint;
+                            font-size: 11px;
+                            wrap: word-wrap;
+                        }
+                        Divider { }
+                        OptionLine {
+                            title: @tr("Démarrer Platinum à l'ouverture de la fenêtre");
+                            text: @tr("Si Platinum est arrêté quand vous ouvrez cette fenêtre, elle le démarre.");
+                            note: root.notes[SettingId.start-on-open];
+                            Toggle {
+                                on: root.start-on-open;
+                                toggled(on) => { Backend.set-switch(SettingId.start-on-open, on); }
+                            }
+                        }
+                    }
+                    if root.section == Section.general: Card {
+                        title: @tr("NOMS DES CANAUX");
+                        icon: "speaker";
+                        OptionLine {
+                            title: @tr("Noms dans Windows");
+                            text: root.platinum-names
+                                ? @tr("« Gaming (Platinum) », « Chat (Platinum) », « Microphone (Platinum) »… dans les réglages son de Windows et dans vos applications.")
+                                : @tr("Les noms que les canaux avaient avant Platinum (« SteelSeries Sonar - Gaming »…). À remettre avant de revenir à SteelSeries GG, qui pourrait chercher ses périphériques par leur nom.");
+                            note: root.notes[SettingId.channel-names];
+                            Segmented {
+                                width: 220px;
+                                options: ["Platinum", "SteelSeries"];
+                                current: root.platinum-names ? 0 : 1;
+                                chosen(index) => {
+                                    if ((index == 0) != root.platinum-names) {
+                                        Backend.set-channel-names(index == 0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // MICRO
+                    if root.section == Section.microphone: Card {
+                        title: @tr("MICRO RELAYÉ");
+                        icon: "mic";
+                        OptionLine {
+                            title: @tr("Micro");
+                            text: @tr("Le vrai micro que Platinum fait passer, avec ses effets, dans Microphone (Platinum) : celui qu'écoutent Discord et vos autres applications.");
+                            note: root.notes[SettingId.microphone];
+                            Select {
+                                width: 300px;
+                                model: root.mic-inputs;
+                                current: root.mic-current;
+                                placeholder: @tr("Aucun micro choisi");
+                                chosen(index) => { root.pick-microphone(index); }
+                            }
+                        }
+                        Divider { }
+                        OptionLine {
+                            title: @tr("Effets du micro");
+                            text: @tr("Les réglages de l'onglet Micro (réduction de bruit, IA, égaliseur…), appliqués par le moteur d'effets de SteelSeries déjà installé. Éteints, le micro passe tel quel.");
+                            note: root.notes[SettingId.effects];
+                            Toggle {
+                                on: root.mic-effects;
+                                toggled(on) => { Backend.set-switch(SettingId.effects, on); }
+                            }
+                        }
+                        Divider { }
+                        OptionLine {
+                            title: @tr("Volume du micro");
+                            text: @tr("Le volume que Platinum donne au micro relayé. Le fader de la colonne Micro règle à part le volume Windows de Microphone (Platinum).");
+                            note: root.notes[SettingId.gain];
+                            HorizontalLayout {
+                                width: 300px;
+                                spacing: 12px;
+                                gain := Slider {
+                                    y: (parent.height - self.height) / 2;
+                                    value: root.mic-gain;
+                                    released(value) => { Backend.set-gain(value); }
+                                }
+                                Text {
+                                    width: 44px;
+                                    text: "\{round(gain.shown * 100)} %";
+                                    color: Palette.text;
+                                    font-size: 12px;
+                                    horizontal-alignment: right;
+                                    vertical-alignment: center;
+                                }
+                            }
+                        }
+                        Divider { }
+                        OptionLine {
+                            title: @tr("Entrée remise à l'arrêt");
+                            text: @tr("L'entrée par défaut de Windows quand Platinum s'arrête. « Celle d'avant Platinum » : celle qui l'était à son démarrage. Avec des micros de secours, Platinum prend d'abord le premier branché de leur liste.");
+                            note: root.notes[SettingId.fallback-input];
+                            Select {
+                                width: 300px;
+                                model: root.fallback-inputs;
+                                current: root.fallback-input-index;
+                                chosen(index) => { Backend.set-fallback(1, index); }
+                            }
+                        }
+                    }
+                    if root.section == Section.microphone: PriorityList {
+                        list: 1;
+                        icon: "mic";
+                        label: @tr("MICROS DE SECOURS");
+                        heading: @tr("Liste de priorité des périphériques d’entrée");
+                        note: (root.preferred-microphone != "" ? @tr("Le micro choisi plus haut, {}, passe toujours en premier : cette liste sert quand il est absent.", root.preferred-microphone) : @tr("Aucun micro n'est choisi plus haut : cette liste sert à sa place."))
+                            + " " + (root.auto-switch ? @tr("La bascule de secours (section Sorties) est en Auto.") : @tr("La bascule de secours (section Sorties) est en Manuel : la liste ne sert qu'en Auto."))
+                            + " " + @tr("Les micros de casques Bluetooth n'y figurent pas, Platinum ne les ouvre jamais.");
+                        rows: root.input-priority;
+                        addable: root.input-addable;
+                        applies: root.notes[SettingId.auto-switch];
+                    }
+
+                    // SORTIES
+                    if root.section == Section.outputs: Card {
+                        title: @tr("BASCULE DE SECOURS");
+                        icon: "devices";
+                        lit: root.auto-switch;
+                        OptionLine {
+                            title: @tr("Changement automatique de périphérique de secours");
+                            text: (root.auto-switch
+                                ? @tr("Auto : Platinum basculera automatiquement vers le périphérique disponible suivant si celui que vous utilisez est déconnecté pour quelque raison que ce soit, et reviendra au premier de la liste dès qu'il sera rebranché.")
+                                : @tr("Manuel : vous devrez sélectionner vos périphériques manuellement s’ils se déconnectent."))
+                                + " " + @tr("Vaut pour les sorties des canaux et pour le micro relayé (ses micros de secours sont dans la section Micro).");
+                            note: root.notes[SettingId.auto-switch];
+                            HorizontalLayout {
+                                spacing: 10px;
+                                Text {
+                                    text: root.auto-switch ? @tr("AUTO") : @tr("MANUEL");
+                                    color: root.auto-switch ? Palette.text : Palette.faint;
+                                    font-size: 11px;
+                                    font-weight: 700;
+                                    letter-spacing: 1.4px;
+                                    vertical-alignment: center;
+                                }
+                                Toggle {
+                                    y: (parent.height - self.height) / 2;
+                                    on: root.auto-switch;
+                                    toggled(on) => { Backend.set-auto-switch(on); }
+                                }
+                            }
+                        }
+                    }
+                    if root.section == Section.outputs: PriorityList {
+                        list: 0;
+                        icon: "speaker";
+                        label: @tr("LISTE DES SORTIES");
+                        heading: @tr("Liste de priorité des périphériques de sortie");
+                        note: @tr("Partagée par Gaming, Chat, Media et Aux. Classez vos périphériques dans l’ordre d’utilisation souhaité ; un périphérique exclu n'est jamais choisi automatiquement. Choisir une sortie dans le mixeur la place en tête de liste quand le changement automatique est actif.");
+                        rows: root.output-priority;
+                        addable: root.output-addable;
+                        applies: root.notes[SettingId.auto-switch];
+                    }
+                    if root.section == Section.outputs: Card {
+                        title: @tr("ARRÊT DE PLATINUM");
+                        icon: "power";
+                        OptionLine {
+                            title: @tr("Sortie remise à l'arrêt");
+                            text: @tr("La sortie par défaut de Windows quand Platinum s'arrête. « Celle d'avant Platinum » : celle qui l'était à son démarrage. Avec une liste de priorité des sorties, Platinum prend d'abord le premier périphérique branché de la liste.");
+                            note: root.notes[SettingId.fallback-output];
+                            Select {
+                                width: 300px;
+                                model: root.fallback-outputs;
+                                current: root.fallback-output-index;
+                                chosen(index) => { Backend.set-fallback(0, index); }
+                            }
+                        }
+                    }
+
+                    // MODE STREAMER
+                    if root.section == Section.streamer: Card {
+                        title: @tr("MODE STREAMER");
+                        icon: "broadcast";
+                        lit: root.streamer;
+                        OptionLine {
+                            title: @tr("Mode streamer");
+                            text: @tr("Un espace spécialement dédié aux streamers, vous permettant de configurer et gérer vos canaux audio pour vous-même et votre public : un mix personnel et un mix de stream.");
+                            note: root.notes[SettingId.streamer];
+                            // The window asks before switching (the dialog says what changes).
+                            Toggle {
+                                on: root.streamer;
+                                toggled(on) => { root.ask(on ? 6 : 7); }
+                            }
+                        }
+                        Divider { }
+                        Text {
+                            text: @tr("Chaque canal a alors deux volumes : celui du mix personnel, que vous entendez, et celui du mix de stream, envoyé vers Stream (Platinum) pour vos logiciels de streaming (OBS, Streamlabs…). Les sorties des deux mix se choisissent dans la colonne Master du mixeur, les canaux de chaque mix dans leurs onglets. Platinum demande confirmation avant de changer de mode et retient vos sorties du mode classique.");
+                            color: Palette.dim;
+                            font-size: 11px;
+                            wrap: word-wrap;
+                        }
+                    }
+
+                    // STREAMING À DISTANCE
+                    if root.section == Section.remote: Card {
+                        title: @tr("STREAMING À DISTANCE");
+                        icon: "remote";
+                        lit: root.follow-streaming;
+                        OptionLine {
+                            title: @tr("Suivre Sunshine, Moonlight et Steam Remote Play");
+                            text: @tr("Pendant une session Sunshine (Moonlight) ou Steam Remote Play, le son des canaux et des applications passe par Platinum jusqu'à l'appareil distant, puis revient sur vos sorties à la fin. Couper ce réglage pendant une session la rend à vos sorties.");
+                            note: root.notes[SettingId.follow-streaming];
+                            Toggle {
+                                on: root.follow-streaming;
+                                toggled(on) => { Backend.set-switch(SettingId.follow-streaming, on); }
+                            }
+                        }
+                        Divider { }
+                        OptionLine {
+                            title: @tr("Faire passer les applications par Platinum");
+                            text: @tr("Pendant une session, les applications qui jouent directement sur la sortie de streaming sont rangées sur Gaming (Platinum), pour garder vos effets ; ces routes sont effacées à la fin de la session.");
+                            note: root.notes[SettingId.route-apps];
+                            enabled: root.follow-streaming;
+                            Toggle {
+                                on: root.route-apps;
+                                enabled: root.follow-streaming;
+                                toggled(on) => { Backend.set-switch(SettingId.route-apps, on); }
+                            }
+                        }
+                    }
+                    if root.section == Section.remote: Card {
+                        title: @tr("AVANCÉ");
+                        icon: "settings";
+                        OptionLine {
+                            title: @tr("Sorties de streaming reconnues");
+                            text: @tr("Des morceaux du nom des sorties qu'un hôte de streaming met par défaut pendant une session, séparés par des virgules. Par défaut : {} (Sunshine et Steam Remote Play).", root.sinks-default);
+                            note: root.notes[SettingId.streaming-sinks];
+                        }
+                        HorizontalLayout {
+                            spacing: 8px;
+                            sinks := TextField {
+                                horizontal-stretch: 1;
+                                placeholder: @tr("Aucune : aucune session ne sera suivie");
+                                text <=> root.sinks-text;
+                                accepted(text) => { Backend.set-streaming-sinks(text); }
+                            }
+                            Button {
+                                horizontal-stretch: 0;
+                                text: @tr("Enregistrer");
+                                primary: sinks.text != root.sinks-saved;
+                                enabled: sinks.text != root.sinks-saved;
+                                clicked => { Backend.set-streaming-sinks(sinks.text); }
+                            }
+                            Button {
+                                horizontal-stretch: 0;
+                                text: @tr("Par défaut");
+                                enabled: root.sinks-saved != root.sinks-default || sinks.text != root.sinks-default;
+                                clicked => {
+                                    root.sinks-text = root.sinks-default;
+                                    Backend.set-streaming-sinks(root.sinks-default);
+                                }
+                            }
+                        }
+                    }
+
+                    // JEUX
+                    if root.section == Section.games: Card {
+                        title: @tr("PRÉRÉGLAGE PAR JEU");
+                        icon: "game";
+                        lit: root.game-presets;
+                        OptionLine {
+                            title: @tr("Préréglage par jeu");
+                            text: @tr("Quand un jeu associé à un préréglage de Gaming tourne, Gaming prend ce préréglage ; le vôtre revient quand le jeu se ferme. Les associations de SteelSeries GG aux jeux installés comptent aussi ; les vôtres passent avant.");
+                            note: root.notes[SettingId.game-presets];
+                            Toggle {
+                                on: root.game-presets;
+                                toggled(on) => { Backend.set-switch(SettingId.game-presets, on); }
+                            }
+                        }
+                    }
+                    if root.section == Section.games: Card {
+                        title: @tr("VOS ASSOCIATIONS");
+                        icon: "browse";
+                        Text {
+                            text: @tr("Les programmes que vous avez associés à un préréglage de Gaming (onglet Gaming, menu « … » du préréglage, « Associer au jeu en cours… »). Dissocier s'applique tout de suite.");
+                            color: Palette.dim;
+                            font-size: 11px;
+                            wrap: word-wrap;
+                        }
+                        if root.links.length == 0: Rectangle {
+                            height: 46px;
+                            border-radius: 4px;
+                            border-width: 1px;
+                            border-color: Palette.hairline;
+                            Text {
+                                text: @tr("Aucune association pour l'instant");
+                                color: Palette.faint;
+                                font-size: 12px;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                        }
+                        for link in root.links: LinkLine {
+                            link: link;
+                        }
+                    }
+                    if root.section == Section.games: Card {
+                        title: @tr("ENCEINTES ARENA 7");
+                        icon: "speaker";
+                        lit: root.arena-speakers;
+                        OptionLine {
+                            title: @tr("Règle Arena 7");
+                            text: @tr("Comme dans SteelSeries GG : un canal Gaming, Media ou Aux qui joue sur des enceintes Arena 7 avec l'audio spatial en mode casque passe en mode haut-parleurs. Elle ne revient jamais en arrière d'elle-même.");
+                            note: root.notes[SettingId.arena-speakers];
+                            Toggle {
+                                on: root.arena-speakers;
+                                toggled(on) => { Backend.set-switch(SettingId.arena-speakers, on); }
+                            }
+                        }
+                    }
+
+                    // RACCOURCIS ET SUPERPOSITIONS
+                    if root.section == Section.shortcuts: ShortcutsSection {
+                        width-available: root.content-width;
+                        groups: root.shortcut-groups;
+                        capturing <=> root.shortcut-capturing;
+                        note: root.shortcut-note;
+                        conflicts: root.shortcut-conflicts;
+                        daemon-running: root.daemon-running;
+                        overlays-on: root.overlays-on;
+                        overlay-position: root.overlay-position;
+                        positions: root.overlay-positions;
+                        overlay-volume: root.overlay-volume;
+                        overlay-mute: root.overlay-mute;
+                        overlay-device: root.overlay-device;
+                        can-preview: root.can-preview-overlay;
+                        applies: root.notes[SettingId.shortcuts];
+                    }
+
+                    // RAPPORTS DE PLANTAGE
+                    if root.section == Section.crashes: Card {
+                        title: @tr("ENVOI");
+                        icon: "remote";
+                        lit: root.crash-ask;
+                        OptionLine {
+                            title: @tr("Proposer d'envoyer les rapports de plantage");
+                            text: @tr("Après un plantage, Platinum vous propose, à la prochaine ouverture de cette fenêtre, d'envoyer le rapport. Vous le lisez d'abord, anonymisé (noms d'utilisateur et de PC, adresses e-mail et noms de vos périphériques audio retirés), puis votre navigateur ouvre une issue GitHub que vous envoyez vous-même. Platinum n'envoie jamais rien et ne fait aucun appel réseau pour cela. Éteint, les rapports restent seulement sur ce PC.");
+                            note: root.notes[SettingId.crash-reports];
+                            Toggle {
+                                on: root.crash-ask;
+                                toggled(on) => { Backend.set-switch(SettingId.crash-reports, on); }
+                            }
+                        }
+                        Divider { }
+                        if root.crash-repository-known: Text {
+                            text: root.crash-repository;
+                            color: Palette.dim;
+                            font-size: 11px;
+                            wrap: word-wrap;
+                        }
+                        if !root.crash-repository-known: Warning {
+                            text: root.crash-repository;
+                        }
+                    }
+                    if root.section == Section.crashes: Card {
+                        title: @tr("RAPPORTS SUR CE PC");
+                        icon: "alert";
+                        Text {
+                            text: @tr("Les 20 derniers rapports sont gardés dans {}. Un plantage hors du code de Platinum (dans un module de SteelSeries, par exemple) laisse aussi un fichier de vidage .dmp : il reste sur ce PC et ne fait jamais partie de ce qui est envoyé.", root.crash-folder);
+                            color: Palette.dim;
+                            font-size: 11px;
+                            wrap: word-wrap;
+                        }
+                        if root.crash-rows.length == 0: Rectangle {
+                            height: 46px;
+                            border-radius: 4px;
+                            border-width: 1px;
+                            border-color: Palette.hairline;
+                            Text {
+                                text: @tr("Aucun plantage enregistré");
+                                color: Palette.faint;
+                                font-size: 12px;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                        }
+                        for report in root.crash-rows: CrashLine {
+                            report: report;
+                        }
+                        HorizontalLayout {
+                            alignment: start;
+                            spacing: 8px;
+                            Button {
+                                text: @tr("Ouvrir le dossier");
+                                enabled: root.crash-rows.length > 0;
+                                clicked => { Backend.crash-open-folder(); }
+                            }
+                            Button {
+                                text: @tr("Tout effacer");
+                                enabled: root.crash-rows.length > 0;
+                                clicked => { root.ask(11); }
+                            }
+                        }
+                    }
+
+                    // À PROPOS
+                    if root.section == Section.about: Card {
+                        title: @tr("PLATINUM");
+                        icon: "info";
+                        InfoLine {
+                            label: @tr("Version");
+                            value: root.about.version;
+                        }
+                        InfoLine {
+                            label: @tr("Dossier");
+                            value: root.about.folder;
+                        }
+                        InfoLine {
+                            label: @tr("Journal");
+                            value: root.about.log;
+                        }
+                        HorizontalLayout {
+                            alignment: start;
+                            spacing: 8px;
+                            Button {
+                                text: @tr("Ouvrir le dossier");
+                                enabled: root.about.can-open-folder;
+                                clicked => { Backend.open-folder(); }
+                            }
+                            Button {
+                                text: @tr("Ouvrir le journal");
+                                enabled: root.about.can-open-log;
+                                clicked => { Backend.open-log(); }
+                            }
+                        }
+                    }
+                    if root.section == Section.about: Card {
+                        title: @tr("TÂCHE DE FOND");
+                        icon: "power";
+                        InfoLine {
+                            label: @tr("État");
+                            value: root.about.state;
+                        }
+                        InfoLine {
+                            label: @tr("Processus");
+                            value: root.about.pid;
+                        }
+                        InfoLine {
+                            label: @tr("Mémoire");
+                            value: root.about.memory;
+                        }
+                        InfoLine {
+                            label: @tr("Moteur du micro");
+                            value: root.about.engine-memory;
+                        }
+                        InfoLine {
+                            label: @tr("Dernier état publié");
+                            value: root.about.updated;
+                        }
+                        Text {
+                            text: @tr("L'état vient de status.txt, que la tâche de fond réécrit à chaque changement ; sa mémoire est relevée par cette fenêtre toutes les 2 secondes.");
+                            color: Palette.faint;
+                            font-size: 11px;
+                            wrap: word-wrap;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,16 @@
+[package]
+name = "platinum-setup"
+version = "0.1.0"
+edition = "2024"
+description = "Platinum's installer: installs Platinum, and the Sonar driver taken from SteelSeries GG's official installer"
+license = "GPL-3.0-only"
+
+[dependencies]
+platinum = { path = ".." }
+slint = { version = "1", default-features = false, features = ["std", "compat-1-2", "backend-winit", "renderer-software", "accessibility"] }
+# Pure-Rust LZMA decoder (MIT), for the solid LZMA stream of GG's NSIS installer (`nsis.rs`).
+# Pinned: the reader is checked against GG's installer with this exact decoder.
+lzma-rs = "=0.3.0"
+
+[build-dependencies]
+slint-build = "1"

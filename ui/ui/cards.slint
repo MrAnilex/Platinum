@@ -1,0 +1,798 @@
+// The effect cards of a channel tab, in GG's order and with GG's French labels
+// (extracted/localization/fr.json), drawn in Platinum's style: knobs for amounts, sliders where GG
+// shows words at both ends instead of a number.
+//
+// Playback channels (Gaming, Media, Aux): Égaliseur with Basses, Voix and Aigus; Audio spatial;
+// Boost de volume and Volume intelligent. Capture channels (Chat, Micro): Égaliseur; Suppression de
+// bruit IA (with Annulation d'écho on the microphone); Réduction du bruit and Noise Gate;
+// Compresseur. Every change goes to Backend.edit, with the field's number (backend.slint).
+
+import { Palette, Label, Toggle, Knob, Slider, Segmented, IconButton, MenuFrame, MenuLine, ValueEdit } from "controls.slint";
+import { Icon } from "icons.slint";
+import { EqGraph, BandView, MarkerView } from "eq.slint";
+import { Backend, Field, CardKind, RenderView, CaptureView, SpeakerView, Preview } from "backend.slint";
+
+// The frame of an effect card, GG's: its switch and title, then its body; on the right, the "?"
+// that explains the card (GG's own French text) and the "…" menu whose "Réinitialiser" puts the
+// card's amounts back as the chosen preset has them, its switch kept. The body is not dimmed as a
+// whole: its controls are disabled while the card is off and each shows it (dimming both would
+// make them unreadable). A card can be held off by another effect (`enabled` false), which a
+// subtitle then explains.
+export component Card inherits Rectangle {
+    in property <string> title;
+    in property <bool> has-toggle;
+    in property <bool> on;
+    in property <bool> enabled: true;
+    in property <string> subtitle;
+    // The channel, and the card for its "Réinitialiser" (CardKind; 0 for none).
+    in property <string> key;
+    in property <int> card;
+    // The explanation the "?" opens; empty for none.
+    in property <string> help;
+    callback toggled(bool);
+    border-radius: 6px;
+    background: Palette.panel;
+    border-width: 1px;
+    border-color: Palette.hairline;
+    VerticalLayout {
+        HorizontalLayout {
+            height: 48px;
+            padding-left: 16px;
+            padding-right: 16px;
+            spacing: 12px;
+            if root.has-toggle: Toggle {
+                y: (parent.height - self.height) / 2;
+                on: root.on;
+                enabled: root.enabled;
+                toggled(on) => { root.toggled(on); }
+            }
+            Text {
+                text: root.title;
+                color: root.enabled ? Palette.text : Palette.faint;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 1.4px;
+                vertical-alignment: center;
+            }
+            if root.subtitle != "": Text {
+                horizontal-stretch: 1;
+                text: root.subtitle;
+                color: Palette.amber;
+                font-size: 11px;
+                vertical-alignment: center;
+                overflow: elide;
+            }
+            if root.subtitle == "": Rectangle {
+                horizontal-stretch: 1;
+            }
+            if root.help != "": IconButton {
+                y: (parent.height - self.height) / 2;
+                width: 26px;
+                height: 26px;
+                icon: "help";
+                clicked => { help-popup.show(); }
+            }
+            if root.card > 0: IconButton {
+                y: (parent.height - self.height) / 2;
+                width: 26px;
+                height: 26px;
+                icon: "more";
+                clicked => { menu.show(); }
+            }
+        }
+        Rectangle {
+            height: 1px;
+            background: Palette.hairline;
+        }
+        VerticalLayout {
+            padding: 16px;
+            @children
+        }
+    }
+    help-popup := PopupWindow {
+        x: root.width - 340px;
+        y: 44px;
+        width: 330px;
+        Rectangle {
+            background: Palette.raised;
+            border-radius: 4px;
+            border-width: 1px;
+            border-color: Palette.edge;
+            drop-shadow-blur: 16px;
+            drop-shadow-color: #000000c0;
+            VerticalLayout {
+                padding: 12px;
+                Text {
+                    text: root.help;
+                    color: Palette.text;
+                    font-size: 11px;
+                    wrap: word-wrap;
+                }
+            }
+        }
+    }
+    menu := PopupWindow {
+        x: root.width - 196px;
+        y: 44px;
+        width: 180px;
+        MenuFrame {
+            MenuLine {
+                text: @tr("Réinitialiser");
+                icon: "reset";
+                clicked => { Backend.reset-card(root.key, root.card); }
+            }
+        }
+    }
+}
+
+// A knob with its value and its label under it. The value can be typed: a click on it opens a
+// field (ValueEdit); what is typed is read by Rust, kept within the knob's range and rounded to its
+// step (0.1 dB, or 1 %), then written as a turn of the knob would.
+export component KnobCell inherits VerticalLayout {
+    in property <string> label;
+    in property <float> value;
+    in property <float> minimum: 0;
+    in property <float> maximum: 1;
+    // "dB" shows the value with one decimal; "%" shows 0..1 as a percentage.
+    in property <string> unit;
+    in property <bool> bipolar;
+    in property <bool> active: true;
+    in property <bool> enabled: true;
+    // Layout check only: the value's field opens.
+    in property <bool> open-edit;
+    callback moved(float);
+    spacing: 6px;
+    alignment: start;
+    width: 110px;
+    property <bool> percent: root.unit == "%";
+    HorizontalLayout {
+        alignment: center;
+        knob := Knob {
+            value: root.value;
+            minimum: root.minimum;
+            maximum: root.maximum;
+            bipolar: root.bipolar;
+            active: root.active && root.enabled;
+            enabled: root.enabled;
+            // Written while it turns, so that the change is heard as it is made.
+            moved(value) => { root.moved(value); }
+        }
+    }
+    ValueEdit {
+        text: root.percent ? "\{round(knob.shown * 100)} %" : ((knob.shown > 0.05 && root.bipolar ? "+" : "") + "\{round(knob.shown * 10) / 10} \{root.unit}");
+        number: root.percent ? "\{round(root.value * 100)}" : "\{round(root.value * 10) / 10}";
+        enabled: root.enabled;
+        text-color: root.active && root.enabled ? Palette.text : Palette.faint;
+        font-size: 13px;
+        open-request: root.open-edit;
+        accepted(typed) => {
+            if (Backend.typed-value(typed, root.minimum, root.maximum, root.percent ? 0.01 : 0.1, root.percent).ok) {
+                root.moved(Backend.typed-value(typed, root.minimum, root.maximum, root.percent ? 0.01 : 0.1, root.percent).value);
+            }
+        }
+    }
+    Text {
+        horizontal-alignment: center;
+        text: root.label;
+        color: Palette.dim;
+        font-size: 11px;
+        wrap: word-wrap;
+    }
+}
+
+// A switch with its label on the right.
+component SwitchRow inherits HorizontalLayout {
+    in property <string> text;
+    in property <bool> on;
+    in property <bool> enabled: true;
+    callback toggled(bool);
+    spacing: 10px;
+    alignment: start;
+    Toggle {
+        y: (parent.height - self.height) / 2;
+        on: root.on;
+        enabled: root.enabled;
+        toggled(on) => { root.toggled(on); }
+    }
+    Text {
+        text: root.text;
+        color: root.enabled ? Palette.text : Palette.faint;
+        font-size: 12px;
+        vertical-alignment: center;
+    }
+}
+
+// A slider with a word at each end (GG shows no number on these).
+component EndsSlider inherits VerticalLayout {
+    in property <string> caption;
+    // Shown after the caption (the distance in percent); empty for none.
+    in property <string> reading;
+    in property <string> low;
+    in property <string> high;
+    in property <float> value;
+    in property <bool> enabled: true;
+    callback moved(float);
+    spacing: 6px;
+    HorizontalLayout {
+        Label {
+            text: root.caption;
+        }
+        Rectangle { }
+        Text {
+            text: root.reading;
+            color: Palette.text;
+            font-size: 12px;
+        }
+    }
+    slider := Slider {
+        value: root.value;
+        enabled: root.enabled;
+        moved(value) => { root.moved(value); }
+    }
+    HorizontalLayout {
+        Text {
+            text: root.low;
+            color: Palette.dim;
+            font-size: 11px;
+        }
+        Rectangle { }
+        Text {
+            text: root.high;
+            color: Palette.dim;
+            font-size: 11px;
+        }
+    }
+}
+
+// The spatial audio wheel: the listener in the middle, front up, seven speakers around, each
+// dragged around the circle within GG's limits (Rust clamps the angle); a right click puts one
+// back. Their distance from the listener follows the distance slider.
+export component SpeakerWheel inherits Rectangle {
+    in property <[SpeakerView]> speakers;
+    // The distance slider's position: 1 the farthest ring, 0 next to the listener.
+    in property <float> distance;
+    in property <bool> enabled: true;
+    callback moved(int, float);
+    callback reset(int);
+    width: 236px;
+    height: 236px;
+    opacity: root.enabled ? 1 : 0.45;
+    property <length> middle: self.width / 2;
+    property <length> outer: self.width / 2 - 18px;
+    property <length> reach: root.outer * (0.32 + 0.68 * root.distance);
+    Rectangle {
+        x: root.middle - root.outer;
+        y: root.middle - root.outer;
+        width: root.outer * 2;
+        height: root.outer * 2;
+        border-radius: root.outer;
+        background: Palette.well;
+        border-width: 1px;
+        border-color: Palette.hairline;
+    }
+    Rectangle {
+        x: root.middle - root.reach;
+        y: root.middle - root.reach;
+        width: root.reach * 2;
+        height: root.reach * 2;
+        border-radius: root.reach;
+        border-width: 1px;
+        border-color: Palette.edge;
+    }
+    // the listener, facing up
+    Path {
+        x: root.middle - 9px;
+        y: root.middle - 30px;
+        width: 18px;
+        height: 12px;
+        viewbox-width: 18;
+        viewbox-height: 12;
+        commands: "M2 11 L9 2 L16 11";
+        stroke: Palette.dim;
+        stroke-width: 1.5px;
+        fill: transparent;
+    }
+    Rectangle {
+        x: root.middle - 17px;
+        y: root.middle - 17px;
+        width: 34px;
+        height: 34px;
+        border-radius: 17px;
+        background: Palette.raised;
+        border-width: 1px;
+        border-color: Palette.edge;
+    }
+    for speaker in root.speakers: Rectangle {
+        property <length> cx: root.middle - root.reach * sin(speaker.angle * 1deg);
+        property <length> cy: root.middle - root.reach * cos(speaker.angle * 1deg);
+        x: self.cx - self.width / 2;
+        y: self.cy - self.height / 2;
+        width: 30px;
+        height: 30px;
+        Rectangle {
+            x: 3px;
+            y: 3px;
+            width: 24px;
+            height: 24px;
+            border-radius: 12px;
+            background: grab.pressed || grab.has-hover ? Palette.light : Palette.raised;
+            border-width: 1.5px;
+            border-color: root.enabled ? Palette.light : Palette.faint;
+            Text {
+                width: parent.width;
+                height: parent.height;
+                text: speaker.short;
+                color: grab.pressed || grab.has-hover ? Palette.base : Palette.text;
+                font-size: 9px;
+                font-weight: 700;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+        grab := TouchArea {
+            enabled: root.enabled;
+            mouse-cursor: move;
+            moved => {
+                if (self.pressed) {
+                    root.moved(speaker.index, atan2(-(parent.x + self.mouse-x - root.middle) / 1px, -(parent.y + self.mouse-y - root.middle) / 1px) / 1deg);
+                }
+            }
+            pointer-event(event) => {
+                if (event.kind == PointerEventKind.down && event.button == PointerEventButton.right) {
+                    root.reset(speaker.index);
+                }
+            }
+        }
+        if grab.pressed || grab.has-hover: Rectangle {
+            x: (parent.width - self.width) / 2;
+            y: parent.height + 2px;
+            width: 128px;
+            height: 22px;
+            border-radius: 3px;
+            background: Palette.raised;
+            border-width: 1px;
+            border-color: Palette.edge;
+            Text {
+                width: parent.width;
+                height: parent.height;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                text: speaker.name + "  " + round(speaker.angle) + "°";
+                color: Palette.text;
+                font-size: 10px;
+            }
+        }
+    }
+}
+
+// The equalizer card: the graph with its band editor (eq.slint), and for playback channels the
+// three boosts under it.
+component EqualizerCard inherits Card {
+    in property <bool> eq-on;
+    in property <[BandView]> bands;
+    in property <[MarkerView]> markers;
+    in property <string> curve;
+    in property <bool> voice-zones;
+    title: @tr("ÉGALISEUR");
+    has-toggle: true;
+    on: root.eq-on;
+    card: CardKind.equalizer;
+    toggled(on) => { Backend.edit(root.key, Field.equalizer, on ? 1 : 0); }
+    VerticalLayout {
+        spacing: 16px;
+        // GG's choice of zone labels above the graph (its label sets), kept per channel.
+        HorizontalLayout {
+            alignment: end;
+            spacing: 10px;
+            Label {
+                text: @tr("ZONES");
+                vertical-alignment: center;
+            }
+            Segmented {
+                width: 160px;
+                options: [@tr("Défaut"), @tr("Voix")];
+                current: root.voice-zones ? 1 : 0;
+                chosen(index) => { Backend.set-voice-zones(root.key, index == 1); }
+            }
+        }
+        EqGraph {
+            height: 330px;
+            key: root.key;
+            bands: root.bands;
+            markers: root.markers;
+            curve: root.curve;
+            active: root.eq-on;
+            voice-zones: root.voice-zones;
+        }
+        @children
+    }
+}
+
+export component RenderCards inherits VerticalLayout {
+    in property <string> key;
+    in property <RenderView> view;
+    in property <[BandView]> bands;
+    in property <[MarkerView]> markers;
+    in property <string> curve;
+    in property <[SpeakerView]> speakers;
+    in property <bool> voice-zones;
+    spacing: 14px;
+    alignment: start;
+    EqualizerCard {
+        key: root.key;
+        eq-on: root.view.eq-on;
+        bands: root.bands;
+        markers: root.markers;
+        curve: root.curve;
+        voice-zones: root.voice-zones;
+        help: @tr("Ajustez la fréquence, le gain et le Q Factor afin de moduler le son avec une précision chirurgicale. Ajoutez et retirez jusqu'à 10 bandes. Réglez facilement les fréquences basses, des voix et aigus avec des curseurs intégrés.");
+        HorizontalLayout {
+            alignment: start;
+            spacing: 24px;
+            KnobCell {
+                label: @tr("Basses");
+                open-edit: Preview.edit-knob;
+                value: root.view.bass;
+                minimum: -12;
+                maximum: 12;
+                unit: "dB";
+                bipolar: true;
+                active: root.view.bass-on;
+                enabled: root.view.eq-on;
+                moved(value) => { Backend.edit(root.key, Field.bass, value); }
+            }
+            KnobCell {
+                label: @tr("Voix");
+                value: root.view.voice;
+                minimum: -12;
+                maximum: 12;
+                unit: "dB";
+                bipolar: true;
+                active: root.view.voice-on;
+                enabled: root.view.eq-on;
+                moved(value) => { Backend.edit(root.key, Field.voice, value); }
+            }
+            KnobCell {
+                label: @tr("Aigus");
+                value: root.view.treble;
+                minimum: -12;
+                maximum: 12;
+                unit: "dB";
+                bipolar: true;
+                active: root.view.treble-on;
+                enabled: root.view.eq-on;
+                moved(value) => { Backend.edit(root.key, Field.treble, value); }
+            }
+        }
+    }
+    Card {
+        title: @tr("AUDIO SPATIAL");
+        has-toggle: true;
+        on: root.view.spatial-on;
+        key: root.key;
+        card: CardKind.spatial;
+        help: @tr("Faites jaillir le son tout autour de vous, pour mieux cerner vos environs. Ajustez les paramètres avancés comme la position et la distance des haut-parleurs pour personnaliser davantage la spatialisation de votre son.");
+        toggled(on) => { Backend.edit(root.key, Field.spatial, on ? 1 : 0); }
+        HorizontalLayout {
+            spacing: 36px;
+            alignment: start;
+            SpeakerWheel {
+                speakers: root.speakers;
+                distance: root.view.distance;
+                enabled: root.view.spatial-on;
+                moved(index, angle) => { Backend.speaker-moved(root.key, index, angle); }
+                reset(index) => { Backend.speaker-reset(root.key, index); }
+            }
+            VerticalLayout {
+                width: 380px;
+                spacing: 22px;
+                alignment: center;
+                Segmented {
+                    width: 260px;
+                    options: [@tr("Mode casque"), @tr("Mode haut-parleur")];
+                    current: root.view.speakers-mode ? 1 : 0;
+                    enabled: root.view.spatial-on;
+                    chosen(index) => { Backend.edit(root.key, Field.speakers, index); }
+                }
+                EndsSlider {
+                    caption: @tr("AJUSTEMENT");
+                    low: @tr("Performance");
+                    high: @tr("Immersion");
+                    value: root.view.reverb;
+                    enabled: root.view.spatial-on;
+                    moved(value) => { Backend.edit(root.key, Field.reverb, value); }
+                }
+                EndsSlider {
+                    caption: @tr("DISTANCE");
+                    reading: round(root.view.distance * 100) + " %";
+                    value: root.view.distance;
+                    enabled: root.view.spatial-on;
+                    moved(value) => { Backend.edit(root.key, Field.distance, value); }
+                }
+                Text {
+                    text: @tr("Glissez une enceinte autour de la tête pour la déplacer ; un clic droit la remet à sa place.");
+                    color: Palette.faint;
+                    font-size: 11px;
+                    wrap: word-wrap;
+                }
+            }
+        }
+    }
+    HorizontalLayout {
+        spacing: 14px;
+        Card {
+            preferred-width: 0px;
+            horizontal-stretch: 1;
+            title: @tr("BOOST DE VOLUME");
+            key: root.key;
+            card: CardKind.volume-boost;
+            help: @tr("Augmenter cette valeur boostera le volume avant tout traitement.");
+            HorizontalLayout {
+                spacing: 20px;
+                alignment: start;
+                KnobCell {
+                    label: @tr("Gain");
+                    value: root.view.boost;
+                    minimum: 0;
+                    maximum: 12;
+                    unit: "dB";
+                    moved(value) => { Backend.edit(root.key, Field.volume-boost, value); }
+                }
+                Text {
+                    width: 200px;
+                    text: @tr("Augmente le volume avant tout traitement.");
+                    color: Palette.faint;
+                    font-size: 11px;
+                    wrap: word-wrap;
+                    vertical-alignment: center;
+                }
+            }
+        }
+        Card {
+            preferred-width: 0px;
+            horizontal-stretch: 1;
+            title: @tr("VOLUME INTELLIGENT");
+            has-toggle: true;
+            on: root.view.smart-on;
+            key: root.key;
+            card: CardKind.smart-volume;
+            help: @tr("Maintient automatiquement le volume dans une certaine amplitude afin qu'il ne soit jamais trop fort ou inaudible. Ajustez le curseur pour définir l'impact de l'effet.");
+            toggled(on) => { Backend.edit(root.key, Field.smart-volume, on ? 1 : 0); }
+            HorizontalLayout {
+                spacing: 24px;
+                alignment: start;
+                KnobCell {
+                    label: @tr("Niveau");
+                    value: root.view.smart-level;
+                    unit: "%";
+                    enabled: root.view.smart-on;
+                    moved(value) => { Backend.edit(root.key, Field.smart-level, value); }
+                }
+                VerticalLayout {
+                    spacing: 8px;
+                    alignment: center;
+                    Label {
+                        text: @tr("INTENSITÉ");
+                    }
+                    Segmented {
+                        options: [@tr("Forte"), @tr("Équilibrée"), @tr("Douce")];
+                        current: root.view.loudness;
+                        enabled: root.view.smart-on;
+                        chosen(index) => { Backend.edit(root.key, Field.loudness, index); }
+                    }
+                    Text {
+                        text: @tr("Réglage propre à Platinum (GG le laisse aux préréglages).");
+                        color: Palette.faint;
+                        font-size: 10px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// A noise reduction: its switch under a knob for its amount.
+component ReductionCell inherits VerticalLayout {
+    in property <string> label;
+    in property <bool> on;
+    in property <float> value;
+    in property <bool> enabled: true;
+    callback toggled(bool);
+    callback moved(float);
+    spacing: 8px;
+    alignment: start;
+    KnobCell {
+        label: root.label;
+        value: root.value;
+        unit: "%";
+        active: root.on;
+        enabled: root.enabled && root.on;
+        moved(value) => { root.moved(value); }
+    }
+    HorizontalLayout {
+        alignment: center;
+        Toggle {
+            on: root.on;
+            enabled: root.enabled;
+            toggled(on) => { root.toggled(on); }
+        }
+    }
+}
+
+export component CaptureCards inherits VerticalLayout {
+    in property <string> key;
+    in property <CaptureView> view;
+    in property <[BandView]> bands;
+    in property <string> curve;
+    in property <bool> voice-zones;
+    spacing: 14px;
+    alignment: start;
+    EqualizerCard {
+        key: root.key;
+        eq-on: root.view.eq-on;
+        bands: root.bands;
+        curve: root.curve;
+        voice-zones: root.voice-zones;
+        help: @tr("Ajustez chacune des bandes pour entendre plus ou moins le son de chaque fréquence.");
+    }
+    Card {
+        title: @tr("SUPPRESSION DE BRUIT IA");
+        has-toggle: true;
+        on: root.view.ai-on;
+        key: root.key;
+        card: CardKind.ai;
+        help: root.view.has-echo
+            ? @tr("Conférez une clarté à toute épreuve à votre voix en supprimant tous les sons non vocaux grâce à l'annulation de bruit gérée par IA de ClearCast.")
+            : @tr("Conférez une clarté à toute épreuve à la voix de vos coéquipiers en supprimant tous les sons non vocaux et l'écho grâce à l'annulation de bruit gérée par IA de ClearCast AI.");
+        toggled(on) => { Backend.edit(root.key, Field.ai, on ? 1 : 0); }
+        VerticalLayout {
+            spacing: 16px;
+            HorizontalLayout {
+                spacing: 14px;
+                Text {
+                    text: @tr("Min");
+                    color: Palette.dim;
+                    font-size: 11px;
+                    vertical-alignment: center;
+                }
+                Slider {
+                    width: 420px;
+                    value: root.view.ai;
+                    enabled: root.view.ai-on;
+                    moved(value) => { Backend.edit(root.key, Field.ai-amount, value); }
+                }
+                Text {
+                    text: @tr("Max");
+                    color: Palette.dim;
+                    font-size: 11px;
+                    vertical-alignment: center;
+                }
+                Rectangle { }
+            }
+            if root.view.has-echo: HorizontalLayout {
+                spacing: 24px;
+                SwitchRow {
+                    horizontal-stretch: 0;
+                    text: @tr("Annulation d'écho");
+                    on: root.view.echo-on;
+                    enabled: root.view.ai-on;
+                    toggled(on) => { Backend.edit(root.key, Field.echo-canceling, on ? 1 : 0); }
+                }
+                Text {
+                    horizontal-stretch: 1;
+                    text: root.view.ai-on ? @tr("Retire de votre voix le son de ce que vous écoutez. À essayer en situation réelle (appel, chat vocal).") : @tr("Disponible quand la suppression de bruit IA est activée.");
+                    color: Palette.faint;
+                    font-size: 11px;
+                    vertical-alignment: center;
+                    wrap: word-wrap;
+                }
+            }
+        }
+    }
+    HorizontalLayout {
+        spacing: 14px;
+        Card {
+            preferred-width: 0px;
+            horizontal-stretch: 1;
+            title: @tr("RÉDUCTION DU BRUIT");
+            enabled: !root.view.ai-on;
+            key: root.key;
+            card: CardKind.noise-reduction;
+            help: @tr("Background réduit le bruit statique comme celui qui émis par les ventilateurs de votre PC ; Impact réduit le bruit des frappes de touches de clavier/clics.");
+            subtitle: root.view.reductions-stuck
+                ? @tr("Encore active malgré la suppression de bruit IA : choisissez de nouveau le préréglage pour la couper")
+                : (root.view.ai-on ? @tr("Désactivé lorsque la suppression de bruit IA est activée") : "");
+            HorizontalLayout {
+                spacing: 24px;
+                alignment: start;
+                ReductionCell {
+                    label: @tr("Bruit de fond");
+                    on: root.view.nr-on;
+                    value: root.view.nr;
+                    enabled: !root.view.ai-on;
+                    toggled(on) => { Backend.edit(root.key, Field.noise-reduction, on ? 1 : 0); }
+                    moved(value) => { Backend.edit(root.key, Field.noise-reduction-amount, value); }
+                }
+                ReductionCell {
+                    label: @tr("Impact");
+                    on: root.view.impact-on;
+                    value: root.view.impact;
+                    enabled: !root.view.ai-on;
+                    toggled(on) => { Backend.edit(root.key, Field.impact, on ? 1 : 0); }
+                    moved(value) => { Backend.edit(root.key, Field.impact-amount, value); }
+                }
+            }
+        }
+        Card {
+            preferred-width: 0px;
+            horizontal-stretch: 1;
+            title: @tr("NOISE GATE");
+            has-toggle: true;
+            on: root.view.gate-on;
+            key: root.key;
+            card: CardKind.noise-gate;
+            help: @tr("Coupe complètement le bruit lorsque son volume est en-dessous du seuil.");
+            toggled(on) => { Backend.edit(root.key, Field.gate, on ? 1 : 0); }
+            HorizontalLayout {
+                spacing: 24px;
+                alignment: start;
+                KnobCell {
+                    label: @tr("Seuil");
+                    value: root.view.gate;
+                    minimum: -60;
+                    maximum: -10;
+                    unit: "dB";
+                    active: !root.view.auto-gate;
+                    enabled: root.view.gate-on && !root.view.auto-gate;
+                    moved(value) => { Backend.edit(root.key, Field.gate-threshold, value); }
+                }
+                VerticalLayout {
+                    alignment: center;
+                    spacing: 6px;
+                    SwitchRow {
+                        text: @tr("Seuil automatique");
+                        on: root.view.auto-gate;
+                        enabled: root.view.gate-on;
+                        toggled(on) => { Backend.edit(root.key, Field.auto-gate, on ? 1 : 0); }
+                    }
+                    Text {
+                        width: 190px;
+                        text: @tr("Calcule automatiquement le seuil de l'effet noise gate.");
+                        color: Palette.faint;
+                        font-size: 10px;
+                        wrap: word-wrap;
+                    }
+                }
+            }
+        }
+    }
+    Card {
+        title: @tr("COMPRESSEUR");
+        has-toggle: true;
+        on: root.view.comp-on;
+        key: root.key;
+        card: CardKind.compressor;
+        help: @tr("Maintient automatiquement la voix dans une certaine amplitude afin qu'elle ne soit jamais trop forte ou inaudible. Ajustez le curseur pour définir l'impact de l'effet.");
+        toggled(on) => { Backend.edit(root.key, Field.compressor, on ? 1 : 0); }
+        HorizontalLayout {
+            spacing: 20px;
+            alignment: start;
+            KnobCell {
+                label: @tr("Niveau");
+                value: root.view.comp;
+                open-edit: Preview.edit-knob;
+                unit: "%";
+                enabled: root.view.comp-on;
+                moved(value) => { Backend.edit(root.key, Field.compressor-level, value); }
+            }
+            Text {
+                width: 320px;
+                text: @tr("Maintient automatiquement la voix dans une certaine amplitude afin qu'elle ne soit jamais trop forte ou inaudible.");
+                color: Palette.faint;
+                font-size: 11px;
+                wrap: word-wrap;
+                vertical-alignment: center;
+            }
+        }
+    }
+}

@@ -1,0 +1,411 @@
+# Platinum's setup (es): the texts of setup/ui/setup.slint and of setup/src/*.rs.
+# Source texts are French; an entry left untranslated shows in French.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Désinstaller Platinum"
+msgstr "Desinstalar Platinum"
+
+msgid "Installer Platinum"
+msgstr "Instalar Platinum"
+
+msgid "CE QUI SERA RETIRÉ"
+msgstr "LO QUE SE QUITARÁ"
+
+msgid "BIENVENUE"
+msgstr "BIENVENIDO"
+
+msgid "DÉSINSTALLATION"
+msgstr "DESINSTALACIÓN"
+
+msgid "INSTALLATION"
+msgstr "INSTALACIÓN"
+
+msgid "TERMINÉ"
+msgstr "TERMINADO"
+
+msgid "Platinum et ses programmes vont être retirés de cet ordinateur."
+msgstr "Platinum y sus programas se quitarán de este equipo."
+
+msgid "Platinum est un mixeur et des effets audio pour le pilote Sonar, sans SteelSeries GG."
+msgstr "Platinum es un mezclador y efectos de audio para el controlador Sonar, sin SteelSeries GG."
+
+msgid "LA DÉSINSTALLATION VA"
+msgstr "LA DESINSTALACIÓN VA A"
+
+msgid "L'INSTALLATION VA"
+msgstr "LA INSTALACIÓN VA A"
+
+msgid "Supprimer aussi mes réglages et préréglages"
+msgstr "Eliminar también mis ajustes y preajustes"
+
+msgid "platinum.ini, vos préréglages et l'état de Platinum. Sinon, ils restent pour une prochaine installation."
+msgstr "platinum.ini, sus preajustes y el estado de Platinum. Si no, se conservan para una próxima instalación."
+
+msgid "Désinstaller aussi le pilote Sonar"
+msgstr "Desinstalar también el controlador Sonar"
+
+msgid "Installé par Platinum. Windows demandera une autorisation d'administrateur, et le son se coupera quelques secondes."
+msgstr "Instalado por Platinum. Windows pedirá permiso de administrador y el sonido se cortará unos segundos."
+
+msgid "Platinum est un logiciel libre, sous licence GNU GPL v3. Il n'est ni affilié à SteelSeries, ni approuvé par SteelSeries."
+msgstr "Platinum es software libre bajo la licencia GNU GPL v3. No está afiliado a SteelSeries ni aprobado por SteelSeries."
+
+msgid "OPTIONS"
+msgstr "OPCIONES"
+
+msgid "Démarrer Platinum avec Windows"
+msgstr "Iniciar Platinum con Windows"
+
+msgid "Le service de Platinum démarre à l'ouverture de session, sans fenêtre."
+msgstr "El servicio de Platinum se inicia al iniciar sesión, sin ventana."
+
+msgid "Raccourci sur le bureau"
+msgstr "Acceso directo en el escritorio"
+
+msgid "Pendant l'installation du pilote, Windows demandera une autorisation d'administrateur et le son se coupera quelques secondes."
+msgstr "Durante la instalación del controlador, Windows pedirá permiso de administrador y el sonido se cortará unos segundos."
+
+msgid "Ouvrir le journal"
+msgstr "Abrir el registro"
+
+msgid "Annuler"
+msgstr "Cancelar"
+
+msgid "Retour"
+msgstr "Atrás"
+
+msgid "Réessayer"
+msgstr "Reintentar"
+
+msgid "Suivant"
+msgstr "Siguiente"
+
+msgid "Désinstaller"
+msgstr "Desinstalar"
+
+msgid "Installer"
+msgstr "Instalar"
+
+msgid "Ouvrir Platinum"
+msgstr "Abrir Platinum"
+
+msgid "Fermer"
+msgstr "Cerrar"
+
+msgid "Terminé."
+msgstr "Terminado."
+
+msgid "La partie administrateur n'a pas reçu les droits d'administrateur."
+msgstr "La parte de administrador no recibió derechos de administrador."
+
+msgid "La partie administrateur a reçu des arguments incorrects."
+msgstr "La parte de administrador recibió argumentos incorrectos."
+
+msgid "Le runtime Visual C++ n'a pas pu être installé : voyez le journal."
+msgstr "No se pudo instalar el runtime de Visual C++: consulte el registro."
+
+msgid "Les fichiers du pilote n'ont pas pu être copiés dans %ProgramData%\\Platinum : voyez le journal."
+msgstr "No se pudieron copiar los archivos del controlador en %ProgramData%\\Platinum: consulte el registro."
+
+msgid "Les fichiers du pilote ne portent pas les signatures attendues de SteelSeries et de Microsoft : rien n'a été installé."
+msgstr "Los archivos del controlador no llevan las firmas esperadas de SteelSeries y Microsoft: no se instaló nada."
+
+msgid "Le pilote Sonar n'a pu être installé ni par l'outil de SteelSeries ni par les fonctions de Windows : voyez le journal."
+msgstr "No se pudo instalar el controlador Sonar ni con la herramienta de SteelSeries ni con las funciones de Windows: consulte el registro."
+
+msgid "Le pilote Sonar n'a pu être retiré ni par l'outil de SteelSeries ni par les fonctions de Windows : voyez le journal."
+msgstr "No se pudo quitar el controlador Sonar ni con la herramienta de SteelSeries ni con las funciones de Windows: consulte el registro."
+
+msgid "Installation annulée."
+msgstr "Instalación cancelada."
+
+msgid "SteelSeries GG démarre encore avec Windows : désactivez-le dans le Gestionnaire des tâches (Applications de démarrage) pour laisser la main à Platinum."
+msgstr "SteelSeries GG todavía se inicia con Windows: desactívelo en el Administrador de tareas (Aplicaciones de arranque) para dejar paso a Platinum."
+
+msgid "Windows demande un redémarrage pour finir d'installer le pilote."
+msgstr "Windows pide reiniciar para terminar de instalar el controlador."
+
+msgid "Platinum est installé."
+msgstr "Platinum está instalado."
+
+msgid "Le son passe sans Platinum pendant quelques secondes."
+msgstr "El sonido pasa sin Platinum durante unos segundos."
+
+msgid "Vérification de la signature de SteelSeries…"
+msgstr "Comprobando la firma de SteelSeries…"
+
+msgid "Extraction du pilote Sonar (seuls 42 Mo sur 1,3 Go sont gardés)…"
+msgstr "Extrayendo el controlador Sonar (solo se conservan 42 MB de 1,3 GB)…"
+
+msgid "Windows demande l'autorisation d'installer le pilote. Le son se coupera quelques secondes pendant le redémarrage du service Audio de Windows."
+msgstr "Windows pide permiso para instalar el controlador. El sonido se cortará unos segundos mientras se reinicia el servicio Audio de Windows."
+
+msgid "Windows demande l'autorisation d'installer le runtime Visual C++."
+msgstr "Windows pide permiso para instalar el runtime de Visual C++."
+
+msgid "L'autorisation d'administrateur a été refusée : rien n'a été installé. Cliquez sur Réessayer pour la redemander."
+msgstr "Se denegó el permiso de administrador: no se instaló nada. Haga clic en Reintentar para volver a pedirlo."
+
+msgid "Attente des périphériques audio Sonar…"
+msgstr "Esperando los dispositivos de audio Sonar…"
+
+msgid "Le pilote Sonar n'est pas installé après les outils de SteelSeries : voyez le journal."
+msgstr "El controlador Sonar no está instalado tras las herramientas de SteelSeries: consulte el registro."
+
+msgid "Les réglages du module audio Sonar n'ont pas été créés : voyez le journal."
+msgstr "No se crearon los ajustes del módulo de audio Sonar: consulte el registro."
+
+msgid "Les périphériques audio Sonar n'apparaissent pas encore : redémarrez Windows si le son ne passe pas par Platinum."
+msgstr "Los dispositivos de audio Sonar aún no aparecen: reinicie Windows si el sonido no pasa por Platinum."
+
+msgid "Cet installateur a été compilé sans les programmes de Platinum : utilisez scripts\\build-setup.ps1."
+msgstr "Este instalador se compiló sin los programas de Platinum: use scripts\\build-setup.ps1."
+
+msgid "Platinum n'a pas pu s'inscrire au démarrage de Windows : voyez le journal."
+msgstr "Platinum no pudo registrarse para iniciarse con Windows: consulte el registro."
+
+msgid "Mixeur et effets audio"
+msgstr "Mezclador y efectos de audio"
+
+msgid "Le journal de l'installation : {file}"
+msgstr "El registro de la instalación: {file}"
+
+msgid "Le runtime Visual C++ ne peut pas être téléchargé (HTTP {status})."
+msgstr "No se puede descargar el runtime de Visual C++ (HTTP {status})."
+
+msgid "Le runtime téléchargé n'est pas signé par Microsoft : {error}"
+msgstr "El runtime descargado no está firmado por Microsoft: {error}"
+
+msgid "Le téléchargement a échoué : {error}"
+msgstr "La descarga falló: {error}"
+
+msgid "L'installateur de SteelSeries GG ne peut pas être téléchargé (HTTP {status})."
+msgstr "No se puede descargar el instalador de SteelSeries GG (HTTP {status})."
+
+msgid "L'installateur testé (GG {pinned}) n'est plus en ligne : le pilote vient de {name}."
+msgstr "El instalador probado (GG {pinned}) ya no está en línea: el controlador viene de {name}."
+
+msgid "Le fichier téléchargé ne correspond pas à l'installateur attendu (SHA-256 {digest}) : il a été supprimé, réessayez."
+msgstr "El archivo descargado no coincide con el instalador esperado (SHA-256 {digest}): se eliminó, inténtelo de nuevo."
+
+msgid "L'installateur téléchargé n'est pas signé par SteelSeries : {error}"
+msgstr "El instalador descargado no está firmado por SteelSeries: {error}"
+
+msgid "Cet installateur n'est pas signé par SteelSeries : {error}"
+msgstr "Este instalador no está firmado por SteelSeries: {error}"
+
+msgid "Le pilote ne peut pas être extrait de l'installateur : {error}"
+msgstr "No se puede extraer el controlador del instalador: {error}"
+
+msgid "Des fichiers du pilote manquent dans cet installateur : {files}"
+msgstr "Faltan archivos del controlador en este instalador: {files}"
+
+msgid "La partie administrateur n'a pas pu démarrer : {error}"
+msgstr "La parte de administrador no pudo iniciarse: {error}"
+
+msgid "Impossible de créer {folder} : {error}"
+msgstr "No se puede crear {folder}: {error}"
+
+msgid "Impossible d'écrire {file} : {error}"
+msgstr "No se puede escribir {file}: {error}"
+
+msgid "Le raccourci {file} n'a pas pu être créé : {error}"
+msgstr "No se pudo crear el acceso directo {file}: {error}"
+
+msgid "Platinum n'a pas pu démarrer : {error}"
+msgstr "Platinum no pudo iniciarse: {error}"
+
+msgid "Téléchargement du runtime Visual C++ : {done} Mo sur {total} Mo"
+msgstr "Descargando el runtime de Visual C++: {done} MB de {total} MB"
+
+msgid "Téléchargement de l'installateur de SteelSeries GG : {done} Mo sur {total} Mo"
+msgstr "Descargando el instalador de SteelSeries GG: {done} MB de {total} MB"
+
+msgid "Télécharger le runtime Visual C++ de Microsoft"
+msgstr "Descargar el runtime de Visual C++ de Microsoft"
+
+msgid "Télécharger l'installateur officiel de SteelSeries GG"
+msgstr "Descargar el instalador oficial de SteelSeries GG"
+
+msgid "Extraire le pilote Sonar et les préréglages"
+msgstr "Extraer el controlador Sonar y los preajustes"
+
+msgid "Installer le pilote Sonar (administrateur)"
+msgstr "Instalar el controlador Sonar (administrador)"
+
+msgid "Vérifier le pilote et les périphériques audio"
+msgstr "Comprobar el controlador y los dispositivos de audio"
+
+msgid "Arrêter Platinum"
+msgstr "Detener Platinum"
+
+msgid "Copier Platinum"
+msgstr "Copiar Platinum"
+
+msgid "Démarrage avec Windows"
+msgstr "Inicio con Windows"
+
+msgid "Raccourcis"
+msgstr "Accesos directos"
+
+msgid "Inscrire Platinum dans les applications installées"
+msgstr "Añadir Platinum a las aplicaciones instaladas"
+
+msgid "Démarrer Platinum"
+msgstr "Iniciar Platinum"
+
+msgid "Supprimer les fichiers téléchargés"
+msgstr "Eliminar los archivos descargados"
+
+msgid "Windows demande un redémarrage pour finir de retirer le pilote."
+msgstr "Windows pide reiniciar para terminar de quitar el controlador."
+
+msgid "SteelSeries GG est toujours installé : réactivez son démarrage avec Windows si vous voulez le retrouver."
+msgstr "SteelSeries GG sigue instalado: vuelva a activar su inicio con Windows si quiere recuperarlo."
+
+msgid "Platinum est désinstallé."
+msgstr "Platinum está desinstalado."
+
+msgid "Windows demande l'autorisation de retirer le pilote. Le son se coupera quelques secondes."
+msgstr "Windows pide permiso para quitar el controlador. El sonido se cortará unos segundos."
+
+msgid "L'autorisation d'administrateur a été refusée : le pilote Sonar est resté installé."
+msgstr "Se denegó el permiso de administrador: el controlador Sonar sigue instalado."
+
+msgid "Vos réglages et préréglages restent dans {folder}."
+msgstr "Sus ajustes y preajustes permanecen en {folder}."
+
+msgid "Impossible de supprimer {file} : {error}"
+msgstr "No se puede eliminar {file}: {error}"
+
+msgid "Retirer le démarrage avec Windows"
+msgstr "Quitar el inicio con Windows"
+
+msgid "Remettre les noms d'origine des périphériques audio"
+msgstr "Restaurar los nombres originales de los dispositivos de audio"
+
+msgid "Supprimer les programmes de Platinum"
+msgstr "Eliminar los programas de Platinum"
+
+msgid "Supprimer les raccourcis"
+msgstr "Eliminar los accesos directos"
+
+msgid "Retirer Platinum des applications installées"
+msgstr "Quitar Platinum de las aplicaciones instaladas"
+
+msgid "Supprimer vos réglages et préréglages"
+msgstr "Eliminar sus ajustes y preajustes"
+
+msgid "Désinstaller le pilote Sonar (administrateur)"
+msgstr "Desinstalar el controlador Sonar (administrador)"
+
+msgid "Télécharger l'installateur officiel de SteelSeries GG (environ 434 Mo) depuis steelseries.com, et n'en garder que le pilote Sonar, ses modules d'effets et les préréglages de GG (environ 42 Mo)."
+msgstr "Descargar el instalador oficial de SteelSeries GG (unos 434 MB) desde steelseries.com y conservar solo el controlador Sonar, sus módulos de efectos y los preajustes de GG (unos 42 MB)."
+
+msgid "Reprendre le pilote Sonar déjà extrait par une installation précédente de Platinum."
+msgstr "Reutilizar el controlador Sonar ya extraído por una instalación anterior de Platinum."
+
+msgid "Le pilote Sonar est déjà installé : rien à télécharger de SteelSeries."
+msgstr "El controlador Sonar ya está instalado: nada que descargar de SteelSeries."
+
+msgid "Installer le pilote Sonar avec les outils de SteelSeries, comme le fait GG (autorisation d'administrateur, son coupé quelques secondes). GG lui-même n'est pas installé."
+msgstr "Instalar el controlador Sonar con las herramientas de SteelSeries, como hace GG (permiso de administrador, sonido cortado unos segundos). GG no se instala."
+
+msgid "Installer le runtime Visual C++ de Microsoft, nécessaire aux effets du micro."
+msgstr "Instalar el runtime de Visual C++ de Microsoft, necesario para los efectos del micrófono."
+
+msgid "Ajouter Platinum au menu Démarrer et aux applications installées, puis le démarrer."
+msgstr "Añadir Platinum al menú Inicio y a las aplicaciones instaladas, y luego iniciarlo."
+
+msgid "Arrêter Platinum et remettre les périphériques audio par défaut de Windows."
+msgstr "Detener Platinum y restaurar los dispositivos de audio predeterminados de Windows."
+
+msgid "Retirer son démarrage avec Windows, ses programmes, ses raccourcis et son entrée dans les applications installées."
+msgstr "Quitar su inicio con Windows, sus programas, sus accesos directos y su entrada en las aplicaciones instaladas."
+
+msgid "Le pilote Sonar reste installé : il appartient à SteelSeries GG."
+msgstr "El controlador Sonar sigue instalado: pertenece a SteelSeries GG."
+
+msgid "Le pilote Sonar reste installé : Platinum ne l'a pas installé."
+msgstr "El controlador Sonar sigue instalado: Platinum no lo instaló."
+
+msgid "Le pilote Sonar n'existe que pour Windows 64 bits sur processeur x64."
+msgstr "El controlador Sonar solo existe para Windows de 64 bits en procesadores x64."
+
+msgid "Prendre le pilote Sonar et les préréglages dans l'installateur de GG indiqué : {file}."
+msgstr "Tomar el controlador Sonar y los preajustes del instalador de GG indicado: {file}."
+
+msgid "Mettre à jour Platinum dans {folder} : vos réglages et préréglages sont gardés."
+msgstr "Actualizar Platinum en {folder}: se conservan sus ajustes y preajustes."
+
+msgid "Copier Platinum dans {folder}, sans droits d'administrateur."
+msgstr "Copiar Platinum en {folder}, sin derechos de administrador."
+
+msgid "SteelSeries GG est ouvert ({programs}). Quittez-le (icône près de l'horloge, Quitter), puis cliquez sur Réessayer. Désactivez aussi son démarrage avec Windows (Gestionnaire des tâches, Applications de démarrage)."
+msgstr "SteelSeries GG está abierto ({programs}). Ciérrelo (icono junto al reloj, Salir) y haga clic en Reintentar. Desactive también su inicio con Windows (Administrador de tareas, Aplicaciones de arranque)."
+
+msgid "Le pilote Sonar demande Windows 10 version 1809 ou plus récente (cet ordinateur : build {build})."
+msgstr "El controlador Sonar requiere Windows 10 versión 1809 o posterior (este equipo: compilación {build})."
+
+msgid "LICENCES ET OPTIONS"
+msgstr "LICENCIAS Y OPCIONES"
+
+msgid "LICENCE DE STEELSERIES GG"
+msgstr "LICENCIA DE STEELSERIES GG"
+
+msgid "LICENCES"
+msgstr "LICENCIAS"
+
+msgid "Le pilote Sonar et ses modules d'effets appartiennent à SteelSeries et ne sont pas fournis avec Platinum. La licence de SteelSeries GG vous sera présentée une fois leur installateur officiel téléchargé et vérifié : rien n'est installé avant que vous l'acceptiez. GG lui-même n'est pas installé."
+msgstr "El controlador Sonar y sus módulos de efectos pertenecen a SteelSeries y no se incluyen con Platinum. La licencia de SteelSeries GG se le mostrará una vez descargado y verificado su instalador oficial: no se instala nada antes de que la acepte. GG no se instala."
+
+msgid "Lisez la licence de SteelSeries GG. Le pilote Sonar et ses modules d'effets sont soumis à cette licence. Rien n'est installé tant que vous ne l'avez pas acceptée."
+msgstr "Lea la licencia de SteelSeries GG. El controlador Sonar y sus módulos de efectos están sujetos a ella. No se instala nada hasta que la acepte."
+
+msgid "J'ai lu et j'accepte la licence de SteelSeries GG"
+msgstr "He leído y acepto la licencia de SteelSeries GG"
+
+msgid "Refuser"
+msgstr "Rechazar"
+
+msgid "Accepter"
+msgstr "Aceptar"
+
+msgid "Rien n'a été installé."
+msgstr "No se instaló nada."
+
+msgid "La licence de SteelSeries GG a été refusée : l'installateur téléchargé a été supprimé."
+msgstr "Se rechazó la licencia de SteelSeries GG: se eliminó el instalador descargado."
+
+msgid "Lecture de la licence de SteelSeries GG dans leur installateur…"
+msgstr "Leyendo la licencia de SteelSeries GG en su instalador…"
+
+msgid "En attente de votre réponse à la licence de SteelSeries GG…"
+msgstr "Esperando su respuesta a la licencia de SteelSeries GG…"
+
+msgid "Le texte de la licence de SteelSeries GG ne peut pas être lu : rien n'est installé ({error})."
+msgstr "No se puede leer el texto de la licencia de SteelSeries GG: no se instala nada ({error})."
+
+msgid "Le texte de la licence de SteelSeries GG ne peut pas être lu dans leur installateur : rien n'est installé ({error})."
+msgstr "No se puede leer el texto de la licencia de SteelSeries GG en su instalador: no se instala nada ({error})."
+
+msgid "Lire et accepter la licence de SteelSeries GG"
+msgstr "Leer y aceptar la licencia de SteelSeries GG"
+
+msgid "Vous montrer la licence de SteelSeries GG, tirée de leur installateur officiel : rien n'est installé avant que vous l'acceptiez."
+msgstr "Mostrarle la licencia de SteelSeries GG, tomada de su instalador oficial: no se instala nada antes de que la acepte."
+
+msgid "Tirée de l'installateur officiel de SteelSeries GG {version}, vérifié par sa signature."
+msgstr "Tomada del instalador oficial de SteelSeries GG {version}, verificado por su firma."
+
+#: setup/ui/setup.slint
+msgid "Proposer d'envoyer les rapports de plantage (anonymisés, via GitHub, toujours après votre accord)"
+msgstr "Proponer el envío de los informes de fallo (anonimizados, a través de GitHub, siempre con su consentimiento)"
+
+#: setup/ui/setup.slint
+msgid "Les plantages sont toujours notés sur ce PC. Activé, Platinum vous propose après un plantage d'envoyer le rapport : vous le lisez, puis vous l'envoyez vous-même depuis votre navigateur. Rien n'est jamais envoyé automatiquement. Modifiable ensuite dans les Paramètres de Platinum."
+msgstr "Los fallos siempre se registran en este PC. Activado, Platinum le propone enviar el informe tras un fallo: usted lo lee y luego lo envía usted mismo desde su navegador. Nunca se envía nada automáticamente. Se puede cambiar después en los Ajustes de Platinum."

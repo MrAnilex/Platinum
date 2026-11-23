@@ -1,0 +1,14 @@
+# Build output
+/target
+
+# Machine-specific build setup, written by scripts/setup-toolchain.ps1 (absolute paths to this
+# machine's Rust toolchain) and the LLVM dlltool it links: never publish them.
+/.cargo/config.toml
+/.tools/
+
+# Window captures (PLATINUM_UI_SNAPSHOT) and other scratch files
+*.rgba
+*.log
+
+# Built setup (scripts/build-setup.ps1)
+/dist/

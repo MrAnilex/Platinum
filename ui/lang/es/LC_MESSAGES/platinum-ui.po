@@ -1,0 +1,2285 @@
+# Platinum's window (es): the texts of ui/ui/*.slint and of ui/src/*.rs.
+# Source texts are French; an entry left untranslated shows in French.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ui/ui/app.slint
+msgid "Actif"
+msgstr "Activo"
+
+#: ui/ui/app.slint
+msgid "Démarrage…"
+msgstr "Iniciando…"
+
+#: ui/ui/app.slint
+msgid "{0} n'a pas autorisé Platinum à modifier ses paramètres audio. Ajustez les paramètres audio directement dans {0}."
+msgstr "{0} no ha permitido que Platinum modifique su configuración de audio. Ajuste la configuración de audio directamente en {0}."
+
+#: ui/ui/app.slint
+msgid "Il est possible que {0} n'autorise pas Platinum à modifier ses paramètres audio. Si besoin, ajustez les paramètres audio directement dans {0}."
+msgstr "Es posible que {0} no permita que Platinum modifique su configuración de audio. Si es necesario, ajuste la configuración de audio directamente en {0}."
+
+#: ui/ui/app.slint
+msgid "APPLICATIONS"
+msgstr "APLICACIONES"
+
+#: ui/ui/app.slint
+msgid "Déposer ici"
+msgstr "Soltar aquí"
+
+#: ui/ui/app.slint
+msgid "Réglages illisibles"
+msgstr "Ajustes ilegibles"
+
+#: ui/ui/app.slint
+msgid "Le module audio de SteelSeries ne répond pas pour ce canal."
+msgstr "El módulo de audio de SteelSeries no responde para este canal."
+
+#: ui/ui/app.slint
+msgid "Sortie inconnue"
+msgstr "Salida desconocida"
+
+#: ui/ui/app.slint
+msgid "PERSO"
+msgstr "PERS."
+
+#: ui/ui/app.slint
+msgid "STREAM"
+msgstr "STREAM"
+
+#: ui/ui/app.slint
+msgid "Paramètres"
+msgstr "Ajustes"
+
+#: ui/ui/app.slint ui/ui/settings.slint
+msgid "Aucun micro choisi"
+msgstr "Ningún micro elegido"
+
+#: ui/ui/app.slint
+msgid "Micro : {}"
+msgstr "Micro: {}"
+
+#: ui/ui/app.slint
+msgid "Aucun micro choisi : choisissez-en un dans la colonne Micro du mixeur."
+msgstr "Ningún micro elegido: elija uno en la columna Micro del mezclador."
+
+#: ui/ui/app.slint
+msgid "Démarrer"
+msgstr "Iniciar"
+
+#: ui/ui/app.slint
+msgid "Arrêter…"
+msgstr "Detener…"
+
+#: ui/ui/app.slint ui/ui/presets.slint
+msgid "Annuler"
+msgstr "Cancelar"
+
+#: ui/ui/app.slint
+msgid "Platinum"
+msgstr "Platinum"
+
+#: ui/ui/app.slint
+msgid "MIXEUR"
+msgstr "MEZCLADOR"
+
+#: ui/ui/app.slint
+msgid "GAMING"
+msgstr "GAMING"
+
+#: ui/ui/app.slint
+msgid "CHAT"
+msgstr "CHAT"
+
+#: ui/ui/app.slint
+msgid "MEDIA"
+msgstr "MEDIA"
+
+#: ui/ui/app.slint
+msgid "AUX"
+msgstr "AUX"
+
+#: ui/ui/app.slint ui/ui/settings.slint
+msgid "MICRO"
+msgstr "MICRO"
+
+#: ui/ui/app.slint
+msgid "MASTER"
+msgstr "MASTER"
+
+#: ui/ui/app.slint
+msgid "MIX PERSONNEL"
+msgstr "MI MEZCLA"
+
+#: ui/ui/app.slint ui/src/engine.rs
+msgid "Aucune sortie"
+msgstr "Sin salida"
+
+#: ui/ui/app.slint
+msgid "Gestionnaire de périphériques"
+msgstr "Administrador de dispositivos"
+
+#: ui/ui/app.slint
+msgid "MIX DE STREAM"
+msgstr "MEZCLA DE STREAM"
+
+#: ui/ui/app.slint
+msgid "À TRANSFÉRER"
+msgstr "POR TRANSFERIR"
+
+#: ui/ui/app.slint
+msgid "Windows…"
+msgstr "Windows…"
+
+#: ui/ui/app.slint
+msgid "SORTIE DES CANAUX"
+msgstr "SALIDA DE CANALES"
+
+#: ui/ui/app.slint
+msgid "NIVEAU"
+msgstr "NIVEL"
+
+#: ui/ui/app.slint
+msgid "Plusieurs sorties"
+msgstr "Varias salidas"
+
+#: ui/ui/app.slint
+msgid "Déposer ici : enregistre Microphone (Platinum)"
+msgstr "Soltar aquí: graba desde Microphone (Platinum)"
+
+#: ui/ui/app.slint
+msgid "Aucune application n'enregistre Microphone (Platinum) en ce moment."
+msgstr "Ninguna aplicación graba desde Microphone (Platinum) en este momento."
+
+#: ui/ui/app.slint
+msgid "Microphone (Platinum) n'est pas actif : démarrez Platinum."
+msgstr "Microphone (Platinum) no está activo: inicie Platinum."
+
+#: ui/ui/app.slint
+msgid "ENTRÉE MICRO"
+msgstr "ENTRADA MICRO"
+
+#: ui/ui/app.slint
+msgid "CHATMIX"
+msgstr "CHATMIX"
+
+#: ui/ui/app.slint
+msgid "Parcourir"
+msgstr "Explorar"
+
+#: ui/ui/app.slint
+msgid "EFFETS DU CANAL"
+msgstr "EFECTOS DEL CANAL"
+
+#: ui/ui/app.slint
+msgid "SORTIE"
+msgstr "SALIDA"
+
+#: ui/ui/app.slint
+msgid "Réglages de ce canal illisibles"
+msgstr "Ajustes de este canal ilegibles"
+
+#: ui/ui/app.slint
+msgid "Le module audio de SteelSeries ne répond pas pour ce canal. Ses réglages ne sont pas affichés plutôt que d'en montrer de faux ; la fenêtre réessaie toutes les 30 secondes."
+msgstr "El módulo de audio de SteelSeries no responde para este canal. Sus ajustes no se muestran para no enseñar valores falsos; la ventana lo reintenta cada 30 segundos."
+
+#: ui/ui/app.slint
+msgid "L'annulation d'écho écoute une autre sortie"
+msgstr "La cancelación de eco escucha otra salida"
+
+#: ui/ui/app.slint
+msgid "Vos correspondants peuvent entendre vos haut-parleurs."
+msgstr "Sus interlocutores pueden oír sus altavoces."
+
+#: ui/ui/app.slint
+msgid "Mettre à jour l'annulation d'écho"
+msgstr "Actualizar la cancelación de eco"
+
+#: ui/ui/app.slint
+msgid "Arrêter Platinum ?"
+msgstr "¿Detener Platinum?"
+
+#: ui/ui/app.slint
+msgid "Le son et le micro passeront directement par Windows, sans les effets de Platinum, jusqu'à ce que vous redémarriez Platinum. Discord et les autres applications n'entendront plus le micro virtuel."
+msgstr "El sonido y el micrófono pasarán directamente por Windows, sin los efectos de Platinum, hasta que vuelva a iniciar Platinum. Discord y las demás aplicaciones dejarán de oír el micrófono virtual."
+
+#: ui/ui/app.slint ui/ui/tester.slint
+msgid "Arrêter"
+msgstr "Detener"
+
+#: ui/ui/app.slint
+msgid "Changer de micro ?"
+msgstr "¿Cambiar de micro?"
+
+#: ui/ui/app.slint
+msgid "Platinum redémarre pour ouvrir {} : le son et le micro sont coupés quelques secondes."
+msgstr "Platinum se reinicia para abrir {}: el sonido y el micro se cortan unos segundos."
+
+#: ui/ui/app.slint
+msgid "Platinum redémarre pour ouvrir ce micro : le son et le micro sont coupés quelques secondes."
+msgstr "Platinum se reinicia para abrir este micro: el sonido y el micro se cortan unos segundos."
+
+#: ui/ui/app.slint
+msgid "Changer de micro"
+msgstr "Cambiar de micro"
+
+#: ui/ui/app.slint
+msgid "Micro d'un casque Bluetooth"
+msgstr "Micro de auriculares Bluetooth"
+
+#: ui/ui/app.slint
+msgid "Ouvrir ce micro ferait passer le casque en mode mains libres : la musique et les appels perdraient en qualité. Platinum ne l'utilise pas ; branchez un autre micro ou choisissez-en un autre dans la liste."
+msgstr "Abrir este micro pasaría los auriculares al modo manos libres: la música y las llamadas perderían calidad. Platinum no lo usa; conecte otro micro o elija otro de la lista."
+
+#: ui/ui/app.slint
+msgid "Fermer"
+msgstr "Cerrar"
+
+#: ui/ui/app.slint
+msgid "Voulez-vous vraiment supprimer ?"
+msgstr "¿Seguro que desea eliminar?"
+
+#: ui/ui/app.slint
+msgid "Le préréglage « {} » sera supprimé : vous perdrez tous les paramètres appliqués à cette configuration. Le canal garde ses réglages actuels."
+msgstr "El preajuste «{}» se eliminará: perderá todos los parámetros aplicados a esta configuración. El canal conserva sus ajustes actuales."
+
+#: ui/ui/app.slint ui/ui/eq.slint
+msgid "Supprimer"
+msgstr "Eliminar"
+
+#: ui/ui/app.slint
+msgid "Activer le mode streamer ?"
+msgstr "¿Activar el modo streamer?"
+
+#: ui/ui/app.slint
+msgid "Chaque canal aura deux volumes : celui du mix personnel, que vous entendez, et celui du mix de stream, envoyé vers Stream (Platinum) pour vos logiciels de streaming (OBS, Streamlabs…). Les canaux du mix personnel joueront tous sur la même sortie ; Platinum retient leurs sorties actuelles et les remettra en revenant au mode classique."
+msgstr "Cada canal tendrá dos volúmenes: el de la mezcla personal, que usted oye, y el de la mezcla de stream, enviado a Stream (Platinum) para sus programas de streaming (OBS, Streamlabs…). Todos los canales de la mezcla personal sonarán en la misma salida; Platinum recuerda sus salidas actuales y las restaurará al volver al modo clásico."
+
+#: ui/ui/app.slint
+msgid "Activer"
+msgstr "Activar"
+
+#: ui/ui/app.slint
+msgid "Revenir au mode classique ?"
+msgstr "¿Volver al modo clásico?"
+
+#: ui/ui/app.slint
+msgid "Plus aucun canal n'est envoyé vers le mix de stream, et chaque canal retrouve la sortie qu'il avait en mode classique. Vos choix de canaux pour les deux mix sont gardés pour la prochaine fois."
+msgstr "Ningún canal se enviará ya a la mezcla de stream, y cada canal recupera la salida que tenía en modo clásico. Su selección de canales para ambas mezclas se guarda para la próxima vez."
+
+#: ui/ui/app.slint
+msgid "Revenir au mode classique"
+msgstr "Volver al modo clásico"
+
+#: ui/ui/app.slint
+msgid "Redémarrer Platinum ?"
+msgstr "¿Reiniciar Platinum?"
+
+#: ui/ui/app.slint
+msgid "Platinum s'arrête puis redémarre avec vos nouveaux réglages : le son et le micro sont coupés quelques secondes. Discord et les autres applications n'entendent plus le micro pendant ce temps."
+msgstr "Platinum se detiene y vuelve a iniciarse con sus nuevos ajustes: el sonido y el micro se cortan unos segundos. Discord y las demás aplicaciones no oyen el micro durante ese tiempo."
+
+#: ui/ui/app.slint
+msgid "Redémarrer"
+msgstr "Reiniciar"
+
+#: ui/ui/app.slint
+msgid "Voulez-vous vraiment réinitialiser ?"
+msgstr "¿Seguro que desea restablecer?"
+
+#: ui/ui/app.slint
+msgid "Tout paramètre appliqué à « {} » sera réinitialisé à la valeur par défaut."
+msgstr "Todos los parámetros aplicados a «{}» se restablecerán a su valor predeterminado."
+
+#: ui/ui/app.slint ui/ui/cards.slint ui/ui/eq.slint ui/ui/presets.slint
+msgid "Réinitialiser"
+msgstr "Restablecer"
+
+#: ui/ui/cards.slint
+msgid "ÉGALISEUR"
+msgstr "ECUALIZADOR"
+
+#: ui/ui/cards.slint
+msgid "ZONES"
+msgstr "ZONAS"
+
+#: ui/ui/cards.slint
+msgid "Défaut"
+msgstr "Estándar"
+
+#: ui/ui/cards.slint
+msgid "Voix"
+msgstr "Voz"
+
+#: ui/ui/cards.slint
+msgid "Ajustez la fréquence, le gain et le Q Factor afin de moduler le son avec une précision chirurgicale. Ajoutez et retirez jusqu'à 10 bandes. Réglez facilement les fréquences basses, des voix et aigus avec des curseurs intégrés."
+msgstr "Ajuste la frecuencia, la ganancia y el factor Q para moldear el sonido con precisión quirúrgica. Añada y quite hasta 10 bandas. Ajuste fácilmente los graves, las voces y los agudos con los controles integrados."
+
+#: ui/ui/cards.slint
+msgid "Basses"
+msgstr "Graves"
+
+#: ui/ui/cards.slint
+msgid "Aigus"
+msgstr "Agudos"
+
+#: ui/ui/cards.slint
+msgid "AUDIO SPATIAL"
+msgstr "AUDIO ESPACIAL"
+
+#: ui/ui/cards.slint
+msgid "Faites jaillir le son tout autour de vous, pour mieux cerner vos environs. Ajustez les paramètres avancés comme la position et la distance des haut-parleurs pour personnaliser davantage la spatialisation de votre son."
+msgstr "Haga que el sonido le envuelva por completo para percibir mejor su entorno. Ajuste los parámetros avanzados, como la posición y la distancia de los altavoces, para personalizar aún más la espacialización de su sonido."
+
+#: ui/ui/cards.slint
+msgid "Mode casque"
+msgstr "Modo auriculares"
+
+#: ui/ui/cards.slint
+msgid "Mode haut-parleur"
+msgstr "Modo altavoces"
+
+#: ui/ui/cards.slint
+msgid "AJUSTEMENT"
+msgstr "AJUSTE"
+
+#: ui/ui/cards.slint
+msgid "Performance"
+msgstr "Rendimiento"
+
+#: ui/ui/cards.slint
+msgid "Immersion"
+msgstr "Inmersión"
+
+#: ui/ui/cards.slint
+msgid "DISTANCE"
+msgstr "DISTANCIA"
+
+#: ui/ui/cards.slint
+msgid "Glissez une enceinte autour de la tête pour la déplacer ; un clic droit la remet à sa place."
+msgstr "Arrastre un altavoz alrededor de la cabeza para moverlo; un clic derecho lo devuelve a su sitio."
+
+#: ui/ui/cards.slint
+msgid "BOOST DE VOLUME"
+msgstr "AUMENTO DE VOLUMEN"
+
+#: ui/ui/cards.slint
+msgid "Augmenter cette valeur boostera le volume avant tout traitement."
+msgstr "Aumentar este valor eleva el volumen antes de cualquier procesamiento."
+
+#: ui/ui/cards.slint ui/ui/eq.slint
+msgid "Gain"
+msgstr "Ganancia"
+
+#: ui/ui/cards.slint
+msgid "Augmente le volume avant tout traitement."
+msgstr "Aumenta el volumen antes de cualquier procesamiento."
+
+#: ui/ui/cards.slint
+msgid "VOLUME INTELLIGENT"
+msgstr "VOLUMEN INTELIGENTE"
+
+#: ui/ui/cards.slint
+msgid "Maintient automatiquement le volume dans une certaine amplitude afin qu'il ne soit jamais trop fort ou inaudible. Ajustez le curseur pour définir l'impact de l'effet."
+msgstr "Mantiene automáticamente el volumen dentro de un cierto rango para que nunca esté demasiado alto ni sea inaudible. Ajuste el control deslizante para definir la intensidad del efecto."
+
+#: ui/ui/cards.slint
+msgid "Niveau"
+msgstr "Nivel"
+
+#: ui/ui/cards.slint
+msgid "INTENSITÉ"
+msgstr "INTENSIDAD"
+
+#: ui/ui/cards.slint
+msgid "Forte"
+msgstr "Fuerte"
+
+#: ui/ui/cards.slint
+msgid "Équilibrée"
+msgstr "Equilibrada"
+
+#: ui/ui/cards.slint
+msgid "Douce"
+msgstr "Suave"
+
+#: ui/ui/cards.slint
+msgid "Réglage propre à Platinum (GG le laisse aux préréglages)."
+msgstr "Ajuste propio de Platinum (GG lo deja a los preajustes)."
+
+#: ui/ui/cards.slint
+msgid "Ajustez chacune des bandes pour entendre plus ou moins le son de chaque fréquence."
+msgstr "Ajuste cada banda para oír más o menos el sonido de cada frecuencia."
+
+#: ui/ui/cards.slint
+msgid "SUPPRESSION DE BRUIT IA"
+msgstr "CANCELACIÓN DE RUIDO IA"
+
+#: ui/ui/cards.slint
+msgid "Conférez une clarté à toute épreuve à votre voix en supprimant tous les sons non vocaux grâce à l'annulation de bruit gérée par IA de ClearCast."
+msgstr "Dé a su voz una claridad a toda prueba eliminando todos los sonidos que no sean voz gracias a la cancelación de ruido por IA de ClearCast."
+
+#: ui/ui/cards.slint
+msgid "Conférez une clarté à toute épreuve à la voix de vos coéquipiers en supprimant tous les sons non vocaux et l'écho grâce à l'annulation de bruit gérée par IA de ClearCast AI."
+msgstr "Dé a la voz de sus compañeros de equipo una claridad a toda prueba eliminando todos los sonidos que no sean voz y el eco gracias a la cancelación de ruido por IA de ClearCast AI."
+
+#: ui/ui/cards.slint
+msgid "Min"
+msgstr "Mín"
+
+#: ui/ui/cards.slint
+msgid "Max"
+msgstr "Máx"
+
+#: ui/ui/cards.slint
+msgid "Annulation d'écho"
+msgstr "Cancelación de eco"
+
+#: ui/ui/cards.slint
+msgid "Retire de votre voix le son de ce que vous écoutez. À essayer en situation réelle (appel, chat vocal)."
+msgstr "Quita de su voz el sonido de lo que está escuchando. Pruébelo en una situación real (llamada, chat de voz)."
+
+#: ui/ui/cards.slint
+msgid "Disponible quand la suppression de bruit IA est activée."
+msgstr "Disponible cuando la cancelación de ruido IA está activada."
+
+#: ui/ui/cards.slint
+msgid "RÉDUCTION DU BRUIT"
+msgstr "REDUCCIÓN DE RUIDO"
+
+#: ui/ui/cards.slint
+msgid "Background réduit le bruit statique comme celui qui émis par les ventilateurs de votre PC ; Impact réduit le bruit des frappes de touches de clavier/clics."
+msgstr "Ruido de fondo reduce el ruido estático, como el que emiten los ventiladores de su PC; Impacto reduce el ruido de las pulsaciones del teclado y de los clics."
+
+#: ui/ui/cards.slint
+msgid "Encore active malgré la suppression de bruit IA : choisissez de nouveau le préréglage pour la couper"
+msgstr "Aún activa pese a la cancelación de ruido IA: vuelva a elegir el preajuste para desactivarla"
+
+#: ui/ui/cards.slint
+msgid "Désactivé lorsque la suppression de bruit IA est activée"
+msgstr "Desactivado con la cancelación de ruido IA activa"
+
+#: ui/ui/cards.slint
+msgid "Bruit de fond"
+msgstr "Ruido de fondo"
+
+#: ui/ui/cards.slint
+msgid "Impact"
+msgstr "Impacto"
+
+#: ui/ui/cards.slint
+msgid "NOISE GATE"
+msgstr "NOISE GATE"
+
+#: ui/ui/cards.slint
+msgid "Coupe complètement le bruit lorsque son volume est en-dessous du seuil."
+msgstr "Corta por completo el ruido cuando su volumen está por debajo del umbral."
+
+#: ui/ui/cards.slint
+msgid "Seuil"
+msgstr "Umbral"
+
+#: ui/ui/cards.slint
+msgid "Seuil automatique"
+msgstr "Umbral automático"
+
+#: ui/ui/cards.slint
+msgid "Calcule automatiquement le seuil de l'effet noise gate."
+msgstr "Calcula automáticamente el umbral del efecto Noise Gate."
+
+#: ui/ui/cards.slint
+msgid "COMPRESSEUR"
+msgstr "COMPRESOR"
+
+#: ui/ui/cards.slint
+msgid "Maintient automatiquement la voix dans une certaine amplitude afin qu'elle ne soit jamais trop forte ou inaudible. Ajustez le curseur pour définir l'impact de l'effet."
+msgstr "Mantiene automáticamente la voz dentro de un cierto rango para que nunca esté demasiado alta ni sea inaudible. Ajuste el control deslizante para definir la intensidad del efecto."
+
+#: ui/ui/cards.slint
+msgid "Maintient automatiquement la voix dans une certaine amplitude afin qu'elle ne soit jamais trop forte ou inaudible."
+msgstr "Mantiene automáticamente la voz dentro de un cierto rango para que nunca esté demasiado alta ni sea inaudible."
+
+#: ui/ui/controls.slint
+msgid "muet"
+msgstr "mudo"
+
+#: ui/ui/devices.slint
+msgid "périphérique actuel"
+msgstr "dispositivo actual"
+
+#: ui/ui/devices.slint
+msgid "exclu"
+msgstr "excluido"
+
+#: ui/ui/devices.slint
+msgid "Exclure"
+msgstr "Excluir"
+
+#: ui/ui/devices.slint
+msgid "Aucun périphérique"
+msgstr "Ningún dispositivo"
+
+#: ui/ui/devices.slint
+msgid "Ajouter un périphérique…"
+msgstr "Añadir un dispositivo…"
+
+#: ui/ui/devices.slint
+msgid "Tous les périphériques sont dans la liste"
+msgstr "Todos los dispositivos están en la lista"
+
+#: ui/ui/eq.slint
+msgid "Bande {}"
+msgstr "Banda {}"
+
+#: ui/ui/eq.slint
+msgid "Activé"
+msgstr "Activado"
+
+#: ui/ui/eq.slint
+msgid "Désactivé"
+msgstr "Desactivado"
+
+#: ui/ui/eq.slint
+msgid "Fréq."
+msgstr "Frec."
+
+#: ui/ui/eq.slint
+msgid "Q"
+msgstr "Q"
+
+#: ui/ui/eq.slint
+msgid "GRONDEMENTS"
+msgstr "RETUMBOS"
+
+#: ui/ui/eq.slint
+msgid "CORPS DE LA VOIX"
+msgstr "CUERPO DE LA VOZ"
+
+#: ui/ui/eq.slint
+msgid "RÉSONANCE"
+msgstr "RESONANCIA"
+
+#: ui/ui/eq.slint
+msgid "MÉDIUMS"
+msgstr "MEDIOS"
+
+#: ui/ui/eq.slint
+msgid "SIBILANTES"
+msgstr "SIBILANTES"
+
+#: ui/ui/eq.slint
+msgid "AIR"
+msgstr "AIRE"
+
+#: ui/ui/eq.slint
+msgid "SUB-BASSES"
+msgstr "SUBGRAVES"
+
+#: ui/ui/eq.slint
+msgid "BASSES"
+msgstr "GRAVES"
+
+#: ui/ui/eq.slint
+msgid "MÉDIUMS BAS"
+msgstr "MEDIOS BAJOS"
+
+#: ui/ui/eq.slint
+msgid "MÉDIUMS HAUTS"
+msgstr "MEDIOS ALTOS"
+
+#: ui/ui/eq.slint
+msgid "AIGUS"
+msgstr "AGUDOS"
+
+#: ui/ui/eq.slint
+msgid "Ajouter une bande"
+msgstr "Añadir una banda"
+
+#: ui/ui/eq.slint
+msgid "(désactivée)"
+msgstr "(desactivada)"
+
+#: ui/ui/presets.slint
+msgid "NOUVEAU"
+msgstr "NUEVO"
+
+#: ui/ui/presets.slint
+msgid "FAVORIS"
+msgstr "FAVORITOS"
+
+#: ui/ui/presets.slint
+msgid "Aucun favori"
+msgstr "Sin favoritos"
+
+#: ui/ui/presets.slint
+msgid "Parcourir…"
+msgstr "Explorar…"
+
+#: ui/ui/presets.slint
+msgid "Activé par {} · modifié"
+msgstr "Activado por {} · modificado"
+
+#: ui/ui/presets.slint
+msgid "Activé par {}"
+msgstr "Activado por {}"
+
+#: ui/ui/presets.slint
+msgid "Modifié"
+msgstr "Modificado"
+
+#: ui/ui/presets.slint ui/ui/settings.slint ui/ui/tester.slint
+msgid "Enregistrer"
+msgstr "Guardar"
+
+#: ui/ui/presets.slint
+msgid "Enregistrer sous…"
+msgstr "Guardar como…"
+
+#: ui/ui/presets.slint
+msgid "Renommer…"
+msgstr "Renombrar…"
+
+#: ui/ui/presets.slint
+msgid "Supprimer…"
+msgstr "Eliminar…"
+
+#: ui/ui/presets.slint
+msgid "Exporter…"
+msgstr "Exportar…"
+
+#: ui/ui/presets.slint
+msgid "Importer…"
+msgstr "Importar…"
+
+#: ui/ui/presets.slint
+msgid "Associer au jeu en cours…"
+msgstr "Asociar al juego actual…"
+
+#: ui/ui/presets.slint
+msgid "Dissocier de {}"
+msgstr "Disociar de {}"
+
+#: ui/ui/presets.slint
+msgid "FAVORIS ({}/9)"
+msgstr "FAVORITOS {}/9"
+
+#: ui/ui/presets.slint
+msgid "PRÉRÉGLAGES"
+msgstr "PREAJUSTES"
+
+#: ui/ui/presets.slint
+msgid "Tous"
+msgstr "Todos"
+
+#: ui/ui/presets.slint ui/src/catalog.rs
+msgid "Bibliothèque GG"
+msgstr "Biblioteca GG"
+
+#: ui/ui/presets.slint
+msgid "Favoris"
+msgstr "Favoritos"
+
+#: ui/ui/presets.slint ui/src/catalog.rs
+msgid "Mes préréglages"
+msgstr "Mis preajustes"
+
+#: ui/ui/presets.slint
+msgid "Nouveaux"
+msgstr "Nuevos"
+
+#: ui/ui/presets.slint
+msgid "Par jeu"
+msgstr "Por juego"
+
+#: ui/ui/presets.slint
+msgid "Recherche"
+msgstr "Buscar"
+
+#: ui/ui/presets.slint
+msgid "Nouveau préréglage"
+msgstr "Nuevo preajuste"
+
+#: ui/ui/presets.slint
+msgid "Les préréglages que GG associe à un jeu installé sur ce PC, et ceux que vous avez associés à un jeu (menu « … » du préréglage, « Associer au jeu en cours… »). Quand le jeu tourne, Gaming prend son préréglage."
+msgstr "Los preajustes que GG asocia a un juego instalado en este PC y los que usted ha asociado a un juego (menú «…» del preajuste, «Asociar al juego actual…»). Cuando el juego está en marcha, Gaming toma su preajuste."
+
+#: ui/ui/presets.slint
+msgid "Aucun préréglage n'est associé à un jeu installé."
+msgstr "Ningún preajuste está asociado a un juego instalado."
+
+#: ui/ui/presets.slint
+msgid "Aucun résultat."
+msgstr "Sin resultados."
+
+#: ui/ui/presets.slint
+msgid "Associer au jeu en cours"
+msgstr "Asociar al juego actual"
+
+#: ui/ui/presets.slint
+msgid "Choisissez le jeu parmi les programmes ouverts : quand il tourne, Gaming prend « {} », puis votre préréglage revient quand vous le quittez. Vos associations passent avant celles de GG."
+msgstr "Elija el juego entre los programas abiertos: mientras esté en marcha, Gaming toma «{}», y su preajuste vuelve cuando lo cierre. Sus asociaciones tienen prioridad sobre las de GG."
+
+#: ui/ui/presets.slint
+msgid "Aucun programme avec une fenêtre ou du son n'est ouvert. Lancez le jeu, puis rouvrez ce menu."
+msgstr "No hay ningún programa abierto con ventana o sonido. Inicie el juego y vuelva a abrir este menú."
+
+#: ui/ui/presets.slint
+msgid "Associer"
+msgstr "Asociar"
+
+#: ui/ui/presets.slint
+msgid "Renommer le préréglage"
+msgstr "Renombrar el preajuste"
+
+#: ui/ui/presets.slint
+msgid "Renommer votre configuration"
+msgstr "Renombrar su configuración"
+
+#: ui/ui/presets.slint
+msgid "Donner un nom à votre configuration"
+msgstr "Dar un nombre a su configuración"
+
+#: ui/ui/presets.slint
+msgid "Donner un nom à votre nouvelle configuration : elle reprend les réglages actuels du canal."
+msgstr "Dar un nombre a su nueva configuración: toma los ajustes actuales del canal."
+
+#: ui/ui/presets.slint
+msgid "Nom"
+msgstr "Nombre"
+
+#: ui/ui/settings.slint
+msgid "{} · préréglage « {} »"
+msgstr "{} · preajuste «{}»"
+
+#: ui/ui/settings.slint
+msgid "Dissocier"
+msgstr "Disociar"
+
+#: ui/ui/settings.slint
+msgid "PARAMÈTRES"
+msgstr "AJUSTES"
+
+#: ui/ui/settings.slint
+msgid "Général"
+msgstr "General"
+
+#: ui/ui/settings.slint
+msgid "Micro"
+msgstr "Micro"
+
+#: ui/ui/settings.slint
+msgid "Sorties"
+msgstr "Salidas"
+
+#: ui/ui/settings.slint ui/src/settings.rs
+msgid "Mode streamer"
+msgstr "Modo streamer"
+
+#: ui/ui/settings.slint
+msgid "Streaming à distance"
+msgstr "Streaming remoto"
+
+#: ui/ui/settings.slint
+msgid "Jeux"
+msgstr "Juegos"
+
+#: ui/ui/settings.slint ui/src/settings.rs
+msgid "Raccourcis et superpositions"
+msgstr "Atajos y superposiciones"
+
+#: ui/ui/settings.slint
+msgid "À propos"
+msgstr "Acerca de"
+
+#: ui/ui/settings.slint
+msgid "Redémarrer Platinum…"
+msgstr "Reiniciar Platinum…"
+
+#: ui/ui/settings.slint
+msgid "GÉNÉRAL"
+msgstr "GENERAL"
+
+#: ui/ui/settings.slint
+msgid "SORTIES"
+msgstr "SALIDAS"
+
+#: ui/ui/settings.slint
+msgid "MODE STREAMER"
+msgstr "MODO STREAMER"
+
+#: ui/ui/settings.slint
+msgid "STREAMING À DISTANCE"
+msgstr "STREAMING REMOTO"
+
+#: ui/ui/settings.slint
+msgid "JEUX"
+msgstr "JUEGOS"
+
+#: ui/ui/settings.slint
+msgid "RACCOURCIS ET SUPERPOSITIONS"
+msgstr "ATAJOS Y SUPERPOSICIONES"
+
+#: ui/ui/settings.slint
+msgid "À PROPOS"
+msgstr "ACERCA DE"
+
+#: ui/ui/settings.slint
+msgid "Le démarrage de Platinum et le nom de ses canaux dans Windows."
+msgstr "El inicio de Platinum y el nombre de sus canales en Windows."
+
+#: ui/ui/settings.slint
+msgid "Le micro que Platinum fait passer dans Microphone (Platinum), ses effets et ses micros de secours."
+msgstr "El micrófono que Platinum envía a Microphone (Platinum), sus efectos y sus micrófonos de respaldo."
+
+#: ui/ui/settings.slint
+msgid "La bascule de secours des sorties et la sortie que Windows retrouve quand Platinum s'arrête."
+msgstr "El cambio de respaldo de las salidas y la salida que Windows recupera cuando Platinum se detiene."
+
+#: ui/ui/settings.slint
+msgid "Un mix pour vous, un autre pour votre public."
+msgstr "Una mezcla para usted y otra para su público."
+
+#: ui/ui/settings.slint
+msgid "Sunshine et Moonlight, Steam Remote Play : le son de Platinum suit la session jusqu'à l'appareil distant."
+msgstr "Sunshine y Moonlight, Steam Remote Play: el sonido de Platinum sigue la sesión hasta el equipo remoto."
+
+#: ui/ui/settings.slint
+msgid "Le préréglage de Gaming qui suit le jeu lancé, et la règle des enceintes Arena 7."
+msgstr "El preajuste de Gaming que sigue al juego iniciado y la regla de los altavoces Arena 7."
+
+#: ui/ui/settings.slint
+msgid "La version de Platinum, sa tâche de fond et ses fichiers."
+msgstr "La versión de Platinum, su servicio en segundo plano y sus archivos."
+
+#: ui/ui/settings.slint
+msgid "LANGUE"
+msgstr "IDIOMA"
+
+#: ui/ui/settings.slint ui/src/settings.rs
+msgid "Langue"
+msgstr "Idioma"
+
+#: ui/ui/settings.slint
+msgid "La langue de cette fenêtre, de l'icône près de l'horloge et des superpositions. « Automatique » suit la langue d'affichage de Windows, ou l'anglais quand Platinum ne la parle pas."
+msgstr "El idioma de esta ventana, del icono junto al reloj y de las superposiciones. «Automático» sigue el idioma de visualización de Windows, o el inglés cuando Platinum no lo habla."
+
+#: ui/ui/settings.slint
+msgid "DÉMARRAGE"
+msgstr "INICIO"
+
+#: ui/ui/settings.slint
+msgid "Démarrer Platinum avec Windows"
+msgstr "Iniciar Platinum con Windows"
+
+#: ui/ui/settings.slint
+msgid "Platinum démarre à l'ouverture de votre session, sans ouvrir la fenêtre : le son et le micro passent par lui dès la connexion."
+msgstr "Platinum se inicia al abrir su sesión, sin abrir la ventana: el sonido y el micrófono pasan por él desde que inicia sesión."
+
+#: ui/ui/settings.slint
+msgid "Platinum est désactivé dans le Gestionnaire des tâches (Applications de démarrage) : activez-le là pour qu'il démarre avec Windows."
+msgstr "Platinum está deshabilitado en el Administrador de tareas (Aplicaciones de arranque): habilítelo allí para que se inicie con Windows."
+
+#: ui/ui/settings.slint
+msgid "Possible une fois Platinum installé dans votre dossier personnel."
+msgstr "Posible una vez que Platinum esté instalado en su carpeta personal."
+
+#: ui/ui/settings.slint
+msgid "Démarrer Platinum à l'ouverture de la fenêtre"
+msgstr "Iniciar Platinum al abrir la ventana"
+
+#: ui/ui/settings.slint
+msgid "Si Platinum est arrêté quand vous ouvrez cette fenêtre, elle le démarre."
+msgstr "Si Platinum está detenido al abrir esta ventana, la ventana lo inicia."
+
+#: ui/ui/settings.slint
+msgid "NOMS DES CANAUX"
+msgstr "NOMBRES DE CANALES"
+
+#: ui/ui/settings.slint
+msgid "Noms dans Windows"
+msgstr "Nombres en Windows"
+
+#: ui/ui/settings.slint
+msgid "« Gaming (Platinum) », « Chat (Platinum) », « Microphone (Platinum) »… dans les réglages son de Windows et dans vos applications."
+msgstr "«Gaming (Platinum)», «Chat (Platinum)», «Microphone (Platinum)»… en la configuración de sonido de Windows y en sus aplicaciones."
+
+#: ui/ui/settings.slint
+msgid "Les noms que les canaux avaient avant Platinum (« SteelSeries Sonar - Gaming »…). À remettre avant de revenir à SteelSeries GG, qui pourrait chercher ses périphériques par leur nom."
+msgstr "Los nombres que tenían los canales antes de Platinum («SteelSeries Sonar - Gaming»…). Restáurelos antes de volver a SteelSeries GG, que podría buscar sus dispositivos por su nombre."
+
+#: ui/ui/settings.slint
+msgid "MICRO RELAYÉ"
+msgstr "MICRO REENVIADO"
+
+#: ui/ui/settings.slint
+msgid "Le vrai micro que Platinum fait passer, avec ses effets, dans Microphone (Platinum) : celui qu'écoutent Discord et vos autres applications."
+msgstr "El micrófono real que Platinum envía, con sus efectos, a Microphone (Platinum): el que escuchan Discord y sus demás aplicaciones."
+
+#: ui/ui/settings.slint ui/src/settings.rs
+msgid "Effets du micro"
+msgstr "Efectos del micro"
+
+#: ui/ui/settings.slint
+msgid "Les réglages de l'onglet Micro (réduction de bruit, IA, égaliseur…), appliqués par le moteur d'effets de SteelSeries déjà installé. Éteints, le micro passe tel quel."
+msgstr "Los ajustes de la pestaña Micro (reducción de ruido, IA, ecualizador…), aplicados por el motor de efectos de SteelSeries ya instalado. Si se desactivan, el micrófono pasa tal cual."
+
+#: ui/ui/settings.slint ui/src/settings.rs
+msgid "Volume du micro"
+msgstr "Volumen del micro"
+
+#: ui/ui/settings.slint
+msgid "Le volume que Platinum donne au micro relayé. Le fader de la colonne Micro règle à part le volume Windows de Microphone (Platinum)."
+msgstr "El volumen que Platinum da al micro reenviado. El fader de la columna Micro ajusta por separado el volumen de Windows de Microphone (Platinum)."
+
+#: ui/ui/settings.slint ui/src/settings.rs
+msgid "Entrée remise à l'arrêt"
+msgstr "Entrada al detener"
+
+#: ui/ui/settings.slint
+msgid "L'entrée par défaut de Windows quand Platinum s'arrête. « Celle d'avant Platinum » : celle qui l'était à son démarrage. Avec des micros de secours, Platinum prend d'abord le premier branché de leur liste."
+msgstr "La entrada predeterminada de Windows cuando Platinum se detiene. «La de antes de Platinum»: la que lo era cuando se inició. Con micrófonos de respaldo, Platinum toma antes el primero de su lista que esté conectado."
+
+#: ui/ui/settings.slint
+msgid "MICROS DE SECOURS"
+msgstr "MICROS DE RESPALDO"
+
+#: ui/ui/settings.slint
+msgid "Liste de priorité des périphériques d’entrée"
+msgstr "Lista de prioridad de dispositivos de entrada"
+
+#: ui/ui/settings.slint
+msgid "Le micro choisi plus haut, {}, passe toujours en premier : cette liste sert quand il est absent."
+msgstr "El micro elegido más arriba, {}, siempre va primero: esta lista se usa cuando no está."
+
+#: ui/ui/settings.slint
+msgid "Aucun micro n'est choisi plus haut : cette liste sert à sa place."
+msgstr "No hay ningún micro elegido más arriba: esta lista se usa en su lugar."
+
+#: ui/ui/settings.slint
+msgid "La bascule de secours (section Sorties) est en Auto."
+msgstr "El cambio de respaldo (sección Salidas) está en Auto."
+
+#: ui/ui/settings.slint
+msgid "La bascule de secours (section Sorties) est en Manuel : la liste ne sert qu'en Auto."
+msgstr "El cambio de respaldo (sección Salidas) está en Manual: la lista solo se usa en Auto."
+
+#: ui/ui/settings.slint
+msgid "Les micros de casques Bluetooth n'y figurent pas, Platinum ne les ouvre jamais."
+msgstr "Los micrófonos de auriculares Bluetooth no aparecen: Platinum nunca los abre."
+
+#: ui/ui/settings.slint
+msgid "BASCULE DE SECOURS"
+msgstr "CAMBIO DE RESPALDO"
+
+#: ui/ui/settings.slint
+msgid "Changement automatique de périphérique de secours"
+msgstr "Cambio automático a dispositivo de respaldo"
+
+#: ui/ui/settings.slint
+msgid "Auto : Platinum basculera automatiquement vers le périphérique disponible suivant si celui que vous utilisez est déconnecté pour quelque raison que ce soit, et reviendra au premier de la liste dès qu'il sera rebranché."
+msgstr "Auto: Platinum cambiará automáticamente al siguiente dispositivo disponible si el que está usando se desconecta por cualquier motivo, y volverá al primero de la lista en cuanto se vuelva a conectar."
+
+#: ui/ui/settings.slint
+msgid "Manuel : vous devrez sélectionner vos périphériques manuellement s’ils se déconnectent."
+msgstr "Manual: tendrá que seleccionar sus dispositivos manualmente si se desconectan."
+
+#: ui/ui/settings.slint
+msgid "Vaut pour les sorties des canaux et pour le micro relayé (ses micros de secours sont dans la section Micro)."
+msgstr "Se aplica a las salidas de los canales y al micro reenviado (sus micros de respaldo están en la sección Micro)."
+
+#: ui/ui/settings.slint
+msgid "AUTO"
+msgstr "AUTO"
+
+#: ui/ui/settings.slint
+msgid "MANUEL"
+msgstr "MANUAL"
+
+#: ui/ui/settings.slint
+msgid "LISTE DES SORTIES"
+msgstr "LISTA DE SALIDAS"
+
+#: ui/ui/settings.slint
+msgid "Liste de priorité des périphériques de sortie"
+msgstr "Lista de prioridad de dispositivos de salida"
+
+#: ui/ui/settings.slint
+msgid "Partagée par Gaming, Chat, Media et Aux. Classez vos périphériques dans l’ordre d’utilisation souhaité ; un périphérique exclu n'est jamais choisi automatiquement. Choisir une sortie dans le mixeur la place en tête de liste quand le changement automatique est actif."
+msgstr "Compartida por Gaming, Chat, Media y Aux. Ordene sus dispositivos según el orden de uso que desee; un dispositivo excluido nunca se elige automáticamente. Elegir una salida en el mezclador la coloca al principio de la lista cuando el cambio automático está activo."
+
+#: ui/ui/settings.slint
+msgid "ARRÊT DE PLATINUM"
+msgstr "AL DETENER PLATINUM"
+
+#: ui/ui/settings.slint ui/src/settings.rs
+msgid "Sortie remise à l'arrêt"
+msgstr "Salida al detener"
+
+#: ui/ui/settings.slint
+msgid "La sortie par défaut de Windows quand Platinum s'arrête. « Celle d'avant Platinum » : celle qui l'était à son démarrage. Avec une liste de priorité des sorties, Platinum prend d'abord le premier périphérique branché de la liste."
+msgstr "La salida predeterminada de Windows cuando Platinum se detiene. «La de antes de Platinum»: la que lo era cuando se inició. Con una lista de prioridad de salidas, Platinum toma antes el primer dispositivo conectado de la lista."
+
+#: ui/ui/settings.slint
+msgid "Un espace spécialement dédié aux streamers, vous permettant de configurer et gérer vos canaux audio pour vous-même et votre public : un mix personnel et un mix de stream."
+msgstr "Un espacio dedicado especialmente a los streamers, que le permite configurar y gestionar sus canales de audio para usted y para su público: una mezcla personal y una mezcla de stream."
+
+#: ui/ui/settings.slint
+msgid "Chaque canal a alors deux volumes : celui du mix personnel, que vous entendez, et celui du mix de stream, envoyé vers Stream (Platinum) pour vos logiciels de streaming (OBS, Streamlabs…). Les sorties des deux mix se choisissent dans la colonne Master du mixeur, les canaux de chaque mix dans leurs onglets. Platinum demande confirmation avant de changer de mode et retient vos sorties du mode classique."
+msgstr "Cada canal tiene entonces dos volúmenes: el de la mezcla personal, que usted oye, y el de la mezcla de stream, enviado a Stream (Platinum) para sus programas de streaming (OBS, Streamlabs…). Las salidas de ambas mezclas se eligen en la columna Master del mezclador, y los canales de cada mezcla, en sus pestañas. Platinum pide confirmación antes de cambiar de modo y recuerda sus salidas del modo clásico."
+
+#: ui/ui/settings.slint
+msgid "Suivre Sunshine, Moonlight et Steam Remote Play"
+msgstr "Seguir Sunshine, Moonlight y Steam Remote Play"
+
+#: ui/ui/settings.slint
+msgid "Pendant une session Sunshine (Moonlight) ou Steam Remote Play, le son des canaux et des applications passe par Platinum jusqu'à l'appareil distant, puis revient sur vos sorties à la fin. Couper ce réglage pendant une session la rend à vos sorties."
+msgstr "Durante una sesión de Sunshine (Moonlight) o Steam Remote Play, el sonido de los canales y de las aplicaciones pasa por Platinum hasta el equipo remoto, y vuelve a sus salidas al terminar. Desactivar este ajuste durante una sesión devuelve el sonido a sus salidas."
+
+#: ui/ui/settings.slint
+msgid "Faire passer les applications par Platinum"
+msgstr "Pasar las aplicaciones por Platinum"
+
+#: ui/ui/settings.slint
+msgid "Pendant une session, les applications qui jouent directement sur la sortie de streaming sont rangées sur Gaming (Platinum), pour garder vos effets ; ces routes sont effacées à la fin de la session."
+msgstr "Durante una sesión, las aplicaciones que suenan directamente en la salida de streaming se colocan en Gaming (Platinum) para conservar sus efectos; estas rutas se borran al final de la sesión."
+
+#: ui/ui/settings.slint
+msgid "AVANCÉ"
+msgstr "AVANZADO"
+
+#: ui/ui/settings.slint ui/src/settings.rs
+msgid "Sorties de streaming reconnues"
+msgstr "Salidas de streaming reconocidas"
+
+#: ui/ui/settings.slint
+msgid "Des morceaux du nom des sorties qu'un hôte de streaming met par défaut pendant une session, séparés par des virgules. Par défaut : {} (Sunshine et Steam Remote Play)."
+msgstr "Fragmentos del nombre de las salidas que un host de streaming pone como predeterminadas durante una sesión, separados por comas. Predeterminado: {} (Sunshine y Steam Remote Play)."
+
+#: ui/ui/settings.slint
+msgid "Aucune : aucune session ne sera suivie"
+msgstr "Ninguna: no se seguirá ninguna sesión"
+
+#: ui/ui/settings.slint
+msgid "Par défaut"
+msgstr "Por defecto"
+
+#: ui/ui/settings.slint
+msgid "PRÉRÉGLAGE PAR JEU"
+msgstr "PREAJUSTE POR JUEGO"
+
+#: ui/ui/settings.slint ui/src/settings.rs
+msgid "Préréglage par jeu"
+msgstr "Preajuste por juego"
+
+#: ui/ui/settings.slint
+msgid "Quand un jeu associé à un préréglage de Gaming tourne, Gaming prend ce préréglage ; le vôtre revient quand le jeu se ferme. Les associations de SteelSeries GG aux jeux installés comptent aussi ; les vôtres passent avant."
+msgstr "Cuando un juego asociado a un preajuste de Gaming está en marcha, Gaming toma ese preajuste; el suyo vuelve cuando se cierra el juego. Las asociaciones de SteelSeries GG con los juegos instalados también cuentan; las suyas tienen prioridad."
+
+#: ui/ui/settings.slint
+msgid "VOS ASSOCIATIONS"
+msgstr "SUS ASOCIACIONES"
+
+#: ui/ui/settings.slint
+msgid "Les programmes que vous avez associés à un préréglage de Gaming (onglet Gaming, menu « … » du préréglage, « Associer au jeu en cours… »). Dissocier s'applique tout de suite."
+msgstr "Los programas que ha asociado a un preajuste de Gaming (pestaña Gaming, menú «…» del preajuste, «Asociar al juego actual…»). Disociar se aplica de inmediato."
+
+#: ui/ui/settings.slint
+msgid "Aucune association pour l'instant"
+msgstr "Ninguna asociación por ahora"
+
+#: ui/ui/settings.slint
+msgid "ENCEINTES ARENA 7"
+msgstr "ALTAVOCES ARENA 7"
+
+#: ui/ui/settings.slint ui/src/settings.rs
+msgid "Règle Arena 7"
+msgstr "Regla Arena 7"
+
+#: ui/ui/settings.slint
+msgid "Comme dans SteelSeries GG : un canal Gaming, Media ou Aux qui joue sur des enceintes Arena 7 avec l'audio spatial en mode casque passe en mode haut-parleurs. Elle ne revient jamais en arrière d'elle-même."
+msgstr "Como en SteelSeries GG: un canal Gaming, Media o Aux que suena en altavoces Arena 7 con el audio espacial en modo auriculares pasa al modo altavoces. La regla nunca lo revierte por sí sola."
+
+#: ui/ui/settings.slint
+msgid "PLATINUM"
+msgstr "PLATINUM"
+
+#: ui/ui/settings.slint
+msgid "Version"
+msgstr "Versión"
+
+#: ui/ui/settings.slint
+msgid "Dossier"
+msgstr "Carpeta"
+
+#: ui/ui/settings.slint
+msgid "Journal"
+msgstr "Registro"
+
+#: ui/ui/settings.slint
+msgid "Ouvrir le dossier"
+msgstr "Abrir la carpeta"
+
+#: ui/ui/settings.slint
+msgid "Ouvrir le journal"
+msgstr "Abrir el registro"
+
+#: ui/ui/settings.slint
+msgid "TÂCHE DE FOND"
+msgstr "SEGUNDO PLANO"
+
+#: ui/ui/settings.slint
+msgid "État"
+msgstr "Estado"
+
+#: ui/ui/settings.slint
+msgid "Processus"
+msgstr "Proceso"
+
+#: ui/ui/settings.slint
+msgid "Mémoire"
+msgstr "Memoria"
+
+#: ui/ui/settings.slint
+msgid "Moteur du micro"
+msgstr "Motor del micrófono"
+
+#: ui/ui/settings.slint
+msgid "Dernier état publié"
+msgstr "Último estado publicado"
+
+#: ui/ui/settings.slint
+msgid "L'état vient de status.txt, que la tâche de fond réécrit à chaque changement ; sa mémoire est relevée par cette fenêtre toutes les 2 secondes."
+msgstr "El estado viene de status.txt, que el servicio en segundo plano reescribe con cada cambio; esta ventana lee su memoria cada 2 segundos."
+
+#: ui/ui/shortcuts.slint
+msgid "Appuyez…"
+msgstr "Pulse…"
+
+#: ui/ui/shortcuts.slint
+msgid "Non attribué"
+msgstr "Sin asignar"
+
+#: ui/ui/shortcuts.slint
+msgid "Définissez vos raccourcis clavier pour Platinum. Les raccourcis peuvent utiliser des modificateurs tels que Ctrl, Maj, Alt ou une touche unique (F1 à F24, pavé numérique, touches multimédia). Cliquez sur un champ puis appuyez sur la combinaison ; Échap. annule. Ils marchent dans toutes les applications, fenêtre de Platinum fermée. Ceux du mix de stream n'agissent qu'en mode streamer."
+msgstr "Defina sus atajos de teclado para Platinum. Los atajos pueden usar modificadores como Ctrl, Mayús, Alt o una sola tecla (F1 a F24, teclado numérico, teclas multimedia). Haga clic en un campo y pulse la combinación; Esc cancela. Funcionan en todas las aplicaciones, aunque la ventana de Platinum esté cerrada. Los de la mezcla de stream solo actúan en modo streamer."
+
+#: ui/ui/shortcuts.slint
+msgid "Raccourci déjà assigné : les combinaisons en orange servent à plusieurs actions, seule la première fonctionne."
+msgstr "Atajo ya asignado: las combinaciones en naranja sirven para varias acciones; solo funciona la primera."
+
+#: ui/ui/shortcuts.slint
+msgid "Platinum est arrêté : les raccourcis et les superpositions marcheront dès qu'il sera démarré."
+msgstr "Platinum está detenido: los atajos y las superposiciones funcionarán en cuanto se inicie."
+
+#: ui/ui/shortcuts.slint
+msgid "SUPERPOSITIONS"
+msgstr "SUPERPOSICIONES"
+
+#: ui/ui/shortcuts.slint
+msgid "Afficher les superpositions"
+msgstr "Mostrar superposiciones"
+
+#: ui/ui/shortcuts.slint
+msgid "Platinum affichera une animation pour vous avertir qu'un événement a eu lieu, sans prendre le clavier ni la souris."
+msgstr "Platinum mostrará una animación para avisarle de que se ha producido un evento, sin acaparar el teclado ni el ratón."
+
+#: ui/ui/shortcuts.slint
+msgid "Position de la superposition"
+msgstr "Posición de la superposición"
+
+#: ui/ui/shortcuts.slint
+msgid "Volume"
+msgstr "Volumen"
+
+#: ui/ui/shortcuts.slint
+msgid "Activer/désactiver la coupure du son"
+msgstr "Activar/desactivar el silencio"
+
+#: ui/ui/shortcuts.slint
+msgid "Changement de périphérique"
+msgstr "Cambio de dispositivo"
+
+#: ui/ui/shortcuts.slint
+msgid "Aperçu"
+msgstr "Probar"
+
+#: ui/ui/tester.slint
+msgid "TESTER"
+msgstr "PROBAR"
+
+#: ui/ui/tester.slint
+msgid "Pause"
+msgstr "Pausa"
+
+#: ui/ui/tester.slint
+msgid "Écouter"
+msgstr "Escuchar"
+
+#: ui/src/background.rs
+msgid "actif"
+msgstr "activo"
+
+#: ui/src/background.rs
+msgid "sans effets"
+msgstr "sin efectos"
+
+#: ui/src/background.rs
+msgid "démarrage…"
+msgstr "iniciando…"
+
+#: ui/src/background.rs
+msgid "en attente des périphériques"
+msgstr "esperando los dispositivos"
+
+#: ui/src/background.rs
+msgid "arrêt…"
+msgstr "deteniendo…"
+
+#: ui/src/background.rs
+msgid "arrêté"
+msgstr "detenido"
+
+#: ui/src/background.rs
+msgid "erreur"
+msgstr "error"
+
+#: ui/src/background.rs
+msgid "GG ouvert"
+msgstr "GG abierto"
+
+#: ui/src/background.rs
+msgid "Platinum ne répond pas à la demande d'arrêt"
+msgstr "Platinum no responde a la solicitud de detención"
+
+#: ui/src/background.rs
+msgid "Platinum s'est arrêté au démarrage"
+msgstr "Platinum se detuvo al iniciarse"
+
+#: ui/src/background.rs
+msgid "Platinum fait passer le son"
+msgstr "El sonido pasa por Platinum"
+
+#: ui/src/background.rs
+msgid "SteelSeries GG est ouvert et garde la main sur le son"
+msgstr "SteelSeries GG está abierto y mantiene el control del sonido"
+
+#: ui/src/background.rs
+msgid "Fermez GG pour démarrer Platinum."
+msgstr "Cierre GG para iniciar Platinum."
+
+#: ui/src/background.rs ui/src/engine.rs
+msgid "Platinum n'a pas démarré"
+msgstr "Platinum no se inició"
+
+#: ui/src/background.rs
+msgid "Platinum s'est arrêté sur une erreur"
+msgstr "Platinum se detuvo por un error"
+
+#: ui/src/background.rs
+msgid "Platinum est arrêté"
+msgstr "Platinum está detenido"
+
+#: ui/src/background.rs
+msgid "Platinum ne s'est pas arrêté en {seconds} secondes"
+msgstr "Platinum no se detuvo en {seconds} segundos"
+
+#: ui/src/background.rs
+msgid "Platinum n'a pas démarré en {seconds} secondes : {detail}"
+msgstr "Platinum no se inició en {seconds} segundos: {detail}"
+
+#: ui/src/background.rs
+msgid "Platinum n'a pas démarré en {seconds} secondes, sans rien dire de plus"
+msgstr "Platinum no se inició en {seconds} segundos, sin dar más detalles"
+
+#: ui/src/catalog.rs
+msgid "Créé dans GG"
+msgstr "Creado en GG"
+
+#: ui/src/catalog.rs
+msgid "Donnez un nom au préréglage."
+msgstr "Dé un nombre al preajuste."
+
+#: ui/src/catalog.rs
+msgid "Nom trop long (60 caractères au plus)."
+msgstr "Nombre demasiado largo (60 caracteres como máximo)."
+
+#: ui/src/catalog.rs
+msgid "Nom déjà utilisé"
+msgstr "Nombre ya en uso"
+
+#: ui/src/catalog.rs ui/src/main.rs
+msgid "Mon préréglage"
+msgstr "Mi preajuste"
+
+#: ui/src/catalog.rs
+msgid "La base de préréglages de GG est introuvable : seuls le préréglage neutre et vos préréglages sont proposés."
+msgstr "No se encuentra la base de preajustes de GG: solo se ofrecen el preajuste neutro y sus preajustes."
+
+#: ui/src/catalog.rs
+msgid "La base de préréglages de GG n'a pas pu être lue."
+msgstr "No se pudo leer la base de preajustes de GG."
+
+#: ui/src/catalog.rs
+msgid "La bibliothèque de préréglages de GG est illisible"
+msgstr "La biblioteca de preajustes de GG es ilegible"
+
+#: ui/src/catalog.rs
+msgid "Un de vos préréglages n'a pas pu être lu"
+msgstr "No se pudo leer uno de sus preajustes"
+
+#: ui/src/catalog.rs ui/src/engine.rs
+msgid "ce préréglage n'existe plus"
+msgstr "este preajuste ya no existe"
+
+#: ui/src/catalog.rs
+msgid "seul un préréglage peut être associé à un jeu"
+msgstr "solo un preajuste puede asociarse a un juego"
+
+#: ui/src/catalog.rs ui/src/engine.rs
+msgid "canal inconnu"
+msgstr "canal desconocido"
+
+#: ui/src/catalog.rs
+msgid "Nombre maximum de favoris atteint"
+msgstr "Número máximo de favoritos alcanzado"
+
+#: ui/src/catalog.rs
+msgid "préréglage enregistré mais introuvable"
+msgstr "preajuste guardado pero no encontrado"
+
+#: ui/src/catalog.rs
+msgid "seuls vos propres préréglages s'enregistrent"
+msgstr "solo se pueden guardar sus propios preajustes"
+
+#: ui/src/catalog.rs
+msgid "réglages du canal inconnus"
+msgstr "ajustes del canal desconocidos"
+
+#: ui/src/catalog.rs
+msgid "seuls vos propres préréglages se renomment"
+msgstr "solo se pueden renombrar sus propios preajustes"
+
+#: ui/src/catalog.rs
+msgid "seuls vos propres préréglages se suppriment"
+msgstr "solo se pueden eliminar sus propios preajustes"
+
+#: ui/src/catalog.rs
+msgid "Associé : {game}"
+msgstr "Asociado: {game}"
+
+#: ui/src/catalog.rs
+msgid "préréglage renommé, mais ses associations à des jeux n'ont pas suivi ({error})"
+msgstr "preajuste renombrado, pero sus asociaciones con juegos no se actualizaron ({error})"
+
+#: ui/src/catalog.rs
+msgid "préréglage supprimé, mais ses associations à des jeux restent ({error})"
+msgstr "preajuste eliminado, pero sus asociaciones con juegos se mantienen ({error})"
+
+#: ui/src/engine.rs
+msgid "Master non réglé"
+msgstr "No se ajustó el Master"
+
+#: ui/src/engine.rs
+msgid "Sourdine du Master non changée"
+msgstr "No se cambió el silencio del Master"
+
+#: ui/src/engine.rs
+msgid "Sortie des canaux non changée"
+msgstr "No se cambió la salida de los canales"
+
+#: ui/src/engine.rs
+msgid "Niveau du périphérique non réglé"
+msgstr "No se ajustó el nivel del dispositivo"
+
+#: ui/src/engine.rs
+msgid "Volume du micro virtuel non réglé"
+msgstr "No se ajustó el volumen del micro virtual"
+
+#: ui/src/engine.rs
+msgid "Sourdine du micro virtuel non changée"
+msgstr "No se cambió el silencio del micro virtual"
+
+#: ui/src/engine.rs
+msgid "ChatMix non réglé"
+msgstr "No se ajustó ChatMix"
+
+#: ui/src/engine.rs
+msgid "Préréglage non enregistré"
+msgstr "No se guardó el preajuste"
+
+#: ui/src/engine.rs
+msgid "Préréglage non renommé"
+msgstr "No se renombró el preajuste"
+
+#: ui/src/engine.rs
+msgid "Préréglage non supprimé"
+msgstr "No se eliminó el preajuste"
+
+#: ui/src/engine.rs
+msgid "Favoris non changés"
+msgstr "No se cambiaron los favoritos"
+
+#: ui/src/engine.rs ui/src/main.rs
+msgid "Préréglage non importé"
+msgstr "No se importó el preajuste"
+
+#: ui/src/engine.rs
+msgid "Annulation d'écho non mise à jour"
+msgstr "No se actualizó la cancelación de eco"
+
+#: ui/src/engine.rs
+msgid "Zones de l'égaliseur non changées"
+msgstr "No se cambiaron las zonas del ecualizador"
+
+#: ui/src/engine.rs
+msgid "Platinum ne s'est pas arrêté"
+msgstr "Platinum no se detuvo"
+
+#: ui/src/engine.rs
+msgid "Micro non changé"
+msgstr "No se cambió el micro"
+
+#: ui/src/engine.rs
+msgid "Changement automatique de périphérique de secours non enregistré"
+msgstr "No se guardó el cambio automático a dispositivo de respaldo"
+
+#: ui/src/engine.rs
+msgid "Liste de priorité non enregistrée"
+msgstr "No se guardó la lista de prioridad"
+
+#: ui/src/engine.rs
+msgid "Démarrage avec Windows non changé"
+msgstr "No se cambió el inicio con Windows"
+
+#: ui/src/engine.rs
+msgid "Noms des canaux non changés"
+msgstr "No se cambiaron los nombres de los canales"
+
+#: ui/src/engine.rs
+msgid "Platinum n'a pas redémarré"
+msgstr "Platinum no se reinició"
+
+#: ui/src/engine.rs
+msgid "Raccourci non enregistré"
+msgstr "No se guardó el atajo"
+
+#: ui/src/engine.rs
+msgid "Options des superpositions non enregistrées"
+msgstr "No se guardaron las opciones de las superposiciones"
+
+#: ui/src/engine.rs
+msgid "Mode streamer non activé"
+msgstr "No se activó el modo streamer"
+
+#: ui/src/engine.rs
+msgid "Mode streamer non désactivé"
+msgstr "No se desactivó el modo streamer"
+
+#: ui/src/engine.rs
+msgid "Master du mix de stream non réglé"
+msgstr "No se ajustó el Master de la mezcla de stream"
+
+#: ui/src/engine.rs
+msgid "Sourdine du mix de stream non changée"
+msgstr "No se cambió el silencio de la mezcla de stream"
+
+#: ui/src/engine.rs
+msgid "Sortie du mix personnel non changée"
+msgstr "No se cambió la salida de la mezcla personal"
+
+#: ui/src/engine.rs
+msgid "Sortie du mix de stream non changée"
+msgstr "No se cambió la salida de la mezcla de stream"
+
+#: ui/src/engine.rs
+msgid "Niveau de la sortie du mix de stream non réglé"
+msgstr "No se ajustó el nivel de la salida de la mezcla de stream"
+
+#: ui/src/engine.rs
+msgid "Préréglage non associé au jeu"
+msgstr "No se asoció el preajuste al juego"
+
+#: ui/src/engine.rs
+msgid "Association au jeu non retirée"
+msgstr "No se quitó la asociación con el juego"
+
+#: ui/src/engine.rs
+msgid "Les réglages du module audio de SteelSeries sont indisponibles"
+msgstr "Los ajustes del módulo de audio de SteelSeries no están disponibles"
+
+#: ui/src/engine.rs
+msgid "Une ligne de platinum.ini a été ignorée"
+msgstr "Se ignoró una línea de platinum.ini"
+
+#: ui/src/engine.rs
+msgid "aucune sortie réelle n'est choisie"
+msgstr "no hay ninguna salida real elegida"
+
+#: ui/src/engine.rs
+msgid "une autre opération sur Platinum est en cours"
+msgstr "hay otra operación de Platinum en curso"
+
+#: ui/src/engine.rs
+msgid "périphériques audio de Windows indisponibles"
+msgstr "dispositivos de audio de Windows no disponibles"
+
+#: ui/src/engine.rs
+msgid "le mix de stream n'a pas de sortie"
+msgstr "la mezcla de stream no tiene salida"
+
+#: ui/src/engine.rs
+msgid "réglages illisibles"
+msgstr "ajustes ilegibles"
+
+#: ui/src/engine.rs
+msgid "réglage absent pour ce canal"
+msgstr "ajuste ausente para este canal"
+
+#: ui/src/engine.rs
+msgid "ce canal n'a pas de volume"
+msgstr "este canal no tiene volumen"
+
+#: ui/src/engine.rs
+msgid "le volume n'est pas un nombre"
+msgstr "el volumen no es un número"
+
+#: ui/src/engine.rs
+msgid "ce canal n'a pas de sourdine"
+msgstr "este canal no se puede silenciar"
+
+#: ui/src/engine.rs
+msgid "ce canal n'a pas de mix de stream"
+msgstr "este canal no tiene mezcla de stream"
+
+#: ui/src/engine.rs
+msgid "seuls Gaming, Chat, Media et Aux vont dans les mix"
+msgstr "solo Gaming, Chat, Media y Aux van en las mezclas"
+
+#: ui/src/engine.rs
+msgid "le mode streamer n'est pas actif"
+msgstr "el modo streamer no está activo"
+
+#: ui/src/engine.rs
+msgid "La position du Master n'a pas été enregistrée"
+msgstr "No se guardó la posición del Master"
+
+#: ui/src/engine.rs
+msgid "Les préréglages des canaux n'ont pas été enregistrés"
+msgstr "No se guardaron los preajustes de los canales"
+
+#: ui/src/engine.rs
+msgid "réglages du canal illisibles"
+msgstr "ajustes del canal ilegibles"
+
+#: ui/src/engine.rs
+msgid "aucun préréglage à réinitialiser : ces réglages ne viennent d'aucun préréglage"
+msgstr "ningún preajuste que restablecer: estos ajustes no vienen de ningún preajuste"
+
+#: ui/src/engine.rs
+msgid "La liste de priorité des sorties n'a pas été mise à jour"
+msgstr "No se actualizó la lista de prioridad de salidas"
+
+#: ui/src/engine.rs
+msgid "ChatMix non remis au milieu"
+msgstr "No se volvió a centrar ChatMix"
+
+#: ui/src/engine.rs
+msgid "Mode haut-parleur non appliqué pour l'Arena 7"
+msgstr "No se aplicó el modo altavoces a los Arena 7"
+
+#: ui/src/engine.rs
+msgid "périphériques audio indisponibles"
+msgstr "dispositivos de audio no disponibles"
+
+#: ui/src/engine.rs ui/src/tester.rs
+msgid "le micro virtuel n'est pas actif : démarrez Platinum"
+msgstr "el micro virtual no está activo: inicie Platinum"
+
+#: ui/src/engine.rs
+msgid "destination inconnue"
+msgstr "destino desconocido"
+
+#: ui/src/engine.rs
+msgid "SteelSeries GG est ouvert : fermez GG pour démarrer Platinum"
+msgstr "SteelSeries GG está abierto: cierre GG para iniciar Platinum"
+
+#: ui/src/engine.rs
+msgid "Le démarrage avec Windows garde les anciens réglages du micro"
+msgstr "El inicio con Windows conserva los ajustes anteriores del micro"
+
+#: ui/src/engine.rs
+msgid "ce micro n'est plus branché"
+msgstr "este micro ya no está conectado"
+
+#: ui/src/engine.rs
+msgid "Le démarrage avec Windows garde l'ancien micro"
+msgstr "El inicio con Windows conserva el micro anterior"
+
+#: ui/src/engine.rs
+msgid "une autre opération sur Platinum est en cours : le micro servira au prochain démarrage"
+msgstr "hay otra operación de Platinum en curso: el micro se usará en el próximo inicio"
+
+#: ui/src/engine.rs
+msgid "Platinum : opération non aboutie"
+msgstr "Platinum: operación no completada"
+
+#: ui/src/engine.rs
+msgid "Volume de {channel} non réglé"
+msgstr "No se ajustó el volumen de {channel}"
+
+#: ui/src/engine.rs
+msgid "Sourdine de {channel} non changée"
+msgstr "No se cambió el silencio de {channel}"
+
+#: ui/src/engine.rs
+msgid "Sortie de {channel} non changée"
+msgstr "No se cambió la salida de {channel}"
+
+#: ui/src/engine.rs
+msgid "Effets de {channel} non changés"
+msgstr "No se cambiaron los efectos de {channel}"
+
+#: ui/src/engine.rs
+msgid "Égaliseur de {channel} non réglé"
+msgstr "No se ajustó el ecualizador de {channel}"
+
+#: ui/src/engine.rs
+msgid "Réglage de {channel} non écrit"
+msgstr "No se escribió el ajuste de {channel}"
+
+#: ui/src/engine.rs
+msgid "Préréglage de {channel} non appliqué"
+msgstr "No se aplicó el preajuste de {channel}"
+
+#: ui/src/engine.rs
+msgid "Préréglage de {channel} non réinitialisé"
+msgstr "No se restableció el preajuste de {channel}"
+
+#: ui/src/engine.rs
+msgid "{app} non transféré"
+msgstr "No se transfirió {app}"
+
+#: ui/src/engine.rs
+msgid "Volume de {channel} dans le mix de stream non réglé"
+msgstr "No se ajustó el volumen de {channel} en la mezcla de stream"
+
+#: ui/src/engine.rs
+msgid "Sourdine de {channel} dans le mix de stream non changée"
+msgstr "No se cambió el silencio de {channel} en la mezcla de stream"
+
+#: ui/src/engine.rs
+msgid "{channel} non ajouté au mix personnel ni retiré"
+msgstr "No se añadió ni se quitó {channel} de la mezcla personal"
+
+#: ui/src/engine.rs
+msgid "{channel} non ajouté au mix de stream ni retiré"
+msgstr "No se añadió ni se quitó {channel} de la mezcla de stream"
+
+#: ui/src/engine.rs
+msgid "impossible de retirer le démarrage avec Windows ({error})"
+msgstr "no se puede quitar el inicio con Windows ({error})"
+
+#: ui/src/engine.rs
+msgid "réglages du canal {channel} illisibles"
+msgstr "ajustes del canal {channel} ilegibles"
+
+#: ui/src/engine.rs
+msgid "volume de {channel} illisible"
+msgstr "volumen de {channel} ilegible"
+
+#: ui/src/engine.rs
+msgid "le canal {channel} n'existe pas"
+msgstr "el canal {channel} no existe"
+
+#: ui/src/engine.rs
+msgid "le canal {channel} n'est pas actif : démarrez Platinum"
+msgstr "el canal {channel} no está activo: inicie Platinum"
+
+#: ui/src/engine.rs
+msgid "{app} n'a pas suivi le transfert"
+msgstr "{app} no siguió la transferencia"
+
+#: ui/src/engine.rs
+msgid "{app} n'a pas autorisé Platinum à modifier ses paramètres audio. Ajustez les paramètres audio directement dans {app}."
+msgstr "{app} no ha permitido que Platinum modifique su configuración de audio. Ajuste la configuración de audio directamente en {app}."
+
+#: ui/src/engine.rs
+msgid "Windows a refusé de rediriger {app}"
+msgstr "Windows se negó a redirigir {app}"
+
+#: ui/src/engine.rs
+msgid "Platinum est désactivé dans le Gestionnaire des tâches (Applications de démarrage) : activez-le là pour qu'il démarre avec Windows"
+msgstr "Platinum está deshabilitado en el Administrador de tareas (Aplicaciones de arranque): habilítelo allí para que se inicie con Windows"
+
+#: ui/src/filedialog.rs
+msgid "Préréglage Sonar (*.json)"
+msgstr "Preajuste de Sonar (*.json)"
+
+#: ui/src/filedialog.rs
+msgid "Tous les fichiers (*.*)"
+msgstr "Todos los archivos (*.*)"
+
+#: ui/src/keys.rs
+msgid "Cette touche ne peut pas servir de raccourci."
+msgstr "Esta tecla no puede usarse como atajo."
+
+#: ui/src/keys.rs
+msgid "{keys} : {problem}."
+msgstr "{keys}: {problem}."
+
+#: ui/src/main.rs
+msgid "Déposer ici : sortie par défaut de Windows"
+msgstr "Soltar aquí: salida predeterminada de Windows"
+
+#: ui/src/main.rs
+msgid "Personnalisé"
+msgstr "Personalizado"
+
+#: ui/src/main.rs
+msgid "Réglages actuels du canal"
+msgstr "Ajustes actuales del canal"
+
+#: ui/src/main.rs ui/src/settings.rs
+msgid "Préréglage introuvable"
+msgstr "Preajuste no encontrado"
+
+#: ui/src/main.rs
+msgid "B"
+msgstr "G"
+
+#: ui/src/main.rs
+msgid "V"
+msgstr "V"
+
+#: ui/src/main.rs
+msgid "A"
+msgstr "A"
+
+#: ui/src/main.rs
+msgid "Démarrage de Platinum…"
+msgstr "Iniciando Platinum…"
+
+#: ui/src/main.rs
+msgid "Arrêt de Platinum…"
+msgstr "Deteniendo Platinum…"
+
+#: ui/src/main.rs
+msgid "Le son ne passe pas par Platinum."
+msgstr "El sonido no pasa por Platinum."
+
+#: ui/src/main.rs
+msgid "SteelSeries GG est ouvert et garde la main sur le son : fermez GG pour démarrer Platinum."
+msgstr "SteelSeries GG está abierto y mantiene el control del sonido: cierre GG para iniciar Platinum."
+
+#: ui/src/main.rs
+msgid "Platinum attend ses périphériques audio."
+msgstr "Platinum espera sus dispositivos de audio."
+
+#: ui/src/main.rs
+msgid "Aucun journal pour l'instant"
+msgstr "Aún no hay registro"
+
+#: ui/src/main.rs
+msgid "Préréglage non exporté"
+msgstr "No se exportó el preajuste"
+
+#: ui/src/main.rs
+msgid "Lecture de l'état…"
+msgstr "Leyendo el estado…"
+
+#: ui/src/main.rs
+msgid "Déposer ici : suit la sortie par défaut de Windows, aujourd'hui {channel}"
+msgstr "Soltar aquí: sigue la salida predeterminada de Windows, ahora {channel}"
+
+#: ui/src/main.rs
+msgid "{exe} · associé à « {preset} »"
+msgstr "{exe} · asociado a «{preset}»"
+
+#: ui/src/main.rs
+msgid "{text} — {detail}"
+msgstr "{text} — {detail}"
+
+#: ui/src/main.rs
+msgid "Streaming à distance : le son de Platinum part vers {output}"
+msgstr "Streaming remoto: el sonido de Platinum va a {output}"
+
+#: ui/src/main.rs
+msgid "{sentence}. Tout revient sur vos sorties à la fin de la session."
+msgstr "{sentence}. Todo vuelve a sus salidas al final de la sesión."
+
+#: ui/src/main.rs
+msgid "{device} — Bluetooth, refusé"
+msgstr "{device} — Bluetooth, rechazado"
+
+#: ui/src/main.rs
+msgid "Raccourci déjà assigné : {keys} sert aussi à « {group} · {action} »."
+msgstr "Atajo ya asignado: {keys} también sirve para «{group} · {action}»."
+
+#: ui/src/main.rs
+msgid "{folder} (absent : Platinum n'est pas installé)"
+msgstr "{folder} (no existe: Platinum no está instalado)"
+
+#: ui/src/main.rs
+msgid "Exporter le préréglage de {channel}"
+msgstr "Exportar el preajuste de {channel}"
+
+#: ui/src/main.rs
+msgid "Importer un préréglage pour {channel}"
+msgstr "Importar un preajuste para {channel}"
+
+#: ui/src/main.rs
+msgid "C"
+msgstr "C"
+
+#: ui/src/main.rs
+msgid "AG"
+msgstr "FI"
+
+#: ui/src/main.rs
+msgid "AD"
+msgstr "FD"
+
+#: ui/src/main.rs
+msgid "LG"
+msgstr "LI"
+
+#: ui/src/main.rs
+msgid "LD"
+msgstr "LD"
+
+#: ui/src/main.rs
+msgid "ArG"
+msgstr "TI"
+
+#: ui/src/main.rs
+msgid "ArD"
+msgstr "TD"
+
+#: ui/src/main.rs
+msgid "Le son ne passe pas par Platinum"
+msgstr "El sonido no pasa por Platinum"
+
+#: ui/src/main.rs
+msgid "Le micro passe sans les effets de Platinum."
+msgstr "El micro pasa sin los efectos de Platinum."
+
+#: ui/src/main.rs
+msgid "Le micro passe sans les effets de Platinum"
+msgstr "El micro pasa sin los efectos de Platinum"
+
+#: ui/src/presets.rs
+msgid "Sans effet"
+msgstr "Sin efecto"
+
+#: ui/src/presets.rs
+msgid "Passe-bande"
+msgstr "Paso banda"
+
+#: ui/src/presets.rs
+msgid "Passe-tout"
+msgstr "Paso todo"
+
+#: ui/src/presets.rs
+msgid "Passe-bas"
+msgstr "Paso bajo"
+
+#: ui/src/presets.rs
+msgid "Passe-haut"
+msgstr "Paso alto"
+
+#: ui/src/presets.rs
+msgid "Coupe-bande"
+msgstr "Elimina banda"
+
+#: ui/src/presets.rs
+msgid "Égaliseur en cloche"
+msgstr "Ecualizador de campana"
+
+#: ui/src/presets.rs
+msgid "Plateau grave"
+msgstr "Shelving grave"
+
+#: ui/src/presets.rs
+msgid "Plateau aigu"
+msgstr "Shelving agudo"
+
+#: ui/src/presets.rs
+msgid "Centre"
+msgstr "Centro"
+
+#: ui/src/presets.rs
+msgid "Avant gauche"
+msgstr "Frontal izq."
+
+#: ui/src/presets.rs
+msgid "Avant droit"
+msgstr "Frontal der."
+
+#: ui/src/presets.rs
+msgid "Latéral gauche"
+msgstr "Lateral izq."
+
+#: ui/src/presets.rs
+msgid "Latéral droit"
+msgstr "Lateral der."
+
+#: ui/src/presets.rs
+msgid "Arrière gauche"
+msgstr "Trasero izq."
+
+#: ui/src/presets.rs
+msgid "Arrière droit"
+msgstr "Trasero der."
+
+#: ui/src/priority.rs
+msgid "branché"
+msgstr "conectado"
+
+#: ui/src/priority.rs
+msgid "désactivé"
+msgstr "desactivado"
+
+#: ui/src/priority.rs
+msgid "absent"
+msgstr "ausente"
+
+#: ui/src/priority.rs
+msgid "mains libres Bluetooth, jamais choisi"
+msgstr "manos libres Bluetooth, nunca elegido"
+
+#: ui/src/settings.rs
+msgid "S'applique tout de suite."
+msgstr "Se aplica de inmediato."
+
+#: ui/src/settings.rs
+msgid "S'applique au prochain démarrage de Platinum."
+msgstr "Se aplica en el próximo inicio de Platinum."
+
+#: ui/src/settings.rs
+msgid "S'applique à la prochaine ouverture de session Windows."
+msgstr "Se aplica en el próximo inicio de sesión de Windows."
+
+#: ui/src/settings.rs
+msgid "S'applique à la prochaine ouverture de cette fenêtre."
+msgstr "Se aplica la próxima vez que se abra esta ventana."
+
+#: ui/src/settings.rs
+msgid "Si Platinum relaie déjà un micro, il redémarre pour ouvrir le nouveau, après confirmation : le son et le micro sont coupés quelques secondes."
+msgstr "Si Platinum ya reenvía un micro, se reinicia para abrir el nuevo, previa confirmación: el sonido y el micro se cortan unos segundos."
+
+#: ui/src/settings.rs
+msgid "S'applique au prochain préréglage appliqué ou changement de sortie."
+msgstr "Se aplica al próximo preajuste aplicado o cambio de salida."
+
+#: ui/src/settings.rs
+msgid "S'applique tout de suite à cette fenêtre. L'icône près de l'horloge et les superpositions suivent dans les 2 secondes quand Platinum tourne (ou à son prochain démarrage)."
+msgstr "Se aplica de inmediato a esta ventana. El icono junto al reloj y las superposiciones lo siguen en 2 segundos cuando Platinum está en marcha (o en su próximo inicio)."
+
+#: ui/src/settings.rs
+msgid "Démarrer avec Windows"
+msgstr "Iniciar con Windows"
+
+#: ui/src/settings.rs
+msgid "Démarrer à l'ouverture de la fenêtre"
+msgstr "Iniciar al abrir la ventana"
+
+#: ui/src/settings.rs
+msgid "Noms des canaux"
+msgstr "Nombres de canales"
+
+#: ui/src/settings.rs
+msgid "Micro relayé"
+msgstr "Micro reenviado"
+
+#: ui/src/settings.rs
+msgid "Suivre le streaming à distance"
+msgstr "Seguir el streaming remoto"
+
+#: ui/src/settings.rs
+msgid "Applications par Platinum"
+msgstr "Aplicaciones por Platinum"
+
+#: ui/src/settings.rs
+msgid "« {option} » non enregistré"
+msgstr "No se guardó «{option}»"
+
+#: ui/src/settings.rs
+msgid "Automatique ({language})"
+msgstr "Automático ({language})"
+
+#: ui/src/settings.rs
+msgid "{option} : s'appliquera au prochain démarrage de Platinum."
+msgstr "{option}: se aplicará en el próximo inicio de Platinum."
+
+#: ui/src/settings.rs
+msgid "{options} : s'appliqueront au prochain démarrage de Platinum."
+msgstr "{options}: se aplicarán en el próximo inicio de Platinum."
+
+#: ui/src/settings.rs
+msgid "{list} et {last}"
+msgstr "{list} y {last}"
+
+#: ui/src/settings.rs
+msgid "{device} (absent)"
+msgstr "{device} (ausente)"
+
+#: ui/src/settings.rs
+msgid "{date} à {time}"
+msgstr "{date} a las {time}"
+
+#: ui/src/settings.rs
+msgid "{amount} Mo"
+msgstr "{amount} MB"
+
+#: ui/src/settings.rs
+msgid "{private} privés · {resident} en mémoire vive"
+msgstr "{private} privados · {resident} en RAM"
+
+#: ui/src/settings.rs
+msgid "{memory} (processus {pid})"
+msgstr "{memory} (proceso {pid})"
+
+#: ui/src/settings.rs
+msgid "Celle d'avant Platinum"
+msgstr "La de antes de Platinum"
+
+#: ui/src/sounds.rs
+msgid "Audio spatial"
+msgstr "Audio espacial"
+
+#: ui/src/sounds.rs
+msgid "{file} illisible ({error})"
+msgstr "{file} ilegible ({error})"
+
+#: ui/src/sounds.rs
+msgid "pas un fichier Ogg Vorbis ({error})"
+msgstr "no es un archivo Ogg Vorbis ({error})"
+
+#: ui/src/sounds.rs
+msgid "décodage interrompu ({error})"
+msgstr "decodificación interrumpida ({error})"
+
+#: ui/src/sounds.rs
+msgid "Extrait de {length}"
+msgstr "Clip de {length}"
+
+#: ui/src/sounds.rs
+msgid "Sélectionnez une sortie dans l'onglet Mixeur pour tester le son"
+msgstr "Seleccione una salida en la pestaña Mezclador para probar el sonido"
+
+#: ui/src/sounds.rs
+msgid "Sélectionnez un micro dans l'onglet Mixeur pour enregistrer"
+msgstr "Seleccione un micro en la pestaña Mezclador para grabar"
+
+#: ui/src/sounds.rs
+msgid "Platinum ne relaie pas le micro en ce moment : l'enregistrement serait muet"
+msgstr "Platinum no está reenviando el micro en este momento: la grabación quedaría en silencio"
+
+#: ui/src/sounds.rs
+msgid "Sélectionnez une sortie pour le Chat dans l'onglet Mixeur pour utiliser cette fonction"
+msgstr "Seleccione una salida para Chat en la pestaña Mezclador para usar esta función"
+
+#: ui/src/sounds.rs
+msgid "Enregistrez d'abord un extrait"
+msgstr "Grabe primero un clip"
+
+#: ui/src/tester.rs
+msgid "le périphérique virtuel de ce canal est introuvable"
+msgstr "no se encuentra el dispositivo virtual de este canal"
+
+#: ui/src/tester.rs
+msgid "{device} n'est pas actif : démarrez Platinum"
+msgstr "{device} no está activo: inicie Platinum"
+
+#: ui/src/tester.rs
+msgid "{device} n'est pas branché"
+msgstr "{device} no está conectado"
+
+#: ui/src/tester.rs
+msgid "Son de test non joué"
+msgstr "No se reprodujo el sonido de prueba"
+
+#: ui/src/tester.rs
+msgid "Enregistrement interrompu"
+msgstr "Grabación interrumpida"
+
+#: ui/src/tester.rs
+msgid "Écoute impossible"
+msgstr "No se puede escuchar"
+
+#: ui/ui/tester.slint (the microphone test: stop recording, record)
+msgctxt "test du micro"
+msgid "Arrêter"
+msgstr "Detener"
+
+#: ui/ui/tester.slint
+msgctxt "test du micro"
+msgid "Enregistrer"
+msgstr "Grabar"
+
+#: ui/src/sounds.rs
+msgid "Son de test de GG absent : Platinum joue un test spatial de synthèse à la place"
+msgstr "Falta el sonido de prueba de GG: Platinum reproduce una prueba espacial sintética en su lugar"
+
+#: ui/ui/app.slint
+msgid "Envoyer le rapport de plantage"
+msgstr "Enviar el informe de fallo"
+
+#: ui/ui/app.slint
+msgid "Voici le rapport tel qu'il serait envoyé : votre nom d'utilisateur, celui du PC, les adresses e-mail et les noms de vos périphériques audio ont été remplacés. Relisez-le : vous pourrez encore le modifier sur GitHub avant de l'envoyer."
+msgstr "Este es el informe tal como se enviaría: se han sustituido su nombre de usuario, el del PC, las direcciones de correo electrónico y los nombres de sus dispositivos de audio. Revíselo: aún podrá modificarlo en GitHub antes de enviarlo."
+
+#: ui/ui/app.slint
+msgid "Copier le texte"
+msgstr "Copiar el texto"
+
+#: ui/ui/app.slint
+msgid "Ouvrir sur GitHub"
+msgstr "Abrir en GitHub"
+
+#: ui/ui/app.slint
+msgid "Platinum s'est arrêté brusquement"
+msgstr "Platinum se detuvo de forma inesperada"
+
+#: ui/ui/app.slint
+msgid "Voir le rapport…"
+msgstr "Ver el informe…"
+
+#: ui/ui/app.slint
+msgid "Plus tard"
+msgstr "Más tarde"
+
+#: ui/ui/app.slint
+msgid "Ne plus demander"
+msgstr "No volver a preguntar"
+
+#: ui/ui/app.slint
+msgid "Effacer les rapports de plantage ?"
+msgstr "¿Borrar los informes de fallo?"
+
+#: ui/ui/app.slint
+msgid "Les rapports de plantage enregistrés sur ce PC, et leurs fichiers de vidage, seront supprimés définitivement."
+msgstr "Los informes de fallo guardados en este PC, y sus archivos de volcado, se eliminarán definitivamente."
+
+#: ui/ui/app.slint ui/ui/settings.slint
+msgid "Tout effacer"
+msgstr "Borrar todo"
+
+#: ui/ui/settings.slint (a crash report: date · program)
+msgid "{} · {}"
+msgstr "{} · {}"
+
+#: ui/ui/settings.slint (a crash report)
+msgid "Voir"
+msgstr "Ver"
+
+#: ui/ui/settings.slint
+msgid "Envoyer le rapport…"
+msgstr "Enviar el informe…"
+
+#: ui/ui/settings.slint
+msgid "Rapports de plantage"
+msgstr "Informes de fallos"
+
+#: ui/ui/settings.slint
+msgid "RAPPORTS DE PLANTAGE"
+msgstr "INFORMES DE FALLOS"
+
+#: ui/ui/settings.slint
+msgid "Ce que Platinum note quand l'un de ses programmes s'arrête brusquement, et comment nous l'envoyer si vous le voulez."
+msgstr "Lo que Platinum anota cuando uno de sus programas se detiene de forma inesperada, y cómo enviárnoslo si lo desea."
+
+#: ui/ui/settings.slint
+msgid "ENVOI"
+msgstr "ENVÍO"
+
+#: ui/ui/settings.slint ui/src/settings.rs
+msgid "Proposer d'envoyer les rapports de plantage"
+msgstr "Proponer el envío de los informes de fallo"
+
+#: ui/ui/settings.slint
+msgid "Après un plantage, Platinum vous propose, à la prochaine ouverture de cette fenêtre, d'envoyer le rapport. Vous le lisez d'abord, anonymisé (noms d'utilisateur et de PC, adresses e-mail et noms de vos périphériques audio retirés), puis votre navigateur ouvre une issue GitHub que vous envoyez vous-même. Platinum n'envoie jamais rien et ne fait aucun appel réseau pour cela. Éteint, les rapports restent seulement sur ce PC."
+msgstr "Tras un fallo, Platinum le propone enviar el informe la próxima vez que abra esta ventana. Primero lo lee, anonimizado (sin nombres de usuario ni de PC, direcciones de correo ni nombres de sus dispositivos de audio); después su navegador abre una issue de GitHub que usted mismo envía. Platinum nunca envía nada ni establece ninguna conexión de red para ello. Desactivado, los informes se quedan solo en este PC."
+
+#: ui/ui/settings.slint
+msgid "RAPPORTS SUR CE PC"
+msgstr "INFORMES EN ESTE PC"
+
+#: ui/ui/settings.slint
+msgid "Les 20 derniers rapports sont gardés dans {}. Un plantage hors du code de Platinum (dans un module de SteelSeries, par exemple) laisse aussi un fichier de vidage .dmp : il reste sur ce PC et ne fait jamais partie de ce qui est envoyé."
+msgstr "Los 20 informes más recientes se guardan en {}. Un fallo fuera del código de Platinum (en un módulo de SteelSeries, por ejemplo) deja también un archivo de volcado .dmp: se queda en este PC y nunca forma parte de lo que se envía."
+
+#: ui/ui/settings.slint
+msgid "Aucun plantage enregistré"
+msgstr "Ningún fallo registrado"
+
+#: ui/src/main.rs
+msgid "Rapport de plantage illisible"
+msgstr "Informe de fallo ilegible"
+
+#: ui/src/main.rs
+msgid "Le rapport anonymisé est dans le presse-papiers."
+msgstr "El informe anonimizado está en el portapapeles."
+
+#: ui/src/main.rs
+msgid "Rapports de plantage non effacés"
+msgstr "Informes de fallo no borrados"
+
+#: ui/src/main.rs
+msgid "Copie impossible : {error}"
+msgstr "No se puede copiar: {error}"
+
+#: ui/src/main.rs
+msgid "Le rapport était trop long pour un lien et n'a pas pu être copié ({error}) : utilisez « Copier le texte », puis collez-le dans l'issue."
+msgstr "El informe era demasiado largo para un enlace y no se ha podido copiar ({error}): use «Copiar el texto» y péguelo en la issue."
+
+#: ui/src/settings.rs
+msgid "Ligne de commande"
+msgstr "Línea de comandos"
+
+#: ui/src/settings.rs
+msgid "Tâche de fond"
+msgstr "Servicio en segundo plano"
+
+#: ui/src/settings.rs
+msgid "Fenêtre"
+msgstr "Ventana"
+
+#: ui/src/settings.rs
+msgid "Lanceur"
+msgstr "Lanzador"
+
+#: ui/src/settings.rs
+msgid "Installateur"
+msgstr "Instalador"
+
+#: ui/src/settings.rs
+msgid "Installateur (partie administrateur)"
+msgstr "Instalador (parte de administrador)"
+
+#: ui/src/settings.rs
+msgid "Raison inconnue"
+msgstr "Motivo desconocido"
+
+#: ui/src/settings.rs
+msgid "Un plantage de Platinum ({program}) a été enregistré sur ce PC le {date}. Voulez-vous envoyer le rapport pour aider à corriger le problème ? Vous le lirez d'abord, anonymisé, et c'est vous qui l'enverrez depuis GitHub."
+msgstr "Se ha registrado un fallo de Platinum ({program}) en este PC el {date}. ¿Desea enviar el informe para ayudar a corregir el problema? Primero lo leerá, anonimizado, y será usted quien lo envíe desde GitHub."
+
+#: ui/src/settings.rs
+msgid "« Ouvrir sur GitHub » ouvre une nouvelle issue sur github.com/{repo}, préremplie avec le rapport anonymisé : rien ne part tant que vous ne l'envoyez pas vous-même."
+msgstr "«Abrir en GitHub» abre una nueva issue en github.com/{repo}, rellenada con el informe anonimizado: no se envía nada hasta que usted mismo la envíe."
+
+#: ui/src/settings.rs
+msgid "Le dépôt GitHub de Platinum n'est pas encore défini dans cette version : l'envoi par GitHub est indisponible. Vous pouvez lire et copier les rapports anonymisés."
+msgstr "El repositorio de GitHub de Platinum aún no está definido en esta versión: el envío por GitHub no está disponible. Puede leer y copiar los informes anonimizados."
+
+#: ui/src/settings.rs
+msgid "Le rapport était trop long pour un lien : il a été coupé, et le texte complet anonymisé est dans le presse-papiers. Collez-le dans l'issue avant de l'envoyer."
+msgstr "El informe era demasiado largo para un enlace: se ha recortado, y el texto completo anonimizado está en el portapapeles. Péguelo en la issue antes de enviarla."
+
+#: ui/src/settings.rs
+msgid "La page de GitHub s'ouvre dans votre navigateur : relisez l'issue, puis envoyez-la vous-même si vous le voulez."
+msgstr "La página de GitHub se abre en su navegador: revise la issue y envíela usted mismo si lo desea."

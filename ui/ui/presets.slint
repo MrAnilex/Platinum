@@ -1,0 +1,765 @@
+// The preset views, after GG's (ConfigVADHeader, FavoritesConfigsMenu, BrowseModal): a strip's
+// preset bar with its favourites menu, the tab's current preset with its "…" menu, the
+// favourites bar, the browser and the name dialog. Every action goes to Backend; what is shown
+// comes from src/main.rs.
+
+import { Palette, Label, Button, IconButton, TextField, MenuLine, MenuFrame, MenuSeparator } from "controls.slint";
+import { Icon } from "icons.slint";
+import { ScrollView } from "std-widgets.slint";
+import { Backend, PresetTile, PresetHeader, RunningApp } from "backend.slint";
+
+// The small "NOUVEAU" tag GG puts on presets that came with its last updates.
+component NewTag inherits Rectangle {
+    width: label.preferred-width + 10px;
+    height: 16px;
+    border-radius: 3px;
+    border-width: 1px;
+    border-color: Palette.light;
+    label := Text {
+        width: parent.width;
+        height: parent.height;
+        text: @tr("NOUVEAU");
+        color: Palette.light;
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
+
+// A strip's preset, at the top of the strip as in GG: a click opens its favourites, and
+// "Parcourir…".
+export component PresetBar inherits Rectangle {
+    in property <string> name;
+    in property <[PresetTile]> favorites;
+    in property <bool> enabled: true;
+    // Layout check only: the menu opens when this equals `index`.
+    in property <int> open-request: -1;
+    in property <int> index;
+    callback choose(string);
+    callback browse();
+    changed open-request => {
+        if (root.open-request == root.index) {
+            menu.show();
+        }
+    }
+    height: 24px;
+    border-radius: 4px;
+    opacity: root.enabled ? 1 : 0.4;
+    background: area.has-hover && root.enabled ? Palette.raised : Palette.well;
+    border-width: 1px;
+    border-color: Palette.hairline;
+    Text {
+        x: 8px;
+        width: parent.width - 30px;
+        height: parent.height;
+        text: root.name;
+        color: Palette.text;
+        font-size: 11px;
+        vertical-alignment: center;
+        overflow: elide;
+    }
+    Icon {
+        x: parent.width - 20px;
+        y: (parent.height - self.height) / 2;
+        name: "chevron";
+        size: 13px;
+        tint: Palette.dim;
+    }
+    area := TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: pointer;
+        clicked => { menu.show(); }
+    }
+    // Aligned on the bar's right edge, so that the last strip's menu stays inside the window.
+    menu := PopupWindow {
+        x: root.width - self.width;
+        y: root.height + 4px;
+        width: 240px;
+        MenuFrame {
+            Label {
+                height: 24px;
+                x: 8px;
+                text: @tr("FAVORIS");
+                vertical-alignment: center;
+            }
+            if root.favorites.length == 0: Text {
+                height: 28px;
+                x: 8px;
+                text: @tr("Aucun favori");
+                color: Palette.faint;
+                font-size: 12px;
+                vertical-alignment: center;
+            }
+            for favorite in root.favorites: MenuLine {
+                text: favorite.name;
+                checked: favorite.selected;
+                clicked => { root.choose(favorite.key); }
+            }
+            MenuSeparator { }
+            MenuLine {
+                text: @tr("Parcourir…");
+                icon: "browse";
+                clicked => { root.browse(); }
+            }
+        }
+    }
+}
+
+// The tab's current preset: name, where it comes from or "Modifié" (on Gaming, "Activé par <jeu>"
+// while a game's preset is on), the "Nouveau" tag, the star, and the "…" menu (GG's Reset, Save as,
+// Rename, Delete; Export and Import of a file instead of GG's account-based sharing; on Gaming,
+// the links to games, Platinum's QuickSet).
+export component CurrentPreset inherits Rectangle {
+    in property <string> key;
+    in property <PresetHeader> preset;
+    // Layout check only: opens the menu.
+    in property <bool> open-request;
+    // Opens a question in the window: 4 delete, 5 reset.
+    callback ask(int);
+    changed open-request => {
+        if (root.open-request) {
+            menu.show();
+        }
+    }
+    width: 300px;
+    height: 44px;
+    border-radius: 5px;
+    background: Palette.raised;
+    border-width: 1px;
+    border-color: Palette.edge;
+    opacity: root.preset.ready ? 1 : 0.5;
+    HorizontalLayout {
+        padding-left: 12px;
+        padding-right: 6px;
+        spacing: 8px;
+        VerticalLayout {
+            alignment: center;
+            spacing: 2px;
+            Text {
+                text: root.preset.name;
+                color: Palette.text;
+                font-size: 13px;
+                font-weight: 700;
+                overflow: elide;
+            }
+            HorizontalLayout {
+                spacing: 4px;
+                if root.preset.game != "": Icon {
+                    y: (parent.height - self.height) / 2;
+                    name: "game";
+                    size: 12px;
+                    tint: Palette.light;
+                }
+                Text {
+                    text: root.preset.game != "" ? (root.preset.modified ? @tr("Activé par {} · modifié", root.preset.game) : @tr("Activé par {}", root.preset.game)) : (root.preset.modified ? @tr("Modifié") : root.preset.source);
+                    color: root.preset.modified || root.preset.game != "" ? Palette.light : Palette.faint;
+                    font-size: 10px;
+                    font-weight: root.preset.modified || root.preset.game != "" ? 600 : 400;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+            }
+        }
+        if root.preset.is-new: NewTag {
+            y: (parent.height - self.height) / 2;
+        }
+        Rectangle {
+            width: 28px;
+            Icon {
+                x: (parent.width - self.width) / 2;
+                y: (parent.height - self.height) / 2;
+                name: "star";
+                filled: root.preset.favorite;
+                size: 16px;
+                tint: root.preset.favorite ? Palette.light : (star.has-hover && root.preset.can-favorite ? Palette.text : Palette.faint);
+                opacity: root.preset.can-favorite ? 1 : 0.35;
+            }
+            star := TouchArea {
+                enabled: root.preset.can-favorite && root.preset.ready;
+                mouse-cursor: pointer;
+                clicked => { Backend.toggle-favorite(root.key, root.preset.key); }
+            }
+        }
+        IconButton {
+            y: (parent.height - self.height) / 2;
+            icon: "more";
+            enabled: root.preset.ready;
+            clicked => { menu.show(); }
+        }
+    }
+    menu := PopupWindow {
+        x: root.width - 240px;
+        y: root.height + 4px;
+        width: 240px;
+        MenuFrame {
+            MenuLine {
+                text: @tr("Réinitialiser");
+                enabled: root.preset.can-reset;
+                clicked => { root.ask(5); }
+            }
+            if root.preset.own: MenuLine {
+                text: @tr("Enregistrer");
+                enabled: root.preset.can-save;
+                clicked => { Backend.preset-command(root.key, "save"); }
+            }
+            MenuLine {
+                text: @tr("Enregistrer sous…");
+                clicked => { Backend.ask-name(root.key, 2); }
+            }
+            MenuLine {
+                text: @tr("Renommer…");
+                enabled: root.preset.own;
+                clicked => { Backend.ask-name(root.key, 3); }
+            }
+            MenuLine {
+                text: @tr("Supprimer…");
+                enabled: root.preset.own;
+                clicked => { root.ask(4); }
+            }
+            MenuSeparator { }
+            MenuLine {
+                text: @tr("Exporter…");
+                clicked => { Backend.preset-command(root.key, "export"); }
+            }
+            MenuLine {
+                text: @tr("Importer…");
+                clicked => { Backend.preset-command(root.key, "import"); }
+            }
+            if root.preset.can-link: MenuSeparator { }
+            if root.preset.can-link: MenuLine {
+                text: @tr("Associer au jeu en cours…");
+                icon: "game";
+                clicked => { Backend.ask-link(root.key); }
+            }
+            for link in root.preset.links: MenuLine {
+                text: @tr("Dissocier de {}", link.title);
+                icon: "close";
+                clicked => { Backend.unlink-game(link.exe); }
+            }
+        }
+    }
+}
+
+// GG's favourites bar: nine slots; an empty one opens the browser. A favourite dragged sideways
+// goes to the slot it is dropped on, the others shifting (GG's setFavoritePosition).
+export component FavoritesBar inherits HorizontalLayout {
+    in property <string> key;
+    in property <[PresetTile]> slots;
+    in property <int> count;
+    in property <bool> enabled: true;
+    // The favourite being dragged, and the slot it would go to; -1 when none.
+    property <int> drag-from: -1;
+    property <int> drag-to: -1;
+    // The press that just ended was a drag: its click must not choose the preset.
+    property <bool> was-drag;
+    spacing: 6px;
+    Label {
+        width: 100px;
+        text: @tr("FAVORIS ({}/9)", root.count);
+        vertical-alignment: center;
+    }
+    for slot[index] in root.slots: Rectangle {
+        height: 32px;
+        border-radius: 4px;
+        opacity: !root.enabled ? 0.4 : (root.drag-from == index ? 0.5 : 1);
+        background: slot.selected ? Palette.raised : (cell.has-hover && root.enabled ? #ffffff08 : transparent);
+        border-width: root.drag-from >= 0 && root.drag-to == index && index != root.drag-from ? 2px : 1px;
+        border-color: slot.selected || (root.drag-from >= 0 && root.drag-to == index) ? Palette.light : Palette.hairline;
+        if slot.key == "": Icon {
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            name: "plus";
+            size: 13px;
+            tint: Palette.faint;
+        }
+        if slot.key != "": Text {
+            x: 8px;
+            width: parent.width - 16px;
+            height: parent.height;
+            text: slot.name;
+            color: slot.selected ? Palette.text : Palette.dim;
+            font-size: 11px;
+            vertical-alignment: center;
+            horizontal-alignment: center;
+            overflow: elide;
+        }
+        cell := TouchArea {
+            enabled: root.enabled;
+            mouse-cursor: root.drag-from >= 0 ? MouseCursor.grabbing : MouseCursor.pointer;
+            pointer-event(event) => {
+                if (event.kind == PointerEventKind.down) {
+                    root.was-drag = false;
+                }
+                if (event.kind == PointerEventKind.up && root.drag-from >= 0) {
+                    if (root.drag-to != root.drag-from) {
+                        Backend.move-favorite(root.key, slot.key, root.drag-to);
+                    }
+                    root.was-drag = true;
+                    root.drag-from = -1;
+                    root.drag-to = -1;
+                }
+                if (event.kind == PointerEventKind.cancel) {
+                    root.drag-from = -1;
+                    root.drag-to = -1;
+                }
+            }
+            moved => {
+                // The slots share the bar equally, 6 px apart: the pointer's offset says how many
+                // slots away it is.
+                if (self.pressed && slot.key != "" && (root.drag-from >= 0 || abs((self.mouse-x - self.pressed-x) / 1px) > 6)) {
+                    root.drag-from = index;
+                    root.drag-to = max(0, min(root.count - 1, index + round((self.mouse-x - self.pressed-x) / (parent.width + 6px))));
+                }
+            }
+            clicked => {
+                if (root.was-drag) {
+                    root.was-drag = false;
+                } else if (slot.key == "") {
+                    Backend.open-browse(root.key);
+                } else {
+                    Backend.select-preset(root.key, slot.key);
+                }
+            }
+        }
+    }
+}
+
+// A filter of the browser, with how many presets it holds.
+component FilterPill inherits Rectangle {
+    in property <string> text;
+    in property <int> count;
+    in property <bool> active;
+    callback clicked;
+    height: 28px;
+    width: label.preferred-width + number.preferred-width + 30px;
+    border-radius: 14px;
+    background: root.active ? Palette.light : (area.has-hover ? Palette.raised : transparent);
+    border-width: 1px;
+    border-color: root.active ? Palette.light : Palette.edge;
+    HorizontalLayout {
+        padding-left: 12px;
+        padding-right: 12px;
+        spacing: 6px;
+        label := Text {
+            text: root.text;
+            color: root.active ? Palette.base : Palette.text;
+            font-size: 11px;
+            font-weight: 600;
+            vertical-alignment: center;
+        }
+        number := Text {
+            text: root.count;
+            color: root.active ? Palette.base : Palette.faint;
+            font-size: 11px;
+            vertical-alignment: center;
+        }
+    }
+    area := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}
+
+// One preset in the browser: a click applies it (the browser stays open, to try another).
+component BrowseTile inherits Rectangle {
+    in property <string> key;
+    in property <PresetTile> tile;
+    // Nine favourites already: the star can only take one away.
+    in property <bool> favorites-full;
+    border-radius: 5px;
+    background: area.has-hover ? Palette.raised : Palette.panel;
+    border-width: 1px;
+    border-color: root.tile.selected ? Palette.light : Palette.hairline;
+    area := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { Backend.select-preset(root.key, root.tile.key); }
+    }
+    HorizontalLayout {
+        padding-left: 12px;
+        padding-right: 6px;
+        spacing: 6px;
+        VerticalLayout {
+            alignment: center;
+            spacing: 3px;
+            Text {
+                text: root.tile.name;
+                color: Palette.text;
+                font-size: 12px;
+                font-weight: 600;
+                overflow: elide;
+            }
+            Text {
+                text: root.tile.source;
+                color: Palette.faint;
+                font-size: 10px;
+                overflow: elide;
+            }
+        }
+        if root.tile.is-new: NewTag {
+            y: (parent.height - self.height) / 2;
+        }
+        if root.tile.selected: Icon {
+            y: (parent.height - self.height) / 2;
+            name: "check";
+            size: 14px;
+            tint: Palette.light;
+        }
+        Rectangle {
+            width: 28px;
+            property <bool> usable: root.tile.favorite || !root.favorites-full;
+            Icon {
+                x: (parent.width - self.width) / 2;
+                y: (parent.height - self.height) / 2;
+                name: "star";
+                filled: root.tile.favorite;
+                size: 15px;
+                tint: root.tile.favorite ? Palette.light : (star.has-hover && parent.usable ? Palette.text : Palette.faint);
+                opacity: parent.usable ? 1 : 0.35;
+            }
+            star := TouchArea {
+                enabled: parent.usable;
+                mouse-cursor: pointer;
+                clicked => { Backend.toggle-favorite(root.key, root.tile.key); }
+            }
+        }
+    }
+}
+
+// GG's Browse modal: filters with their counts, a search, the presets as tiles, "Nouveau
+// préréglage". Échap or a click outside closes it.
+export component BrowseOverlay inherits Rectangle {
+    in property <string> key;
+    in property <string> title;
+    in property <int> filter;
+    in property <[int]> counts;
+    in property <[PresetTile]> tiles;
+    in property <bool> favorites-full;
+    in property <string> note;
+    // Gaming's browser: the "Par jeu" filter (GG's QuickSet) is offered too.
+    in property <bool> games;
+    background: #000000a0;
+    init => { search.focus(); }
+    // Échap reaches it from the search field, which has the focus.
+    FocusScope {
+        key-pressed(event) => {
+            if (event.text == Key.Escape) {
+                Backend.close-browse();
+                return accept;
+            }
+            return reject;
+        }
+        TouchArea {
+            clicked => { Backend.close-browse(); }
+        }
+        panel := Rectangle {
+            x: (parent.width - self.width) / 2;
+            y: 40px;
+            width: min(parent.width - 80px, 1080px);
+            height: parent.height - 80px;
+            background: Palette.base;
+            border-radius: 8px;
+            border-width: 1px;
+            border-color: Palette.edge;
+            drop-shadow-blur: 30px;
+            drop-shadow-color: #000000e0;
+            // Clicks on the panel stay on the panel.
+            TouchArea { }
+            VerticalLayout {
+                padding: 22px;
+                spacing: 14px;
+                HorizontalLayout {
+                    spacing: 10px;
+                    Text {
+                        text: @tr("PRÉRÉGLAGES");
+                        color: Palette.text;
+                        font-size: 15px;
+                        font-weight: 700;
+                        letter-spacing: 2px;
+                        vertical-alignment: center;
+                    }
+                    Text {
+                        text: "— " + root.title;
+                        color: Palette.dim;
+                        font-size: 15px;
+                        letter-spacing: 2px;
+                        vertical-alignment: center;
+                    }
+                    Rectangle { }
+                    IconButton {
+                        icon: "close";
+                        clicked => { Backend.close-browse(); }
+                    }
+                }
+                HorizontalLayout {
+                    spacing: 6px;
+                    for name[index] in root.games ? [@tr("Tous"), @tr("Bibliothèque GG"), @tr("Favoris"), @tr("Mes préréglages"), @tr("Nouveaux"), @tr("Par jeu")] : [@tr("Tous"), @tr("Bibliothèque GG"), @tr("Favoris"), @tr("Mes préréglages"), @tr("Nouveaux")]: FilterPill {
+                        text: name;
+                        count: index < root.counts.length ? root.counts[index] : 0;
+                        active: root.filter == index;
+                        clicked => { Backend.browse-filter(index); }
+                    }
+                    Rectangle { }
+                    search := TextField {
+                        width: 230px;
+                        icon: "search";
+                        placeholder: @tr("Recherche");
+                        edited(text) => { Backend.browse-search(text); }
+                    }
+                    Button {
+                        text: @tr("Nouveau préréglage");
+                        primary: true;
+                        clicked => { Backend.ask-name(root.key, 1); }
+                    }
+                }
+                if root.note != "": Text {
+                    text: root.note;
+                    color: Palette.amber;
+                    font-size: 11px;
+                    wrap: word-wrap;
+                }
+                if root.games && root.filter == 5: Text {
+                    text: @tr("Les préréglages que GG associe à un jeu installé sur ce PC, et ceux que vous avez associés à un jeu (menu « … » du préréglage, « Associer au jeu en cours… »). Quand le jeu tourne, Gaming prend son préréglage.");
+                    color: Palette.dim;
+                    font-size: 11px;
+                    wrap: word-wrap;
+                }
+                if root.tiles.length == 0: Text {
+                    text: root.games && root.filter == 5 ? @tr("Aucun préréglage n'est associé à un jeu installé.") : @tr("Aucun résultat.");
+                    color: Palette.dim;
+                    font-size: 12px;
+                }
+                ScrollView {
+                    vertical-stretch: 1;
+                    property <int> columns: 4;
+                    property <length> gap: 10px;
+                    // Room is kept on the right for the scroll bar, which is drawn over the content.
+                    property <length> tile-width: (self.visible-width - 14px - (self.columns - 1) * self.gap) / self.columns;
+                    property <length> tile-height: 56px;
+                    content-width: self.visible-width;
+                    content-height: ceil(root.tiles.length / self.columns) * (self.tile-height + self.gap);
+                    for tile[index] in root.tiles: BrowseTile {
+                        x: mod(index, parent.columns) * (parent.tile-width + parent.gap);
+                        y: floor(index / parent.columns) * (parent.tile-height + parent.gap);
+                        width: parent.tile-width;
+                        height: parent.tile-height;
+                        key: root.key;
+                        tile: tile;
+                        favorites-full: root.favorites-full;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// "Associer au jeu en cours…": the programs running now (with a window or with sound), one to
+// pick; once linked, Gaming takes the preset whenever that program runs.
+export component LinkDialog inherits Rectangle {
+    in property <string> preset;
+    in property <[RunningApp]> apps;
+    callback closed();
+    property <int> picked: -1;
+    background: #000000a0;
+    TouchArea { }
+    init => { scope.focus(); }
+    scope := FocusScope {
+        key-pressed(event) => {
+            if (event.text == Key.Escape) {
+                root.closed();
+                return accept;
+            }
+            return reject;
+        }
+        Rectangle {
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            width: 520px;
+            height: box.preferred-height;
+            background: Palette.raised;
+            border-radius: 8px;
+            border-width: 1px;
+            border-color: Palette.edge;
+            drop-shadow-blur: 24px;
+            drop-shadow-color: #000000d0;
+            box := VerticalLayout {
+                padding: 22px;
+                spacing: 12px;
+                Text {
+                    text: @tr("Associer au jeu en cours");
+                    color: Palette.text;
+                    font-size: 15px;
+                    font-weight: 700;
+                }
+                Text {
+                    text: @tr("Choisissez le jeu parmi les programmes ouverts : quand il tourne, Gaming prend « {} », puis votre préréglage revient quand vous le quittez. Vos associations passent avant celles de GG.", root.preset);
+                    color: Palette.dim;
+                    font-size: 12px;
+                    wrap: word-wrap;
+                }
+                if root.apps.length == 0: Text {
+                    height: 40px;
+                    text: @tr("Aucun programme avec une fenêtre ou du son n'est ouvert. Lancez le jeu, puis rouvrez ce menu.");
+                    color: Palette.faint;
+                    font-size: 12px;
+                    wrap: word-wrap;
+                    vertical-alignment: center;
+                }
+                if root.apps.length > 0: Rectangle {
+                    height: min(root.apps.length, 7) * 40px + 8px;
+                    border-radius: 5px;
+                    background: Palette.well;
+                    border-width: 1px;
+                    border-color: Palette.hairline;
+                    ScrollView {
+                        x: 4px;
+                        y: 4px;
+                        width: parent.width - 8px;
+                        height: parent.height - 8px;
+                        content-width: self.visible-width;
+                        content-height: root.apps.length * 40px;
+                        for app[index] in root.apps: Rectangle {
+                            y: index * 40px;
+                            width: parent.width - 14px;
+                            height: 38px;
+                            border-radius: 4px;
+                            background: root.picked == index ? Palette.light : (row.has-hover ? Palette.raised : transparent);
+                            HorizontalLayout {
+                                padding-left: 10px;
+                                padding-right: 10px;
+                                spacing: 10px;
+                                VerticalLayout {
+                                    alignment: center;
+                                    spacing: 2px;
+                                    Text {
+                                        text: app.title;
+                                        color: root.picked == index ? Palette.base : Palette.text;
+                                        font-size: 12px;
+                                        font-weight: 600;
+                                        overflow: elide;
+                                    }
+                                    Text {
+                                        text: app.detail;
+                                        color: root.picked == index ? Palette.base : Palette.faint;
+                                        font-size: 10px;
+                                        overflow: elide;
+                                    }
+                                }
+                            }
+                            row := TouchArea {
+                                mouse-cursor: pointer;
+                                clicked => { root.picked = index; }
+                                double-clicked => {
+                                    Backend.link-game(index);
+                                    root.closed();
+                                }
+                            }
+                        }
+                    }
+                }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: end;
+                    Button {
+                        text: @tr("Annuler");
+                        clicked => { root.closed(); }
+                    }
+                    Button {
+                        text: @tr("Associer");
+                        primary: true;
+                        enabled: root.picked >= 0 && root.picked < root.apps.length;
+                        clicked => {
+                            Backend.link-game(root.picked);
+                            root.closed();
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Asks for a preset's name (new preset, save as, rename); the name is checked as it is typed.
+export component NameDialog inherits Rectangle {
+    in property <string> key;
+    // 1 new preset, 2 save as, 3 rename.
+    in property <int> purpose;
+    in property <string> initial;
+    callback closed();
+    property <string> problem: Backend.name-problem(root.key, root.purpose, field.text);
+    function confirm() {
+        if (root.problem == "") {
+            Backend.name-chosen(root.key, root.purpose, field.text);
+            root.closed();
+        }
+    }
+    background: #000000a0;
+    TouchArea { }
+    init => {
+        field.focus();
+        field.select-all();
+    }
+    FocusScope {
+        key-pressed(event) => {
+            if (event.text == Key.Escape) {
+                root.closed();
+                return accept;
+            }
+            return reject;
+        }
+        Rectangle {
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            width: 440px;
+            height: box.preferred-height;
+            background: Palette.raised;
+            border-radius: 8px;
+            border-width: 1px;
+            border-color: Palette.edge;
+            drop-shadow-blur: 24px;
+            drop-shadow-color: #000000d0;
+            box := VerticalLayout {
+                padding: 22px;
+                spacing: 12px;
+                Text {
+                    text: root.purpose == 3 ? @tr("Renommer le préréglage") : (root.purpose == 2 ? @tr("Enregistrer sous…") : @tr("Nouveau préréglage"));
+                    color: Palette.text;
+                    font-size: 15px;
+                    font-weight: 700;
+                }
+                Text {
+                    text: root.purpose == 3 ? @tr("Renommer votre configuration") : (root.purpose == 2 ? @tr("Donner un nom à votre configuration") : @tr("Donner un nom à votre nouvelle configuration : elle reprend les réglages actuels du canal."));
+                    color: Palette.dim;
+                    font-size: 12px;
+                    wrap: word-wrap;
+                }
+                field := TextField {
+                    text: root.initial;
+                    placeholder: @tr("Nom");
+                    accepted => { root.confirm(); }
+                }
+                Text {
+                    height: 14px;
+                    text: root.problem;
+                    color: Palette.hot;
+                    font-size: 11px;
+                }
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: end;
+                    Button {
+                        text: @tr("Annuler");
+                        clicked => { root.closed(); }
+                    }
+                    Button {
+                        text: @tr("Enregistrer");
+                        primary: true;
+                        enabled: root.problem == "";
+                        clicked => { root.confirm(); }
+                    }
+                }
+            }
+        }
+    }
+}

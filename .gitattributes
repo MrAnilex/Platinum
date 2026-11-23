@@ -1,0 +1,8 @@
+# Line endings: text files are stored with LF; cmd.exe needs CRLF to find its labels.
+* text=auto
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+*.png binary
+*.ico binary
+*.db binary

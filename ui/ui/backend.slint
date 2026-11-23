@@ -1,0 +1,393 @@
+// What the window and src/main.rs exchange: the shapes of the data shown, and the Backend global
+// through which every action goes back to Rust. Kept in its own file so that the cards and the
+// preset views (cards.slint, presets.slint) can call Backend without importing app.slint.
+
+// A preset as a tile (favourites bar, browser, a strip's menu).
+export struct PresetTile {
+    // How Rust names it: "flat", "gg:<id>", "own:<name>"; empty for an empty favourite slot.
+    key: string,
+    name: string,
+    // Where it comes from: "Bibliothèque GG", "Mes préréglages"…
+    source: string,
+    is-new: bool,
+    favorite: bool,
+    selected: bool,
+}
+
+// A program the user linked to one of Gaming's presets (game-links.txt).
+export struct GameLinkView {
+    exe: string,
+    title: string,
+}
+
+// A program running now, offered by "Associer au jeu en cours…": one with a window on screen or
+// with sound.
+export struct RunningApp {
+    exe: string,
+    title: string,
+    // The executable, and the preset it is linked to already, if any.
+    detail: string,
+}
+
+// The preset a channel uses, for the tab's header.
+export struct PresetHeader {
+    key: string,
+    name: string,
+    // The second line: where it comes from, or "Modifié".
+    source: string,
+    modified: bool,
+    is-new: bool,
+    favorite: bool,
+    // It can be starred: a preset, and fewer than nine favourites (or starred already).
+    can-favorite: bool,
+    can-reset: bool,
+    // One of the user's own presets: it can be saved again, renamed and deleted.
+    own: bool,
+    can-save: bool,
+    // The channel's settings can be read (nothing can be applied otherwise).
+    ready: bool,
+    // Gaming: the game whose preset the daemon put on the channel ("Activé par …"); empty when
+    // none.
+    game: string,
+    // Gaming: the preset can be linked to a running program, and the programs linked to it.
+    can-link: bool,
+    links: [GameLinkView],
+}
+
+// The effect cards of a playback channel (Gaming, Media, Aux), in GG's scales.
+export struct RenderView {
+    eq-on: bool,
+    // Bass, voice and treble boosts, -12..12 dB; lit when on (they follow the equalizer).
+    bass: float,
+    voice: float,
+    treble: float,
+    bass-on: bool,
+    voice-on: bool,
+    treble-on: bool,
+    spatial-on: bool,
+    speakers-mode: bool,
+    // Slider positions 0..1: Performance to Immersion, and the distance (shown in percent).
+    reverb: float,
+    distance: float,
+    // Volume boost, 0..12 dB.
+    boost: float,
+    smart-on: bool,
+    smart-level: float,
+    // 0 strong, 1 balanced, 2 soft.
+    loudness: int,
+}
+
+// The effect cards of a capture channel (Chat, Micro).
+export struct CaptureView {
+    eq-on: bool,
+    ai-on: bool,
+    // Slider position 0..1 on GG's decibel-shaped scale.
+    ai: float,
+    has-echo: bool,
+    echo-on: bool,
+    // As the module holds them: off while AI noise cancelling is on.
+    nr-on: bool,
+    nr: float,
+    impact-on: bool,
+    impact: float,
+    // AI noise cancelling is on, yet the module still holds a noise reduction on.
+    reductions-stuck: bool,
+    gate-on: bool,
+    gate: float,
+    auto-gate: bool,
+    comp-on: bool,
+    comp: float,
+}
+
+// One speaker of the spatial audio wheel.
+export struct SpeakerView {
+    // Its place in GG's list (preset::SPEAKERS in Rust).
+    index: int,
+    name: string,
+    short: string,
+    // Degrees, positive to the left of the listener.
+    angle: float,
+}
+
+// One test sound of a channel tab (GG's "Tester").
+export struct TestSample {
+    label: string,
+    playing: bool,
+}
+
+// The microphone test of the Micro tab.
+export struct MicTest {
+    // 0 nothing recorded, 1 recording, 2 recorded, 3 listening (sounds::MicPhase in Rust).
+    phase: int,
+    // While recording: the level, 0..1 on the meters' scale.
+    level: float,
+    // "0:04 / 0:30", "Extrait de 0:07"; empty with nothing recorded.
+    time: string,
+    // A microphone is relayed: "Enregistrer" can work.
+    can-record: bool,
+}
+
+// The numbers of the fields an effect card changes; they must match presets::Field in Rust.
+export global Field {
+    out property <int> global-enable: 1;
+    out property <int> equalizer: 2;
+    out property <int> bass: 10;
+    out property <int> voice: 11;
+    out property <int> treble: 12;
+    out property <int> spatial: 13;
+    out property <int> speakers: 14;
+    out property <int> reverb: 15;
+    out property <int> distance: 16;
+    out property <int> volume-boost: 17;
+    out property <int> smart-volume: 18;
+    out property <int> smart-level: 19;
+    out property <int> loudness: 20;
+    out property <int> ai: 30;
+    out property <int> ai-amount: 31;
+    out property <int> echo-canceling: 32;
+    out property <int> noise-reduction: 33;
+    out property <int> noise-reduction-amount: 34;
+    out property <int> impact: 35;
+    out property <int> impact-amount: 36;
+    out property <int> gate: 37;
+    out property <int> gate-threshold: 38;
+    out property <int> auto-gate: 39;
+    out property <int> compressor: 40;
+    out property <int> compressor-level: 41;
+}
+
+// One of the user's links of a Gaming preset to a program (game-links.txt), as the settings page
+// lists it.
+export struct LinkRow {
+    exe: string,
+    title: string,
+    // The preset's name now.
+    preset: string,
+}
+
+// What the settings page's "À propos" says (src/main.rs, about_view).
+export struct AboutView {
+    version: string,
+    folder: string,
+    can-open-folder: bool,
+    log: string,
+    can-open-log: bool,
+    // The daemon's state in words, its process, its memory, and when it last wrote status.txt.
+    state: string,
+    pid: string,
+    memory: string,
+    // The microphone engine's memory: the worker process that hosts the relay and the effects engine.
+    engine-memory: string,
+    updated: string,
+}
+
+// A crash report as the settings page lists it (src/settings.rs, crash_lines).
+export struct CrashRow {
+    // The report's file name, which identifies it.
+    name: string,
+    date: string,
+    program: string,
+    // Its one-line reason, technical.
+    reason: string,
+}
+
+// The settings page's sections, in the navigation's order; they must match src/settings.rs.
+export global Section {
+    out property <int> general: 0;
+    out property <int> microphone: 1;
+    out property <int> outputs: 2;
+    out property <int> streamer: 3;
+    out property <int> remote: 4;
+    out property <int> games: 5;
+    out property <int> shortcuts: 6;
+    out property <int> crashes: 7;
+    out property <int> about: 8;
+}
+
+// The options of the settings page, for their note (when a change takes effect) and the on/off
+// ones' Backend.set-switch; they must match settings::Setting in Rust.
+export global SettingId {
+    out property <int> start-with-windows: 0;
+    out property <int> start-on-open: 1;
+    out property <int> channel-names: 2;
+    out property <int> microphone: 3;
+    out property <int> effects: 4;
+    out property <int> gain: 5;
+    out property <int> fallback-input: 6;
+    out property <int> auto-switch: 7;
+    out property <int> fallback-output: 8;
+    out property <int> streamer: 9;
+    out property <int> follow-streaming: 10;
+    out property <int> route-apps: 11;
+    out property <int> streaming-sinks: 12;
+    out property <int> game-presets: 13;
+    out property <int> arena-speakers: 14;
+    out property <int> shortcuts: 15;
+    out property <int> language: 16;
+    out property <int> crash-reports: 17;
+}
+
+// The effect cards, for their "Réinitialiser"; they must match presets::CardKind in Rust.
+export global CardKind {
+    out property <int> equalizer: 1;
+    out property <int> spatial: 2;
+    out property <int> volume-boost: 3;
+    out property <int> smart-volume: 4;
+    out property <int> ai: 5;
+    out property <int> noise-reduction: 6;
+    out property <int> noise-gate: 7;
+    out property <int> compressor: 8;
+}
+
+// A value typed under a knob or a fader, as Rust read it: `ok` false when it is not a number.
+export struct TypedValue {
+    ok: bool,
+    value: float,
+}
+
+// Layout check only: what the window shows open for a capture.
+export global Preview {
+    // A knob's value being typed: the first one (Basses) on a playback channel, the
+    // compressor's level on a capture channel (whichever is enabled opens).
+    in property <bool> edit-knob;
+}
+
+export global Backend {
+    // A value typed under a knob or a fader (ValueEdit): the text, the control's range and step,
+    // and whether it shows 0..1 as a percentage. Decimal comma or point, unit optional; clamped to
+    // the range and rounded to the step.
+    pure callback typed-value(string, float, float, float, bool) -> TypedValue;
+    callback set-volume(string, float);
+    callback set-muted(string, bool);
+    callback set-output(string, int);
+    callback set-master-volume(float);
+    callback set-master-muted(bool);
+    callback set-master-output(int);
+    callback set-device-level(float);
+    callback set-mic-volume(float);
+    callback set-mic-muted(bool);
+    callback choose-microphone(int);
+    // A microphone picked for the confirmation dialog (Rust keeps which device it is), then the
+    // confirmation itself.
+    callback microphone-picked(int);
+    callback confirm-microphone();
+    // Puts the echo cancellation back on the outputs the channels play to.
+    callback sync-echo();
+    // Opens Windows' own per-application sound settings.
+    callback open-app-volume();
+    callback set-chatmix(float);
+    // An effect card changed (channel, Field number, value: 0 or 1 for a switch).
+    callback edit(string, int, float);
+    // A speaker of the wheel moved (channel, speaker, degrees); reset puts it back.
+    callback speaker-moved(string, int, float);
+    callback speaker-reset(string, int);
+    // A card's "Réinitialiser" (channel, CardKind number).
+    callback reset-card(string, int);
+    // The equalizer's zone labels: a voice's (true) or the default ones.
+    callback set-voice-zones(string, bool);
+    callback route-app(string, int);
+    callback open-page(int);
+    callback start-daemon();
+    callback stop-daemon();
+    // Stops and starts the daemon again, once the user confirmed it (the sound cuts a few seconds).
+    callback restart-daemon();
+    callback set-start-with-windows(bool);
+    callback dismiss(int);
+    // Presets (channel key first).
+    callback select-preset(string, string);
+    callback toggle-favorite(string, string);
+    // A favourite dragged to another place of the bar (channel, preset, new place).
+    callback move-favorite(string, string, int);
+    callback open-browse(string);
+    callback close-browse();
+    callback browse-filter(int);
+    callback browse-search(string);
+    // "reset", "save", "export", "import".
+    callback preset-command(string, string);
+    // Opens the name dialog (Rust proposes a name): 1 new preset, 2 save as, 3 rename.
+    callback ask-name(string, int);
+    // The name given in it.
+    callback name-chosen(string, int, string);
+    // Why that name cannot be used, in French; empty when it can.
+    pure callback name-problem(string, int, string) -> string;
+    callback delete-preset(string);
+    // The settings page, at a section (Section); the mixer's "Gestionnaire de périphériques" lines
+    // open its Sorties and Micro sections.
+    callback open-settings(int);
+    // One of platinum.ini's on/off options, by its SettingId.
+    callback set-switch(int, bool);
+    // The relayed microphone's volume, 0..1, once the slider is let go.
+    callback set-gain(float);
+    // A fallback device (0 the output, 1 the input) by its place in its menu.
+    callback set-fallback(int, int);
+    // The channels' names in Windows: Platinum's (true) or those they had before.
+    callback set-channel-names(bool);
+    // The language, by its place in the menu: 0 Windows' language, then Language::ALL's order.
+    callback set-language(int);
+    // The streaming outputs' name fragments, as typed (comma-separated).
+    callback set-streaming-sinks(string);
+    // "À propos": the daemon's log, the install folder.
+    callback open-log();
+    callback open-folder();
+    // GG's backup device switch and its priority lists (GG's "Gestionnaire de périphériques"),
+    // now on the settings page. The lists are numbered 0 for the outputs and 1 for the
+    // microphones; an entry is given by its place in the list shown.
+    callback set-auto-switch(bool);
+    // An entry moved up (-1) or down (+1).
+    callback priority-move(int, int, int);
+    callback priority-exclude(int, int, bool);
+    callback priority-remove(int, int);
+    // A device added from the "Ajouter" menu, by its place in that menu.
+    callback priority-add(int, int);
+    // Keyboard shortcuts and overlays (GG's Settings > Sonar), on the settings page. An action is
+    // given by its place in the list (hotkeys::Action::ALL in Rust).
+    // A key pressed while a field waits for a combination: the action, the key's text and the
+    // modifiers held (Ctrl, Alt, Maj, Win). True when the combination was taken: the field stops
+    // waiting; false for a modifier alone or a combination refused (the panel says why).
+    callback shortcut-pressed(int, string, bool, bool, bool, bool) -> bool;
+    // A field starts or stops waiting (clears the last refusal).
+    callback shortcut-capture(int);
+    callback clear-shortcut(int);
+    callback set-overlays(bool);
+    // One kind of overlay on or off: 0 volume, 1 mute, 2 device change.
+    callback set-overlay-kind(int, bool);
+    callback set-overlay-position(int);
+    // Shows a sample overlay where the options put it.
+    callback preview-overlay();
+    // Streamer mode (GG's "Streamer mode"): on or off once confirmed; a channel's volume and mute
+    // in the stream mix; the Stream master and its mute; a channel in or out of a mix (0 the
+    // personal mix, 1 the stream mix); the mixes' devices, by their place in their menus; the
+    // Windows level of the stream mix's device.
+    callback set-streamer(bool);
+    callback set-stream-volume(string, float);
+    callback set-stream-muted(string, bool);
+    callback set-stream-master-volume(float);
+    callback set-stream-master-muted(bool);
+    callback set-inclusion(string, int, bool);
+    callback set-personal-output(int);
+    callback set-stream-output(int);
+    callback set-stream-level(float);
+    // "Associer au jeu en cours…" in a Gaming preset's "…" menu (channel key): opens the list of
+    // running programs; then the program chosen, by its place in that list; "Dissocier", by
+    // executable.
+    callback ask-link(string);
+    callback link-game(int);
+    callback unlink-game(string);
+    // A channel tab's test sound pressed (channel, its place in the row): plays it from the start,
+    // or stops it when it is the one playing.
+    callback play-sample(string, int);
+    // The microphone test: 0 "Enregistrer" or "Arrêter", 1 "Écouter" or "Pause".
+    callback mic-test(int);
+    // Crash reports (settings page, "Rapports de plantage"), by file name: "Voir" opens the file
+    // on this PC; "Envoyer le rapport…" shows it anonymised in the send dialog, whose buttons copy
+    // it or open GitHub's new issue page in the browser (never anything sent by Platinum itself).
+    callback crash-view(string);
+    callback crash-send(string);
+    callback crash-copy();
+    callback crash-github();
+    callback crash-open-folder();
+    // Every report deleted, once confirmed.
+    callback crash-clear();
+    // "Ne plus demander" in the question after a crash: crash_reports = off.
+    callback crash-never-ask();
+}

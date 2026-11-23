@@ -1,0 +1,51 @@
+//! Platinum's engine: the settings of the audio module, the Windows audio devices, the microphone
+//! relay and its effects, and the background daemon. `platinum.exe` (the command line) and
+//! `platinum-ui.exe` (the window) are both built on it.
+
+pub mod apo;
+pub mod autostart;
+pub mod com;
+pub mod config;
+pub mod crash;
+pub mod daemon;
+pub mod debuglog;
+pub mod devices;
+pub mod doctor;
+pub mod dsp;
+pub mod eq;
+pub mod fallback;
+pub mod fxhost;
+pub mod fxprobe;
+pub mod games;
+pub mod gamescan;
+pub mod guard;
+pub mod hotkeys;
+pub mod i18n;
+pub mod json;
+pub mod keepalive;
+pub mod library;
+pub mod machine;
+pub mod meter;
+pub mod migrations;
+pub mod mixer;
+pub mod names;
+pub mod outputs;
+pub mod overlay;
+pub mod preset;
+pub mod presetfiles;
+pub mod recycle;
+pub mod regclean;
+pub mod relay;
+pub mod remote;
+pub mod repaint;
+pub mod routing;
+pub mod session;
+pub mod shortcuts;
+pub mod sonarfiles;
+pub mod sqlite;
+pub mod status;
+pub mod streamer;
+pub mod testsignal;
+pub mod tray;
+pub mod wasapi;
+pub mod worker;

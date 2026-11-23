@@ -1,0 +1,547 @@
+// Platinum's setup: welcome, licences and options, progress (with SteelSeries GG's licence, read
+// from their installer, shown before anything is installed), end. Uses the window's own controls
+// and colours (ui/ui/controls.slint), so that the setup looks like Platinum.
+
+import { Palette, Label, Toggle, Button } from "../../ui/ui/controls.slint";
+import { Icon } from "../../ui/ui/icons.slint";
+import { ScrollView } from "std-widgets.slint";
+
+export struct StepView {
+    title: string,
+    // 0 to come, 1 under way, 2 done, 3 failed
+    state: int,
+}
+
+// A switch with its sentence; the whole line toggles it.
+component Choice inherits HorizontalLayout {
+    in property <bool> on;
+    in property <string> text;
+    in property <string> detail;
+    in property <bool> enabled: true;
+    callback toggled(bool);
+    spacing: 12px;
+    Toggle {
+        y: 2px;
+        on: root.on;
+        enabled: root.enabled;
+        toggled(value) => { root.toggled(value); }
+    }
+    VerticalLayout {
+        spacing: 2px;
+        Text {
+            text: root.text;
+            color: root.enabled ? Palette.text : Palette.faint;
+            font-size: 12px;
+            wrap: word-wrap;
+            TouchArea {
+                enabled: root.enabled;
+                mouse-cursor: pointer;
+                clicked => { root.toggled(!root.on); }
+            }
+        }
+        if root.detail != "": Text {
+            text: root.detail;
+            color: Palette.dim;
+            font-size: 11px;
+            wrap: word-wrap;
+        }
+    }
+}
+
+// A framed note: grey, amber (warning) or red (error).
+component Note inherits Rectangle {
+    in property <string> text;
+    in property <int> tone;
+    in property <string> icon: "info";
+    background: root.tone == 2 ? #f0565c18 : (root.tone == 1 ? #f2c14e14 : #ffffff08);
+    border-radius: 4px;
+    HorizontalLayout {
+        padding: 10px;
+        spacing: 10px;
+        Icon {
+            name: root.tone == 0 ? root.icon : "alert";
+            size: 16px;
+            tint: root.tone == 2 ? Palette.hot : (root.tone == 1 ? Palette.amber : Palette.dim);
+        }
+        Text {
+            text: root.text;
+            color: root.tone == 2 ? Palette.hot : (root.tone == 1 ? Palette.amber : Palette.text);
+            font-size: 12px;
+            wrap: word-wrap;
+            horizontal-stretch: 1;
+        }
+    }
+}
+
+component Bullet inherits HorizontalLayout {
+    in property <string> text;
+    spacing: 10px;
+    Rectangle {
+        width: 5px;
+        Rectangle {
+            y: 6px;
+            width: 5px;
+            height: 5px;
+            border-radius: 2.5px;
+            background: Palette.dim;
+        }
+    }
+    Text {
+        text: root.text;
+        color: Palette.text;
+        font-size: 12px;
+        wrap: word-wrap;
+        horizontal-stretch: 1;
+    }
+}
+
+export component SetupWindow inherits Window {
+    title: root.uninstall ? @tr("Désinstaller Platinum") : @tr("Installer Platinum");
+    icon: @image-url("../../ui/ui/icon.png");
+    preferred-width: 720px;
+    preferred-height: 560px;
+    min-width: 640px;
+    min-height: 520px;
+    background: Palette.base;
+    default-font-size: 12px;
+
+    in property <bool> uninstall;
+    in-out property <int> page;
+    in property <[string]> facts;
+    in property <string> blocker;
+    // SteelSeries GG's licence will be shown (their files are used).
+    in property <bool> shows-license;
+    in property <bool> driver;
+    // Page 4: SteelSeries GG's licence, as read from their installer.
+    in property <string> license-text;
+    in property <string> license-source;
+    in-out property <bool> license-accepted;
+    in-out property <length> license-scroll;
+    in-out property <bool> autostart: true;
+    in-out property <bool> desktop;
+    // crash_reports = ask in platinum.ini; unticked unless an earlier install chose it.
+    in-out property <bool> crash-reports;
+    in property <bool> driver-offered;
+    in-out property <bool> remove-data;
+    in-out property <bool> remove-driver: true;
+    in property <[StepView]> steps;
+    in property <float> progress: -1;
+    in property <string> progress-text;
+    in property <bool> running;
+    in property <bool> outcome-ok;
+    // The user declined SteelSeries GG's licence: nothing was installed.
+    in property <bool> outcome-declined;
+    in property <string> outcome-message;
+    in property <[string]> outcome-notes;
+    in property <string> version;
+    // Flipped when Windows needs every pixel drawn again (src/repaint.rs in the library).
+    in property <bool> full-repaint;
+
+    callback next();
+    callback back();
+    callback cancel();
+    callback install();
+    callback retry();
+    callback accept-license();
+    callback decline-license();
+    callback open-platinum();
+    callback open-log();
+    callback quit();
+
+    Rectangle {
+        x: 0;
+        y: 0;
+        width: root.width;
+        height: root.height;
+        background: root.full-repaint ? #0f1013 : Palette.base;
+    }
+
+    VerticalLayout {
+        // Header: the logo, the title, the step.
+        Rectangle {
+            height: 84px;
+            background: Palette.panel;
+            HorizontalLayout {
+                padding-left: 24px;
+                padding-right: 24px;
+                spacing: 18px;
+                Image {
+                    y: (parent.height - self.height) / 2;
+                    source: @image-url("../../ui/ui/logo-wide.png");
+                    height: 54px;
+                    width: 81px;
+                    image-fit: contain;
+                }
+                VerticalLayout {
+                    alignment: center;
+                    spacing: 4px;
+                    Text {
+                        text: root.uninstall ? @tr("Désinstaller Platinum") : @tr("Installer Platinum");
+                        color: Palette.text;
+                        font-size: 20px;
+                        font-weight: 600;
+                    }
+                    Label {
+                        text: root.page == 0 ? (root.uninstall ? @tr("CE QUI SERA RETIRÉ") : @tr("BIENVENUE"))
+                            : root.page == 1 ? @tr("LICENCES ET OPTIONS")
+                            : root.page == 4 ? @tr("LICENCE DE STEELSERIES GG")
+                            : root.page == 2 ? (root.uninstall ? @tr("DÉSINSTALLATION") : @tr("INSTALLATION"))
+                            : @tr("TERMINÉ");
+                    }
+                }
+                Rectangle {
+                    horizontal-stretch: 1;
+                }
+                Text {
+                    vertical-alignment: center;
+                    text: root.version;
+                    color: Palette.faint;
+                    font-size: 11px;
+                }
+            }
+            Rectangle {
+                y: parent.height - 1px;
+                height: 1px;
+                background: Palette.hairline;
+            }
+        }
+
+        // Body
+        Rectangle {
+            vertical-stretch: 1;
+            // Welcome (install) or what goes (uninstall).
+            if root.page == 0: VerticalLayout {
+                padding: 24px;
+                spacing: 14px;
+                Text {
+                    text: root.uninstall ? @tr("Platinum et ses programmes vont être retirés de cet ordinateur.") : @tr("Platinum est un mixeur et des effets audio pour le pilote Sonar, sans SteelSeries GG.");
+                    color: Palette.text;
+                    font-size: 13px;
+                    wrap: word-wrap;
+                }
+                Label {
+                    text: root.uninstall ? @tr("LA DÉSINSTALLATION VA") : @tr("L'INSTALLATION VA");
+                }
+                VerticalLayout {
+                    spacing: 8px;
+                    for fact in root.facts: Bullet {
+                        text: fact;
+                    }
+                }
+                if root.uninstall: VerticalLayout {
+                    spacing: 12px;
+                    padding-top: 6px;
+                    Choice {
+                        on: root.remove-data;
+                        text: @tr("Supprimer aussi mes réglages et préréglages");
+                        detail: @tr("platinum.ini, vos préréglages et l'état de Platinum. Sinon, ils restent pour une prochaine installation.");
+                        toggled(value) => { root.remove-data = value; }
+                    }
+                    if root.driver-offered: Choice {
+                        on: root.remove-driver;
+                        text: @tr("Désinstaller aussi le pilote Sonar");
+                        detail: @tr("Installé par Platinum. Windows demandera une autorisation d'administrateur, et le son se coupera quelques secondes.");
+                        toggled(value) => { root.remove-driver = value; }
+                    }
+                }
+                if root.blocker != "": Note {
+                    text: root.blocker;
+                    tone: 1;
+                }
+                Rectangle {
+                    vertical-stretch: 1;
+                }
+            }
+
+            // Licence and options.
+            if root.page == 1: VerticalLayout {
+                padding: 24px;
+                spacing: 14px;
+                Label {
+                    text: @tr("LICENCES");
+                }
+                Note {
+                    text: @tr("Platinum est un logiciel libre, sous licence GNU GPL v3. Il n'est ni affilié à SteelSeries, ni approuvé par SteelSeries.");
+                    icon: "info";
+                }
+                if root.shows-license: Note {
+                    text: @tr("Le pilote Sonar et ses modules d'effets appartiennent à SteelSeries et ne sont pas fournis avec Platinum. La licence de SteelSeries GG vous sera présentée une fois leur installateur officiel téléchargé et vérifié : rien n'est installé avant que vous l'acceptiez. GG lui-même n'est pas installé.");
+                    icon: "info";
+                }
+                Label {
+                    text: @tr("OPTIONS");
+                }
+                Choice {
+                    on: root.autostart;
+                    text: @tr("Démarrer Platinum avec Windows");
+                    detail: @tr("Le service de Platinum démarre à l'ouverture de session, sans fenêtre.");
+                    toggled(value) => { root.autostart = value; }
+                }
+                Choice {
+                    on: root.desktop;
+                    text: @tr("Raccourci sur le bureau");
+                    toggled(value) => { root.desktop = value; }
+                }
+                Choice {
+                    on: root.crash-reports;
+                    text: @tr("Proposer d'envoyer les rapports de plantage (anonymisés, via GitHub, toujours après votre accord)");
+                    detail: @tr("Les plantages sont toujours notés sur ce PC. Activé, Platinum vous propose après un plantage d'envoyer le rapport : vous le lisez, puis vous l'envoyez vous-même depuis votre navigateur. Rien n'est jamais envoyé automatiquement. Modifiable ensuite dans les Paramètres de Platinum.");
+                    toggled(value) => { root.crash-reports = value; }
+                }
+                if root.driver: Note {
+                    text: @tr("Pendant l'installation du pilote, Windows demandera une autorisation d'administrateur et le son se coupera quelques secondes.");
+                    tone: 1;
+                }
+                Rectangle {
+                    vertical-stretch: 1;
+                }
+            }
+
+            // Progress.
+            if root.page == 2: VerticalLayout {
+                padding: 24px;
+                spacing: 8px;
+                for step in root.steps: HorizontalLayout {
+                    spacing: 10px;
+                    height: 22px;
+                    Rectangle {
+                        width: 18px;
+                        if step.state == 2: Icon {
+                            y: (parent.height - self.height) / 2;
+                            name: "check";
+                            size: 16px;
+                            tint: Palette.signal;
+                        }
+                        if step.state == 3: Icon {
+                            y: (parent.height - self.height) / 2;
+                            name: "alert";
+                            size: 16px;
+                            tint: Palette.hot;
+                        }
+                        if step.state == 1: Rectangle {
+                            x: 4px;
+                            y: (parent.height - self.height) / 2;
+                            width: 9px;
+                            height: 9px;
+                            border-radius: 4.5px;
+                            background: Palette.amber;
+                        }
+                        if step.state == 0: Rectangle {
+                            x: 5px;
+                            y: (parent.height - self.height) / 2;
+                            width: 7px;
+                            height: 7px;
+                            border-radius: 3.5px;
+                            border-width: 1px;
+                            border-color: Palette.edge;
+                        }
+                    }
+                    Text {
+                        text: step.title;
+                        color: step.state == 0 ? Palette.faint : (step.state == 3 ? Palette.hot : Palette.text);
+                        font-weight: step.state == 1 ? 600 : 400;
+                        font-size: 12px;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
+                    }
+                }
+                Rectangle {
+                    vertical-stretch: 1;
+                }
+                Text {
+                    text: root.progress-text;
+                    color: Palette.dim;
+                    font-size: 12px;
+                    wrap: word-wrap;
+                }
+                // The bar: filled to the fraction, or a short block going to and fro while the
+                // amount is unknown.
+                bar := Rectangle {
+                    height: 6px;
+                    border-radius: 3px;
+                    background: Palette.well;
+                    clip: true;
+                    Rectangle {
+                        x: root.progress < 0 ? (parent.width - self.width) * (0.5 + 0.5 * sin(animation-tick() / 1ms * 0.18deg)) : 0;
+                        width: root.progress < 0 ? parent.width / 5 : parent.width * clamp(root.progress, 0, 1);
+                        height: parent.height;
+                        border-radius: 3px;
+                        background: Palette.light;
+                        visible: root.running || root.progress >= 0;
+                    }
+                }
+            }
+
+            // SteelSeries GG's licence, read from their installer: nothing goes on before it is
+            // accepted.
+            if root.page == 4: VerticalLayout {
+                padding: 24px;
+                spacing: 12px;
+                Text {
+                    text: @tr("Lisez la licence de SteelSeries GG. Le pilote Sonar et ses modules d'effets sont soumis à cette licence. Rien n'est installé tant que vous ne l'avez pas acceptée.");
+                    color: Palette.text;
+                    font-size: 12px;
+                    wrap: word-wrap;
+                }
+                Text {
+                    text: root.license-source;
+                    color: Palette.dim;
+                    font-size: 11px;
+                    wrap: word-wrap;
+                }
+                Rectangle {
+                    vertical-stretch: 1;
+                    background: Palette.well;
+                    border-radius: 4px;
+                    border-width: 1px;
+                    border-color: Palette.hairline;
+                    license-view := ScrollView {
+                        content-width: self.visible-width;
+                        content-height: license-layout.preferred-height;
+                        content-y <=> root.license-scroll;
+                        license-layout := VerticalLayout {
+                            width: license-view.visible-width;
+                            padding: 14px;
+                            Text {
+                                text: root.license-text;
+                                color: Palette.text;
+                                font-size: 11px;
+                                wrap: word-wrap;
+                            }
+                        }
+                    }
+                }
+                Choice {
+                    on: root.license-accepted;
+                    text: @tr("J'ai lu et j'accepte la licence de SteelSeries GG");
+                    toggled(value) => { root.license-accepted = value; }
+                }
+            }
+
+            // End.
+            if root.page == 3: VerticalLayout {
+                padding: 24px;
+                spacing: 14px;
+                HorizontalLayout {
+                    spacing: 12px;
+                    Icon {
+                        name: root.outcome-ok ? "check" : (root.outcome-declined ? "info" : "alert");
+                        size: 28px;
+                        tint: root.outcome-ok ? Palette.signal : (root.outcome-declined ? Palette.dim : Palette.hot);
+                    }
+                    Text {
+                        text: root.outcome-message;
+                        color: root.outcome-ok || root.outcome-declined ? Palette.text : Palette.hot;
+                        font-size: 15px;
+                        font-weight: 600;
+                        wrap: word-wrap;
+                        vertical-alignment: center;
+                        horizontal-stretch: 1;
+                    }
+                }
+                for note in root.outcome-notes: Note {
+                    text: note;
+                    tone: root.outcome-ok ? 1 : 0;
+                    icon: "info";
+                }
+                Rectangle {
+                    vertical-stretch: 1;
+                }
+            }
+        }
+
+        // Footer: the buttons of the page.
+        Rectangle {
+            height: 58px;
+            background: Palette.panel;
+            Rectangle {
+                height: 1px;
+                y: 0;
+                background: Palette.hairline;
+            }
+            HorizontalLayout {
+                padding-left: 24px;
+                padding-right: 24px;
+                spacing: 10px;
+                alignment: end;
+                if root.page == 3: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Ouvrir le journal");
+                    clicked => { root.open-log(); }
+                }
+                Rectangle {
+                    horizontal-stretch: 1;
+                }
+                if root.page == 0 || root.page == 1: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Annuler");
+                    clicked => { root.quit(); }
+                }
+                if root.page == 1: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Retour");
+                    clicked => { root.back(); }
+                }
+                if root.page == 0 && root.blocker != "": Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Réessayer");
+                    clicked => { root.retry(); }
+                }
+                if root.page == 0 && !root.uninstall: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Suivant");
+                    primary: true;
+                    enabled: root.blocker == "";
+                    clicked => { root.next(); }
+                }
+                if root.page == 0 && root.uninstall: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Désinstaller");
+                    primary: true;
+                    clicked => { root.install(); }
+                }
+                if root.page == 1: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Installer");
+                    primary: true;
+                    clicked => { root.install(); }
+                }
+                if root.page == 4: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Refuser");
+                    clicked => { root.decline-license(); }
+                }
+                if root.page == 4: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Accepter");
+                    primary: true;
+                    enabled: root.license-accepted;
+                    clicked => { root.accept-license(); }
+                }
+                if root.page == 2: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Annuler");
+                    enabled: root.running && !root.uninstall;
+                    clicked => { root.cancel(); }
+                }
+                if root.page == 3 && !root.outcome-ok && !root.outcome-declined: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Réessayer");
+                    clicked => { root.retry(); }
+                }
+                if root.page == 3 && root.outcome-ok && !root.uninstall: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Ouvrir Platinum");
+                    primary: true;
+                    clicked => { root.open-platinum(); }
+                }
+                if root.page == 3: Button {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("Fermer");
+                    primary: !root.outcome-ok || root.uninstall;
+                    clicked => { root.quit(); }
+                }
+            }
+        }
+    }
+}

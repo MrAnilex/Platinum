@@ -1,0 +1,8 @@
+# French is the source language: every text is written in French in the code. This catalog is
+# empty on purpose: it gives the window French number formatting (decimal comma).
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+

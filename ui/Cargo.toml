@@ -1,0 +1,16 @@
+[package]
+name = "platinum-ui"
+version = "0.1.0"
+edition = "2024"
+description = "Platinum's window: mixer, microphone effects, application routing and settings"
+license = "GPL-3.0-only"
+
+[dependencies]
+platinum = { path = ".." }
+slint = { version = "1", default-features = false, features = ["std", "compat-1-2", "backend-winit", "renderer-software", "accessibility"] }
+# Pure-Rust Ogg Vorbis decoder, for the test sounds GG installs (`sounds::decode`). Pinned: the
+# window decodes files it does not ship, and a decoder change should be a deliberate one.
+lewton = "=0.10.2"
+
+[build-dependencies]
+slint-build = "1"

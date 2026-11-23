@@ -1,0 +1,186 @@
+// The priority lists of GG's "Gestionnaire de périphériques", shown by the settings page: the
+// outputs' (shared by Gaming, Chat, Media and Aux, GG's "link all" case) in its Sorties section,
+// the microphones' in its Micro section. The texts are GG's own French where it has them, "Sonar"
+// becoming "Platinum". Like everything else, they show what Rust put in their properties and ask
+// for changes through the Backend global.
+
+import { Palette, Label, Toggle, IconButton, Select, AppliesNote } from "controls.slint";
+import { Icon } from "icons.slint";
+import { Backend } from "backend.slint";
+
+// One entry of a priority list.
+export struct PriorityRow {
+    name: string,
+    // "branché", "absent", "désactivé" or why it is never chosen.
+    state: string,
+    present: bool,
+    excluded: bool,
+    // In use now: a channel plays to it, or it is the microphone relayed.
+    current: bool,
+}
+
+// One line of a list: rank, name and state, then up, down, "Exclure" and remove.
+component PriorityLine inherits Rectangle {
+    in property <PriorityRow> entry;
+    in property <int> list;
+    in property <int> index;
+    in property <int> count;
+    height: 46px;
+    border-radius: 4px;
+    background: Palette.well;
+    border-width: 1px;
+    border-color: root.entry.current ? Palette.edge : Palette.hairline;
+    HorizontalLayout {
+        padding-left: 10px;
+        padding-right: 8px;
+        spacing: 6px;
+        Text {
+            width: 18px;
+            text: "\{root.index + 1}";
+            color: Palette.faint;
+            font-size: 12px;
+            vertical-alignment: center;
+        }
+        VerticalLayout {
+            alignment: center;
+            spacing: 2px;
+            horizontal-stretch: 1;
+            Text {
+                text: root.entry.name;
+                color: root.entry.present && !root.entry.excluded ? Palette.text : Palette.faint;
+                font-size: 12px;
+                overflow: elide;
+            }
+            Text {
+                text: root.entry.state + (root.entry.current ? " · " + @tr("périphérique actuel") : "") + (root.entry.excluded ? " · " + @tr("exclu") : "");
+                color: root.entry.current ? Palette.signal : (root.entry.present ? Palette.dim : Palette.faint);
+                font-size: 10px;
+                overflow: elide;
+            }
+        }
+        IconButton {
+            y: (parent.height - self.height) / 2;
+            width: 26px;
+            height: 26px;
+            icon: "up";
+            enabled: root.index > 0;
+            clicked => { Backend.priority-move(root.list, root.index, -1); }
+        }
+        IconButton {
+            y: (parent.height - self.height) / 2;
+            width: 26px;
+            height: 26px;
+            icon: "down";
+            enabled: root.index < root.count - 1;
+            clicked => { Backend.priority-move(root.list, root.index, 1); }
+        }
+        Text {
+            text: @tr("Exclure");
+            color: Palette.dim;
+            font-size: 11px;
+            vertical-alignment: center;
+        }
+        VerticalLayout {
+            alignment: center;
+            Toggle {
+                on: root.entry.excluded;
+                toggled(on) => { Backend.priority-exclude(root.list, root.index, on); }
+            }
+        }
+        IconButton {
+            y: (parent.height - self.height) / 2;
+            width: 26px;
+            height: 26px;
+            icon: "trash";
+            clicked => { Backend.priority-remove(root.list, root.index); }
+        }
+    }
+}
+
+// One priority list, with the menu that adds a device to it. It grows with its rows: the settings
+// page scrolls.
+export component PriorityList inherits Rectangle {
+    // 0 the outputs, 1 the microphones.
+    in property <int> list;
+    // The heading in small capitals and its icon, as the settings page's cards have them.
+    in property <string> icon;
+    in property <string> label;
+    in property <string> heading;
+    in property <string> note;
+    in property <[PriorityRow]> rows;
+    in property <[string]> addable;
+    // When a change takes effect; nothing shown when empty.
+    in property <string> applies;
+    border-radius: 6px;
+    background: Palette.panel;
+    border-width: 1px;
+    border-color: Palette.hairline;
+    VerticalLayout {
+        padding: 16px;
+        spacing: 10px;
+        HorizontalLayout {
+            height: 20px;
+            spacing: 8px;
+            Icon {
+                y: (parent.height - self.height) / 2;
+                name: root.icon;
+                size: 16px;
+                tint: Palette.text;
+            }
+            Label {
+                text: root.label;
+                color: Palette.dim;
+                vertical-alignment: center;
+            }
+        }
+        Text {
+            text: root.heading;
+            color: Palette.text;
+            font-size: 13px;
+            font-weight: 600;
+            wrap: word-wrap;
+        }
+        Text {
+            text: root.note;
+            color: Palette.dim;
+            font-size: 11px;
+            wrap: word-wrap;
+        }
+        if root.applies != "": AppliesNote {
+            text: root.applies;
+        }
+        if root.rows.length == 0: Rectangle {
+            height: 46px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-color: Palette.hairline;
+            Text {
+                text: @tr("Aucun périphérique");
+                color: Palette.faint;
+                font-size: 12px;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+        if root.rows.length > 0: VerticalLayout {
+            spacing: 6px;
+            for row[index] in root.rows: PriorityLine {
+                entry: row;
+                list: root.list;
+                index: index;
+                count: root.rows.length;
+            }
+        }
+        HorizontalLayout {
+            alignment: start;
+            Select {
+                width: 360px;
+                model: root.addable;
+                current: -1;
+                enabled: root.addable.length > 0;
+                placeholder: root.addable.length > 0 ? @tr("Ajouter un périphérique…") : @tr("Tous les périphériques sont dans la liste");
+                chosen(index) => { Backend.priority-add(root.list, index); }
+            }
+        }
+    }
+}

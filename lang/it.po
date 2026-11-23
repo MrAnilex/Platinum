@@ -1,0 +1,462 @@
+# Platinum: the library and the daemon (tray, overlays, status), it.
+# Source texts are French; an entry left untranslated shows in French.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: it\n"
+
+#: src/autostart.rs
+msgid "Platinum n'est pas installé : {file} manque"
+msgstr "Platinum non è installato: manca {file}"
+
+#: src/autostart.rs
+msgid "impossible d'écrire la valeur de démarrage (erreur Windows {code})"
+msgstr "impossibile scrivere il valore di avvio (errore Windows {code})"
+
+#: src/config.rs
+msgid "{file} est illisible : réglage non enregistré, pour ne pas remplacer vos autres réglages"
+msgstr "{file} è illeggibile: impostazione non salvata, per non sovrascrivere le altre impostazioni"
+
+#: src/daemon.rs src/hotkeys.rs src/overlay.rs src/shortcuts.rs
+msgid "Périphérique suivant"
+msgstr "Dispositivo successivo"
+
+#: src/daemon.rs src/hotkeys.rs src/overlay.rs src/shortcuts.rs
+msgid "Périphérique précédent"
+msgstr "Dispositivo precedente"
+
+#: src/daemon.rs
+msgid "Streaming à distance en cours"
+msgstr "Streaming remoto in corso"
+
+#: src/daemon.rs
+msgid "Aucun micro choisi : le micro virtuel reste muet"
+msgstr "Nessun microfono scelto: il microfono virtuale resta muto"
+
+#: src/daemon.rs
+msgid "Effets du micro indisponibles"
+msgstr "Effetti micro non disponibili"
+
+#: src/daemon.rs
+msgid "Micro interrompu, en attente de ses périphériques"
+msgstr "Microfono interrotto, in attesa dei suoi dispositivi"
+
+#: src/daemon.rs
+msgid "Micro interrompu, redémarrage"
+msgstr "Microfono interrotto, riavvio in corso"
+
+#: src/daemon.rs
+msgid "SteelSeries GG est ouvert : fermez GG pour que Platinum prenne le relais"
+msgstr "SteelSeries GG è aperto: chiudere GG perché Platinum subentri"
+
+#: src/daemon.rs
+msgid "Impossible de créer l'événement d'arrêt de la tâche de fond"
+msgstr "Impossibile creare l'evento di arresto del servizio in background"
+
+#: src/daemon.rs
+msgid "SteelSeries GG a repris la main"
+msgstr "SteelSeries GG ha ripreso il controllo"
+
+#: src/daemon.rs
+msgid "Remise en place des périphériques par défaut"
+msgstr "Ripristino dei dispositivi predefiniti"
+
+#: src/daemon.rs
+msgid "Arrêtée sur une erreur"
+msgstr "Arrestato per un errore"
+
+#: src/daemon.rs
+msgid "Remise en place incomplète"
+msgstr "Ripristino incompleto"
+
+#: src/daemon.rs
+msgid "SteelSeries GG gère de nouveau les périphériques"
+msgstr "SteelSeries GG gestisce di nuovo i dispositivi"
+
+#: src/daemon.rs
+msgid "Périphériques par défaut remis en place"
+msgstr "Dispositivi predefiniti ripristinati"
+
+#: src/daemon.rs
+msgid "Arrêt demandé"
+msgstr "Arresto richiesto"
+
+#: src/daemon.rs
+msgid "SteelSeries GG a démarré : Platinum lui laisse la main"
+msgstr "SteelSeries GG si è avviato: Platinum gli cede il controllo"
+
+#: src/daemon.rs
+msgid "Bascule de secours"
+msgstr "Commutazione di riserva"
+
+#: src/daemon.rs
+msgid "Micro de secours"
+msgstr "Micro di riserva"
+
+#: src/daemon.rs
+msgid "Canaux pas encore prêts"
+msgstr "Canali non ancora pronti"
+
+#: src/daemon.rs
+msgid "Canaux actifs, sans micro"
+msgstr "Canali attivi, senza microfono"
+
+#: src/daemon.rs
+msgid "Canaux actifs, ouverture du micro"
+msgstr "Canali attivi, apertura del microfono"
+
+#: src/daemon.rs
+msgid "Micro pas encore relayé"
+msgstr "Micro non ancora inoltrato"
+
+#: src/hotkeys.rs
+msgid "cette touche ne peut pas servir de raccourci"
+msgstr "questo tasto non può essere usato come scorciatoia"
+
+#: src/hotkeys.rs
+msgid "ajoutez Ctrl, Alt ou Maj : cette touche seule ne pourrait plus être tapée nulle part"
+msgstr "aggiungere Ctrl, Alt o Maiusc: da solo questo tasto non si potrebbe più digitare da nessuna parte"
+
+#: src/hotkeys.rs
+msgid "Maj"
+msgstr "Maiusc"
+
+#: src/hotkeys.rs
+msgid "Master"
+msgstr "Master"
+
+#: src/hotkeys.rs
+msgid "Gaming"
+msgstr "Gaming"
+
+#: src/hotkeys.rs
+msgid "Chat"
+msgstr "Chat"
+
+#: src/hotkeys.rs
+msgid "Media"
+msgstr "Media"
+
+#: src/hotkeys.rs
+msgid "Aux"
+msgstr "Aux"
+
+#: src/hotkeys.rs src/presetfiles.rs
+msgid "Micro"
+msgstr "Micro"
+
+#: src/hotkeys.rs
+msgid "Volume +"
+msgstr "Volume +"
+
+#: src/hotkeys.rs
+msgid "Volume -"
+msgstr "Volume -"
+
+#: src/hotkeys.rs
+msgid "Couper son"
+msgstr "Muto"
+
+#: src/hotkeys.rs
+msgid "Stream : Volume +"
+msgstr "Stream: Volume +"
+
+#: src/hotkeys.rs
+msgid "Stream : Volume -"
+msgstr "Stream: Volume -"
+
+#: src/hotkeys.rs
+msgid "Stream : Couper son"
+msgstr "Stream: Muto"
+
+#: src/hotkeys.rs
+msgid "ChatMix Jeu"
+msgstr "ChatMix Gioco"
+
+#: src/hotkeys.rs
+msgid "ChatMix Chat"
+msgstr "ChatMix Chat"
+
+#: src/hotkeys.rs
+msgid "Précédent"
+msgstr "Precedente"
+
+#: src/hotkeys.rs
+msgid "Suivant"
+msgstr "Successivo"
+
+#: src/hotkeys.rs
+msgid "Mode streamer inactif"
+msgstr "Modalità streamer inattiva"
+
+#: src/hotkeys.rs
+msgid "Micro virtuel inactif"
+msgstr "Micro virtuale inattivo"
+
+#: src/hotkeys.rs src/overlay.rs
+msgid "ChatMix"
+msgstr "ChatMix"
+
+#: src/hotkeys.rs
+msgid "Gaming et Chat doivent jouer sur la même sortie"
+msgstr "Gaming e Chat devono usare la stessa uscita"
+
+#: src/hotkeys.rs
+msgid "Pavé num. {key}"
+msgstr "Num {key}"
+
+#: src/hotkeys.rs
+msgid "Retour arrière"
+msgstr "Backspace"
+
+#: src/hotkeys.rs
+msgid "Entrée"
+msgstr "Invio"
+
+#: src/hotkeys.rs
+msgid "Espace"
+msgstr "Spazio"
+
+#: src/hotkeys.rs
+msgid "Page préc."
+msgstr "PagSu"
+
+#: src/hotkeys.rs
+msgid "Page suiv."
+msgstr "PagGiù"
+
+#: src/hotkeys.rs
+msgid "Fin"
+msgstr "Fine"
+
+#: src/hotkeys.rs
+msgid "Origine"
+msgstr "Home"
+
+#: src/hotkeys.rs
+msgid "Impr. écran"
+msgstr "Stamp"
+
+#: src/hotkeys.rs
+msgid "Inser"
+msgstr "Ins"
+
+#: src/hotkeys.rs
+msgid "Suppr"
+msgstr "Canc"
+
+#: src/hotkeys.rs
+msgid "Arrêt défil."
+msgstr "Bloc Scorr"
+
+#: src/hotkeys.rs
+msgid "Muet"
+msgstr "Muto"
+
+#: src/hotkeys.rs
+msgid "Piste suivante"
+msgstr "Traccia successiva"
+
+#: src/hotkeys.rs
+msgid "Piste précédente"
+msgstr "Traccia precedente"
+
+#: src/hotkeys.rs
+msgid "Arrêt"
+msgstr "Stop"
+
+#: src/hotkeys.rs
+msgid "Lecture/Pause"
+msgstr "Play/Pausa"
+
+#: src/hotkeys.rs
+msgid "Changement de périphérique"
+msgstr "Cambio dispositivo"
+
+#: src/hotkeys.rs
+msgid "Mix de stream"
+msgstr "Mix stream"
+
+#: src/mixer.rs
+msgid "Veuillez sélectionner le même périphérique de lecture pour Game et Chat afin d'utiliser le ChatMix"
+msgstr "Selezionare lo stesso dispositivo di riproduzione per Game e Chat per usare ChatMix"
+
+#: src/mixer.rs
+msgid "Veuillez sélectionner un Périphérique de lecture pour utiliser ChatMix"
+msgstr "Selezionare un dispositivo di riproduzione per usare ChatMix"
+
+#: src/overlay.rs
+msgid "Coin supérieur gauche"
+msgstr "In alto a sinistra"
+
+#: src/overlay.rs
+msgid "Coin supérieur droit"
+msgstr "In alto a destra"
+
+#: src/overlay.rs
+msgid "Centre gauche"
+msgstr "Al centro a sinistra"
+
+#: src/overlay.rs
+msgid "Centre droit"
+msgstr "Al centro a destra"
+
+#: src/overlay.rs
+msgid "Coin inférieur gauche"
+msgstr "In basso a sinistra"
+
+#: src/overlay.rs
+msgid "Coin inférieur droit"
+msgstr "In basso a destra"
+
+#: src/overlay.rs
+msgid "Son coupé"
+msgstr "Muto"
+
+#: src/overlay.rs
+msgid "Son activé"
+msgstr "Audio attivo"
+
+#: src/overlay.rs
+msgid "Jeu {game} · Chat {chat}"
+msgstr "Gioco {game} · Chat {chat}"
+
+#: src/presetfiles.rs
+msgid "ce fichier ne contient pas de préréglage Sonar (ni « data » ni « parametricEQ »)"
+msgstr "questo file non contiene un preset Sonar (né «data» né «parametricEQ»)"
+
+#: src/presetfiles.rs
+msgid "ce fichier n'est pas du JSON lisible ({error})"
+msgstr "questo file non è JSON leggibile ({error})"
+
+#: src/presetfiles.rs
+msgid "le bloc « data » n'est pas du JSON lisible ({error})"
+msgstr "il blocco «data» non è JSON leggibile ({error})"
+
+#: src/presetfiles.rs
+msgid "ce préréglage est fait pour le canal {other}, pas pour le canal {channel}"
+msgstr "questo preset è per il canale {other}, non per il canale {channel}"
+
+#: src/presetfiles.rs
+msgid "ce préréglage est fait pour un canal de lecture (Gaming, Media, Aux), pas pour le canal {channel}"
+msgstr "questo preset è per un canale di riproduzione (Gaming, Media, Aux), non per il canale {channel}"
+
+#: src/presetfiles.rs
+msgid "ce préréglage est fait pour un canal de capture (Chat, Micro), pas pour le canal {channel}"
+msgstr "questo preset è per un canale di acquisizione (Chat, Micro), non per il canale {channel}"
+
+#: src/presetfiles.rs
+msgid "réglages non valides ({error})"
+msgstr "impostazioni non valide ({error})"
+
+#: src/shortcuts.rs
+msgid "Aucun périphérique de sortie disponible"
+msgstr "Nessun dispositivo di uscita disponibile"
+
+#: src/status.rs
+msgid "Démarrage"
+msgstr "Avvio"
+
+#: src/status.rs
+msgid "En attente"
+msgstr "In attesa"
+
+#: src/status.rs
+msgid "Actif"
+msgstr "Attivo"
+
+#: src/status.rs
+msgid "Sans effets"
+msgstr "Senza effetti"
+
+#: src/status.rs
+msgid "Arrêt en cours"
+msgstr "Arresto in corso"
+
+#: src/status.rs
+msgid "Arrêté"
+msgstr "Arrestato"
+
+#: src/status.rs
+msgid "Échec"
+msgstr "Errore"
+
+#: src/status.rs
+msgid "Démarrage…"
+msgstr "Avvio…"
+
+#: src/status.rs
+msgid "En attente des périphériques audio"
+msgstr "In attesa dei dispositivi audio"
+
+#: src/status.rs
+msgid "Son actif, sans micro"
+msgstr "Audio attivo, senza micro"
+
+#: src/status.rs
+msgid "Son et micro actifs, avec effets"
+msgstr "Audio e microfono attivi, con effetti"
+
+#: src/status.rs
+msgid "Son et micro actifs, sans effets"
+msgstr "Audio e microfono attivi, senza effetti"
+
+#: src/status.rs
+msgid "Arrêt en cours…"
+msgstr "Arresto in corso…"
+
+#: src/status.rs
+msgid "Arrêté brusquement, sans remettre les périphériques en place"
+msgstr "Arrestato bruscamente, senza ripristinare i dispositivi"
+
+#: src/status.rs
+msgid "{text} : {detail}"
+msgstr "{text}: {detail}"
+
+#: src/status.rs
+msgid "Streaming à distance : {output}"
+msgstr "Streaming remoto: {output}"
+
+#: src/status.rs
+msgid "Micro relayé sans effets"
+msgstr "Micro inoltrato senza effetti"
+
+#: src/tray.rs
+msgid "Le son et le micro passeront directement par Windows, sans les effets de Platinum, jusqu'à ce que vous rouvriez la fenêtre de Platinum (fermez-la d'abord si elle est ouverte).\n\nArrêter Platinum maintenant ?"
+msgstr "L'audio e il microfono passeranno direttamente per Windows, senza gli effetti di Platinum, finché non si riaprirà la finestra di Platinum (chiuderla prima, se è aperta).\n\nArrestare Platinum ora?"
+
+#: src/tray.rs
+msgid "Le son et le micro passeront directement par Windows, sans les effets de Platinum, jusqu'à ce que vous redémarriez Platinum depuis sa fenêtre (bouton Démarrer).\n\nArrêter Platinum maintenant ?"
+msgstr "L'audio e il microfono passeranno direttamente per Windows, senza gli effetti di Platinum, finché non si riavvierà Platinum dalla sua finestra (pulsante Avvia).\n\nArrestare Platinum ora?"
+
+#: src/tray.rs
+msgid "Arrêter Platinum"
+msgstr "Arresta Platinum"
+
+#: src/tray.rs
+msgid "Ouvrir Platinum"
+msgstr "Apri Platinum"
+
+#: src/tray.rs
+msgid "Arrêter Platinum…"
+msgstr "Arresta Platinum…"
+
+#: src/doctor.rs
+msgid "Cette version de Windows n'est pas prise en charge par le pilote Sonar (Windows 10 1809 ou plus récent, 64 bits)."
+msgstr "Questa versione di Windows non è supportata dal driver Sonar (Windows 10 1809 o successivo, 64 bit)."
+
+#: src/doctor.rs
+msgid "Le pilote Sonar n'est pas installé : lancez Platinum-Setup.exe pour l'installer."
+msgstr "Il driver Sonar non è installato: avvia Platinum-Setup.exe per installarlo."
+
+#: src/doctor.rs
+msgid "Les réglages du module audio Sonar manquent : relancez Platinum-Setup.exe pour réparer l'installation."
+msgstr "Mancano le impostazioni del modulo audio Sonar: riavvia Platinum-Setup.exe per riparare l'installazione."
+
+#: src/doctor.rs
+msgid "Le moteur d'effets Sonar est introuvable : relancez Platinum-Setup.exe pour réparer l'installation."
+msgstr "Il motore degli effetti Sonar non è stato trovato: riavvia Platinum-Setup.exe per riparare l'installazione."
+
+#: src/doctor.rs
+msgid "Le runtime Visual C++ manque : les effets du micro ne peuvent pas démarrer. Relancez Platinum-Setup.exe."
+msgstr "Manca il runtime di Visual C++: gli effetti del microfono non possono avviarsi. Riavvia Platinum-Setup.exe."
