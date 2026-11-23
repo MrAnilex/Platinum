@@ -5,6 +5,10 @@
 <h1 align="center">Platinum</h1>
 
 <p align="center">
+  (Temporary readme btw)
+</p>
+  
+<p align="center">
   A lightweight, open-source replacement for SteelSeries GG's <b>Sonar</b> on Windows.<br>
   Per-channel mixer, effects and presets, microphone effects, streamer mode — without the 1.4 GB suite.<br>
   Windows for now: macOS and Linux versions will probably follow.
