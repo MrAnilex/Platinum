@@ -5,16 +5,16 @@
 <h1 align="center">Platinum</h1>
 
 <p align="center">
-  Un remplaçant léger et open source de <b>Sonar</b>, la partie audio de SteelSeries GG, sous Windows.<br>
-  Mixeur par canal, effets et préréglages, effets du micro, mode streamer — sans la suite de 1,4 Go.<br>
-  Windows pour l'instant : des versions macOS et Linux suivront probablement.
+  Un remplaçant léger et open source du <b>Sonar</b>, la partie audio de SteelSeries GG, sous Windows.<br>
+  Mixeur par canal, effets et préréglages, effets du micro, mode streamer — sans que ça pèse littéralement 1,4 Go.<br>
+  Windows pour l'instant : des versions macOS et Linux suivront probablement. 
 </p>
 
 <p align="center">
   Français · <a href="README.md">English</a>
 </p>
 
-> **Platinum est un projet indépendant, sans lien avec SteelSeries ni approuvé par elle.**
+> **Platinum est un mini-projet indépendant, sans lien avec SteelSeries ni approuvé par eux 🥀**
 > Il ne contient aucun fichier, code, firmware ou modèle de SteelSeries. Il pilote le pilote audio
 > virtuel Sonar de SteelSeries et ses modules d'effets : ceux qui sont déjà sur votre PC si
 > SteelSeries GG est installé, sinon ceux que son installateur prend, sur votre PC, dans
@@ -24,13 +24,14 @@
 |---|---|
 | ![Mixeur en mode normal](docs/screenshots/mixer-classic.png) | ![Mixeur en mode streamer](docs/screenshots/mixer-streamer.png) |
 
-## Pourquoi
+## Pourquoi faire ???
 
-SteelSeries GG 123 occupe environ **1,37 Go de mémoire en 14 processus**. Le service Sonar et
-l'interface Electron en représentent 84 %. L'essentiel n'est pas nécessaire pour mixer le son : les
-effets tournent dans le moteur audio de Windows lui-même, réglés à travers un magasin de réglages.
+SteelSeries GG occupe environ **1,37 Go de mémoire en 14 processus**. Le service Sonar et
+l'interface Electron en représentent 84 %, CE QUI EST ENORME, et une grosse perte de puissance pour votre PC
+qui est bloaté littéralement. L'essentiel n'est pas nécessaire pour mixer le son : les
+effets tournent dans le moteur audio de Windows lui-même, réglés à travers le mixeur de réglages.
 
-Platinum fait le même travail avec **une seule tâche de fond d'environ 50 Mo**, moteur d'effets du
+Platinum fait le même travail avec **une seule tâche de fond d'environ 50 Mo** (ce qui est vachement plus vivable, faut avouer), moteur d'effets du
 micro compris, et une fenêtre qu'on n'ouvre que pour changer quelque chose (~30 Mo, fermée le reste
 du temps).
 
@@ -238,7 +239,7 @@ documentées de Windows.
   par l'installateur de Platinum à partir de l'installateur officiel de GG). Des versions macOS et
   Linux seront probablement travaillées : un cœur multiplateforme (PipeWire sous Linux / Steam Deck,
   puis macOS) avec des effets libres (égaliseur, réduction de bruit DeepFilterNet, annulation d'écho
-  WebRTC).
+  WebRTC), parce que les drivers de Steelseries sont propriétaire, et adapter que pour les appareils Windows
 - Sans GG, les préréglages de GG viennent des migrations de sa base ; ceux que GG change par la
   suite ne sont pris qu'en relançant l'installateur avec un installateur de GG plus récent.
 - En mode streamer, « micro dans le mix du stream » et « écouter le stream » ne sont pas encore faits.
