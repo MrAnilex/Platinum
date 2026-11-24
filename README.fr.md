@@ -14,6 +14,10 @@
   Français · <a href="README.md">English</a>
 </p>
 
+<p align="center">
+  <a href="https://ko-fi.com/mr_anilex"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Soutenir Platinum sur Ko-fi"></a>
+</p>
+
 > **Platinum est un mini-projet indépendant, sans lien avec SteelSeries ni approuvé par eux 🥀**
 > Il ne contient aucun fichier, code, firmware ou modèle de SteelSeries. Il pilote le pilote audio
 > virtuel Sonar de SteelSeries et ses modules d'effets : ceux qui sont déjà sur votre PC si
@@ -259,6 +263,9 @@ fenêtre et de l'installateur dans `WINDOW_CATALOGS` (`ui/src/main.rs`) et `SETU
 (`setup/src/main.rs`) ; les tests de couverture listent ce qui manque.
 
 ## Contribuer
+
+Platinum est gratuit et le restera. S'il vous est utile, vous pouvez soutenir son développement sur
+[Ko-fi](https://ko-fi.com/mr_anilex).
 
 Les [tickets](https://github.com/MrAnilex/Platinum/issues) et les pull requests sont bienvenus. Une règle : **ne jamais ajouter de fichier de
 SteelSeries**, ni code décompilé, firmware, modèle, données de préréglages ou traductions tirés de

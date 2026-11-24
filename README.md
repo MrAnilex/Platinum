@@ -18,6 +18,10 @@
   <a href="README.fr.md">Français</a> · English
 </p>
 
+<p align="center">
+  <a href="https://ko-fi.com/mr_anilex"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support Platinum on Ko-fi"></a>
+</p>
+
 > **Platinum is an independent project, not affiliated with or endorsed by SteelSeries.**
 > It contains no SteelSeries file, code, firmware or model. It drives SteelSeries' Sonar virtual
 > audio driver and audio-effects modules: those already on your PC if SteelSeries GG is installed,
@@ -246,6 +250,9 @@ Texts are written in French in the code and translated through small `.po` catal
 tests list what is missing.
 
 ## Contributing
+
+Platinum is free and stays free. If it is useful to you, you can support its development on
+[Ko-fi](https://ko-fi.com/mr_anilex).
 
 [Issues](https://github.com/MrAnilex/Platinum/issues) and pull requests are welcome. One rule: **never commit SteelSeries files**, decompiled code,
 firmware, models, preset data or translations taken from their software. Platinum must stay a clean
