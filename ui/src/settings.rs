@@ -574,7 +574,7 @@ mod tests {
     }
 
     fn status(state: DaemonState, microphone: &str, effects: bool) -> Status {
-        Status { state, pid: 7, microphone: microphone.into(), effects, message: String::new(), remote: String::new(), worker: 0, replaced: String::new(), updated: String::new(), vanished: false }
+        Status { state, pid: 7, microphone: microphone.into(), effects, message: String::new(), remote: String::new(), worker: 0, replaced: String::new(), audio_frozen: String::new(), updated: String::new(), vanished: false }
     }
 
     #[test]

@@ -295,10 +295,10 @@ fn emit(report: &Report) {
     let _ = out.flush();
 }
 
-/// Ends this process at once with `code`. The engine has been released by then; ending outright
-/// spares the vendor's DLLs their unload, which nothing needs and which could hang a process that
-/// must not linger.
-fn end_process(code: u32) -> ! {
+/// Ends this process at once with `code`. In the worker, the engine has been released by then;
+/// ending outright spares the vendor's DLLs their unload, which nothing needs and which could hang
+/// a process that must not linger (the daemon's `stop_deadline` ends it the same way).
+pub(crate) fn end_process(code: u32) -> ! {
     let _ = std::io::stdout().lock().flush();
     unsafe {
         TerminateProcess(GetCurrentProcess(), code);

@@ -7,7 +7,9 @@
 //! `remote` (the streaming output followed during a remote session, see `remote`; empty outside
 //! one), `worker` (the microphone worker's process, see `worker`; 0 when none runs), `replaced`
 //! (the last replacement of that worker: when, at how much memory, how long the microphone was
-//! cut; empty before the first) and `updated` (local time, `YYYYMMDD-HHMMSS`).
+//! cut; empty before the first), `audio_frozen` (when the daemon found Windows' audio service no
+//! longer answering, see `audiowatch`; empty while it answers) and `updated` (local time,
+//! `YYYYMMDD-HHMMSS`).
 //!
 //! A daemon killed outright (Task Manager, a crash) cannot say it stopped: the reader checks that
 //! the process that wrote the file still runs, and reports it stopped otherwise.
@@ -18,6 +20,8 @@ use std::ffi::c_void;
 use std::path::{Path, PathBuf};
 
 pub const FILE_NAME: &str = "status.txt";
+/// What the window, the tray and `daemon --status` say while Windows' audio service is frozen.
+pub const AUDIO_FROZEN: &str = mark("Le service Audio de Windows ne répond plus : le son est figé");
 
 /// The daemon's state, as written in the file.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -97,6 +101,9 @@ pub struct Status {
     /// The last replacement of the microphone worker, for `platinum doctor` and `daemon --status`:
     /// "20261122-153000, 412 MB, gap 140 ms"; empty before the first.
     pub replaced: String,
+    /// When the daemon found Windows' audio service frozen (local time, `YYYYMMDD-HHMMSS`); empty
+    /// while the service answers. Every program's sound is stuck meanwhile (`audiowatch`).
+    pub audio_frozen: String,
     /// When the file was written, local time, `YYYYMMDD-HHMMSS`.
     pub updated: String,
     /// Set by the reader, never written: the file says the daemon runs, but its process is gone,
@@ -116,6 +123,7 @@ impl Status {
             remote: String::new(),
             worker: 0,
             replaced: String::new(),
+            audio_frozen: String::new(),
             updated: crate::guard::stamp(),
             vanished: false,
         }
@@ -124,7 +132,7 @@ impl Status {
     /// The file's text.
     pub fn to_text(&self) -> String {
         format!(
-            "# État de la tâche de fond de Platinum, réécrit par elle à chaque changement.\nstate = {}\npid = {}\nmicrophone = {}\neffects = {}\nmessage = {}\nremote = {}\nworker = {}\nreplaced = {}\nupdated = {}\n",
+            "# État de la tâche de fond de Platinum, réécrit par elle à chaque changement.\nstate = {}\npid = {}\nmicrophone = {}\neffects = {}\nmessage = {}\nremote = {}\nworker = {}\nreplaced = {}\naudio_frozen = {}\nupdated = {}\n",
             self.state.key(),
             self.pid,
             single_line(&self.microphone, 200),
@@ -133,13 +141,14 @@ impl Status {
             single_line(&self.remote, 200),
             self.worker,
             single_line(&self.replaced, 200),
+            single_line(&self.audio_frozen, 40),
             single_line(&self.updated, 40),
         )
     }
 
     /// Reads the file's text; `None` without a valid `state`. Missing keys stay empty.
     pub fn parse(text: &str) -> Option<Status> {
-        let mut status = Status { state: State::Stopped, pid: 0, microphone: String::new(), effects: false, message: String::new(), remote: String::new(), worker: 0, replaced: String::new(), updated: String::new(), vanished: false };
+        let mut status = Status { state: State::Stopped, pid: 0, microphone: String::new(), effects: false, message: String::new(), remote: String::new(), worker: 0, replaced: String::new(), audio_frozen: String::new(), updated: String::new(), vanished: false };
         let mut state = None;
         for line in text.trim_start_matches('\u{feff}').lines() {
             let Some((key, value)) = line.split_once('=') else { continue };
@@ -153,6 +162,7 @@ impl Status {
                 "remote" => status.remote = value.to_string(),
                 "worker" => status.worker = value.parse().unwrap_or(0),
                 "replaced" => status.replaced = value.to_string(),
+                "audio_frozen" => status.audio_frozen = value.to_string(),
                 "updated" => status.updated = value.to_string(),
                 _ => {}
             }
@@ -171,6 +181,9 @@ impl Status {
     /// are doing.
     pub fn summary(&self) -> String {
         let with_message = |text: &str| if self.message.is_empty() { tr(text).to_string() } else { trf!("{text} : {detail}", text = tr(text), detail = self.message_text()) };
+        if self.audio_frozen() {
+            return tr(AUDIO_FROZEN).into();
+        }
         match self.state {
             State::Starting => tr("Démarrage…").into(),
             State::WaitingDevices if self.message.is_empty() => tr("En attente des périphériques audio").into(),
@@ -184,6 +197,13 @@ impl Status {
             State::Stopped => tr("Arrêté").into(),
             State::Failed => with_message(mark("Échec")),
         }
+    }
+
+    /// Whether the daemon says Windows' audio service no longer answers: while it runs, and after a
+    /// stop it had to force because of that service (`Failed`, the freeze outlasting it). A daemon
+    /// that stopped normally, or vanished, says nothing any more.
+    pub fn audio_frozen(&self) -> bool {
+        !self.audio_frozen.is_empty() && ((self.state.is_live() && !self.vanished) || self.state == State::Failed)
     }
 
     /// The tray icon's tooltip: Platinum, the summary, the microphone while it is relayed, and the
@@ -331,6 +351,7 @@ mod tests {
             remote: String::new(),
             worker: 0,
             replaced: String::new(),
+            audio_frozen: String::new(),
             updated: "20261115-190000".into(),
             vanished: false,
         }
@@ -346,10 +367,12 @@ mod tests {
             assert_eq!(Status::parse(&status.to_text()), Some(status.clone()));
             status.worker = 21_360;
             status.replaced = "20261122-153000, 412 MB, gap 140 ms".into();
+            assert_eq!(Status::parse(&status.to_text()), Some(status.clone()));
+            status.audio_frozen = "20261126-213345".into();
             assert_eq!(Status::parse(&status.to_text()), Some(status));
         }
         // A file written before `remote` and `worker` existed reads as no session and no worker.
-        assert_eq!(Status::parse("state = running\npid = 4\n").map(|s| (s.remote, s.worker, s.replaced)), Some((String::new(), 0, String::new())));
+        assert_eq!(Status::parse("state = running\npid = 4\n").map(|s| (s.remote, s.worker, s.replaced, s.audio_frozen)), Some((String::new(), 0, String::new(), String::new())));
         assert_eq!(State::from_key("asleep"), None);
         assert_eq!(Status::parse("pid = 4\n"), None);
     }
@@ -419,6 +442,17 @@ mod tests {
         let mut remote = sample(State::Running);
         remote.remote = "Steam Streaming Speakers".into();
         assert_eq!(remote.tooltip(), "Platinum\nSon et micro actifs, avec effets\nMicrophone (Razer Seiren Mini)\nStreaming à distance : Steam Streaming Speakers");
+        let mut frozen = sample(State::Running);
+        frozen.audio_frozen = "20261126-213345".into();
+        assert!(frozen.audio_frozen());
+        assert_eq!(frozen.tooltip(), "Platinum\nLe service Audio de Windows ne répond plus : le son est figé\nMicrophone (Razer Seiren Mini)");
+        // A stop forced by the freeze leaves it said; a daemon that stopped normally says nothing.
+        frozen.state = State::Failed;
+        assert!(frozen.audio_frozen());
+        assert_eq!(frozen.summary(), "Le service Audio de Windows ne répond plus : le son est figé");
+        frozen.state = State::Stopped;
+        assert!(!frozen.audio_frozen());
+        assert_eq!(frozen.summary(), "Arrêté");
         assert_eq!(shorten("abc", 3), "abc");
         assert_eq!(shorten("abcd", 3), "ab…");
     }

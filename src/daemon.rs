@@ -50,6 +50,12 @@
 //! Gaming; the backup switch and the device shortcuts leave the outputs alone meanwhile. Everything
 //! goes back when the session ends, when the daemon stops, or at the next start after a crash.
 //!
+//! It checks that Windows' audio service still answers (`audiowatch`): a probe thread asks it one
+//! question every 5 s, and the watcher logs and publishes a question left unanswered for 10 s
+//! (`audio_frozen` in status.txt), for which the window offers `platinum audio-restart`. A stop
+//! that has not finished 10 s after it was asked for ends the process without its cleanup
+//! (`stop_deadline`), so that a call into a frozen service cannot keep Platinum from stopping.
+//!
 //! It also does GG's QuickSet (`games`): while a game linked to a Game preset runs, Gaming uses
 //! that preset, and the preset of before comes back once the game exits, from the same 2 s tick
 //! and with the stores it keeps. What it changed is written down first; an override still under
@@ -77,7 +83,7 @@ use crate::streamer;
 use crate::keepalive::{KeepAlive, StoreClock};
 use crate::recycle::{Decision, Moment, Replacement, Restarts};
 use crate::worker::{self, Command, Event, Job, Report, Worker};
-use crate::{crash, fallback, gamescan, keepalive, names, outputs, recycle, regclean, relay, routing, session};
+use crate::{audiowatch, crash, fallback, gamescan, keepalive, names, outputs, recycle, regclean, relay, routing, session};
 use std::collections::HashMap;
 use std::ffi::c_void;
 use std::path::{Path, PathBuf};
@@ -239,6 +245,9 @@ pub fn print_status() -> Result<(), String> {
             println!("remote      {}", if published.remote.is_empty() { "no remote streaming session followed".to_string() } else { format!("following the streaming output {}", published.remote) });
             println!("mic worker  {}", worker_text(published.state.is_live(), published.worker));
             println!("replaced    {}", if published.replaced.is_empty() { "no replacement of the mic worker yet" } else { published.replaced.as_str() });
+            if published.audio_frozen() {
+                println!("audio       Windows' audio service not answering since {} (`platinum audio-restart` restarts it)", published.audio_frozen);
+            }
             println!("updated     {}", published.updated);
         }
     }
@@ -439,8 +448,19 @@ pub fn run(options: &Options) -> Result<(), String> {
     // The shortcuts thread registers the combinations; the mixer thread carries them out.
     let (actions, pressed) = std::sync::mpsc::channel();
     let shortcuts = Shortcuts::start(actions);
+    if !audiowatch::start() {
+        log("cannot start the thread that checks Windows' audio service: a freeze of it will go unnoticed");
+    }
 
-    let result = supervise(options, &reporter, stop_event as usize, pressed, shortcuts.overlays());
+    // A stop that hangs (a call into a frozen audio service never comes back) ends the process
+    // after `STOP_DEADLINE`, so that Platinum can always be stopped and started again.
+    let supervised = AtomicBool::new(false);
+    let result = std::thread::scope(|scope| {
+        scope.spawn(|| stop_deadline(&reporter, &supervised));
+        let result = supervise(options, &reporter, stop_event as usize, pressed, shortcuts.overlays());
+        supervised.store(true, Ordering::SeqCst);
+        result
+    });
 
     // The combinations go back to Windows before the devices are left.
     drop(shortcuts);
@@ -487,6 +507,9 @@ fn supervise(options: &Options, reporter: &Reporter, stop_event: usize, pressed:
         scope.spawn(move || switch_devices(options, reporter, finished_ref, gg_ref, pressed, &overlays));
         let result = serve(options, reporter);
         finished.store(true, Ordering::SeqCst);
+        // Ended on an error rather than asked to stop: the cleanup after it is timed all the same
+        // (`stop_deadline`).
+        relay::request_stop();
         result
     });
 
@@ -514,8 +537,66 @@ fn supervise(options: &Options, reporter: &Reporter, stop_event: usize, pressed:
         status.state = state;
         status.message = message;
         status.effects = false;
+        // The cleanup got its answers from Windows' audio service: a freeze said earlier is over.
+        status.audio_frozen.clear();
     });
     result.and(cleanup)
+}
+
+/// How long a stop may take, from the request to the defaults put back, before the daemon ends
+/// without its cleanup. A stop takes about a second; the window waits 15 s for one.
+const STOP_DEADLINE: Duration = Duration::from_secs(10);
+
+/// Ends the process when a stop asked for has not finished after `STOP_DEADLINE`: on 26/11/2026 a
+/// stop waited 1 min 47 s for a call into Windows' frozen audio service, and ended only once the
+/// service was killed. The channels then stay enabled and default; the next start takes them up.
+/// Returns as soon as `supervised` is set.
+fn stop_deadline(reporter: &Reporter, supervised: &AtomicBool) {
+    while !relay::stop_requested() {
+        if supervised.load(Ordering::SeqCst) {
+            return;
+        }
+        std::thread::sleep(Duration::from_millis(250));
+    }
+    let asked = Instant::now();
+    while !supervised.load(Ordering::SeqCst) {
+        if asked.elapsed() >= STOP_DEADLINE {
+            // The watcher ended with the request: the probe's question tells whether the service is
+            // frozen. A freeze stays published, since it outlasts the daemon (the window then offers
+            // the service's restart rather than a start that would hang too).
+            let frozen = audiowatch::stuck_for().is_some_and(|waited| waited >= STOP_DEADLINE / 2);
+            let mut finished = false;
+            reporter.update(|status| {
+                // The cleanup's last word came in meanwhile: the stop did finish.
+                if !status.state.is_live() {
+                    finished = true;
+                    return;
+                }
+                status.state = Phase::Failed;
+                status.message = if frozen {
+                    mark("Arrêt forcé : le son de Windows ne répondait plus, périphériques par défaut non remis en place")
+                } else {
+                    mark("Arrêt forcé : la tâche de fond restait bloquée, périphériques par défaut non remis en place")
+                }
+                .into();
+                status.effects = false;
+                if frozen && status.audio_frozen.is_empty() {
+                    status.audio_frozen = crate::guard::stamp();
+                }
+            });
+            if finished {
+                return;
+            }
+            log(format!(
+                "stop not done after {} s: a call is stuck{}; the daemon ends without putting the default devices back or disabling the channels",
+                STOP_DEADLINE.as_secs(),
+                if frozen { " (Windows' audio service is not answering either)" } else { "" }
+            ));
+            // The microphone worker goes with this process (its job object).
+            crate::worker::end_process(3);
+        }
+        std::thread::sleep(Duration::from_millis(100));
+    }
 }
 
 /// How often the daemon writes its memory in the log, whatever it is.
@@ -585,6 +666,7 @@ fn memory_line(reason: &str, worker: u32) -> String {
 fn watch(reporter: &Reporter, stop_event: usize, sonar_returned: &AtomicBool, finished: &AtomicBool) {
     let mut ticks = 0u32;
     let mut memory = MemoryWatch::new(Instant::now());
+    let mut freeze = audiowatch::Freeze::default();
     log(memory_line("at start", reporter.worker_pid()));
     while !finished.load(Ordering::SeqCst) {
         if unsafe { WaitForSingleObject(stop_event as *mut c_void, 500) } == WAIT_OBJECT_0 {
@@ -593,6 +675,7 @@ fn watch(reporter: &Reporter, stop_event: usize, sonar_returned: &AtomicBool, fi
             relay::request_stop();
             return;
         }
+        follow_audio_service(&mut freeze, reporter);
         ticks += 1;
         if ticks % 4 == 0 && sonar_running() {
             log("GG's Sonar started: stepping aside and leaving the devices to it");
@@ -608,6 +691,26 @@ fn watch(reporter: &Reporter, stop_event: usize, sonar_returned: &AtomicBool, fi
             }
         }
         reporter.follow_relay();
+    }
+}
+
+/// One look at the probe of Windows' audio service (`audiowatch`), from the watcher's 500 ms loop:
+/// a freeze, and its end, are logged and published in status.txt (the window then offers to
+/// restart the service).
+fn follow_audio_service(freeze: &mut audiowatch::Freeze, reporter: &Reporter) {
+    match freeze.look(audiowatch::asking()) {
+        Some(audiowatch::Change::Froze) => {
+            log(format!(
+                "Windows' audio service is not answering: a question asked to it has waited {} s; every program's sound may be stuck (`platinum audio-restart`, or the window's button, restarts the service)",
+                audiowatch::FROZEN_LOOKS / 2
+            ));
+            reporter.update(|status| status.audio_frozen = crate::guard::stamp());
+        }
+        Some(audiowatch::Change::Answered { looks }) => {
+            log(format!("Windows' audio service answers again, after about {} s", looks / 2));
+            reporter.update(|status| status.audio_frozen.clear());
+        }
+        None => {}
     }
 }
 

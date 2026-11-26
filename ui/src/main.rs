@@ -178,6 +178,14 @@ thread_local! {
     /// A missing prerequisite (`platinum::doctor::banner`: no Sonar driver, no VC++ runtime…), as a
     /// French catalog key and a tone; it takes the daemon's banner line while it lasts.
     static PREREQUISITE: RefCell<Option<(&'static str, i32)>> = const { RefCell::new(None) };
+    /// The daemon says Windows' audio service no longer answers (`watch_audio_service`). Read by
+    /// the window itself from status.txt: the engine's thread may be stuck in a call to that
+    /// service, and its snapshots with it.
+    static AUDIO_FROZEN: Cell<bool> = const { Cell::new(false) };
+    /// The restart of Windows' audio service asked from the banner (`repair_audio`).
+    static REPAIR: RefCell<Repair> = const { RefCell::new(Repair::Idle) };
+    /// The timer of `watch_audio_service`, kept for the life of the window.
+    static AUDIO_TIMER: RefCell<Option<slint::Timer>> = const { RefCell::new(None) };
     /// The window, for the full repaints the window procedure asks for (`full_repaint_requested`).
     static WINDOW: RefCell<slint::Weak<App>> = RefCell::new(slint::Weak::default());
     /// The crash report in the send dialog, anonymised: what "Copier le texte" and "Ouvrir sur
@@ -243,7 +251,95 @@ fn check_prerequisites(app: &App) {
 
 fn set_prerequisite(app: &App, missing: Option<(&'static str, i32)>) {
     PREREQUISITE.with(|slot| *slot.borrow_mut() = missing);
+    refresh_daemon(app);
+}
+
+/// Draws the daemon's state again from the last snapshot, with what the window adds to it.
+fn refresh_daemon(app: &App) {
     with_ui(|ui| app.set_daemon(daemon_state(&ui.last.daemon)));
+}
+
+/// Where the restart of Windows' audio service asked from the banner stands.
+#[derive(Clone, Debug, PartialEq)]
+enum Repair {
+    Idle,
+    /// Windows' elevation prompt, the restart, then Platinum's own restart.
+    Running,
+    /// Why it did not work out, and when that was known.
+    Failed(String, Instant),
+}
+
+/// How long a failed restart stays said once the service answers again.
+const REPAIR_FAILURE_SHOWN: Duration = Duration::from_secs(20);
+/// Set while `repair_audio`'s thread runs: the window closing waits for it (`shut_down`), so that
+/// Platinum is not left stopped between the stop and the start of its restart.
+static REPAIRING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+/// The longest that thread can take: Windows' prompt answered, the service's restart
+/// (`audioservice::run_elevated` waits 45 s at most), then Platinum's.
+const REPAIR_LIMIT: Duration = Duration::from_secs(90);
+
+/// The banner line about Windows' audio service, and its tone, when there is one to show: it goes
+/// before everything else, since no sound plays meanwhile.
+fn audio_banner(frozen: bool, repair: &Repair, now: Instant) -> Option<(String, i32)> {
+    match repair {
+        Repair::Running => Some((tr("Relance du son de Windows… Windows demande l'accord administrateur.").into(), 0)),
+        Repair::Failed(error, at) if frozen || now.duration_since(*at) < REPAIR_FAILURE_SHOWN => Some((trf!("Relance du son de Windows non aboutie : {error}", error = error), 2)),
+        _ if frozen => Some((tr("Le service Audio de Windows ne répond plus : le son de tous les programmes est figé.").into(), 2)),
+        _ => None,
+    }
+}
+
+/// Reads status.txt every second, on the window's thread, for the daemon's word on Windows' audio
+/// service; draws the banner again when it changes, and forgets an old failure of the restart.
+fn watch_audio_service(app: &App) {
+    let weak = app.as_weak();
+    let timer = slint::Timer::default();
+    timer.start(slint::TimerMode::Repeated, Duration::from_secs(1), move || {
+        let frozen = platinum::status::read().is_some_and(|status| status.audio_frozen());
+        let mut changed = AUDIO_FROZEN.with(|cell| cell.replace(frozen)) != frozen;
+        REPAIR.with(|repair| {
+            let mut repair = repair.borrow_mut();
+            if matches!(&*repair, Repair::Failed(_, at) if !frozen && at.elapsed() >= REPAIR_FAILURE_SHOWN) {
+                *repair = Repair::Idle;
+                changed = true;
+            }
+        });
+        if changed {
+            if let Some(app) = weak.upgrade() {
+                refresh_daemon(&app);
+            }
+        }
+    });
+    AUDIO_TIMER.with(|slot| *slot.borrow_mut() = Some(timer));
+}
+
+/// The banner's "Relancer le son de Windows": Windows' audio service is restarted as administrator
+/// (`platinum audio-restart`, after Windows' prompt), then Platinum, whose streams went with the
+/// old service. On a thread of its own, outside the engine.
+fn repair_audio(app: &App) {
+    if READ_ONLY.with(Cell::get) || REPAIR.with(|repair| *repair.borrow() == Repair::Running) {
+        return;
+    }
+    REPAIR.with(|repair| *repair.borrow_mut() = Repair::Running);
+    refresh_daemon(app);
+    let weak = app.as_weak();
+    REPAIRING.store(true, std::sync::atomic::Ordering::SeqCst);
+    let spawned = std::thread::Builder::new().name("relance du son".into()).spawn(move || {
+        let outcome = platinum::audioservice::run_elevated().and_then(|()| background::restart_now());
+        REPAIRING.store(false, std::sync::atomic::Ordering::SeqCst);
+        let _ = slint::invoke_from_event_loop(move || finish_repair(&weak, outcome));
+    });
+    if let Err(error) = spawned {
+        REPAIRING.store(false, std::sync::atomic::Ordering::SeqCst);
+        finish_repair(&app.as_weak(), Err(error.to_string()));
+    }
+}
+
+fn finish_repair(weak: &slint::Weak<App>, outcome: Result<(), String>) {
+    REPAIR.with(|repair| *repair.borrow_mut() = outcome.err().map_or(Repair::Idle, |error| Repair::Failed(error, Instant::now())));
+    if let Some(app) = weak.upgrade() {
+        refresh_daemon(&app);
+    }
 }
 
 fn with_ui<R>(work: impl FnOnce(&mut Ui) -> R) -> Option<R> {
@@ -613,10 +709,15 @@ fn remote_sentence(sink: &str) -> String {
 }
 
 fn daemon_state(view: &DaemonView) -> DaemonState {
-    // A missing prerequisite explains the rest: it goes first.
-    let (banner, banner_tone) = match PREREQUISITE.with(|slot| *slot.borrow()) {
-        Some((text, tone)) => (tr(text).to_string(), tone),
-        None => banner(view),
+    let frozen = AUDIO_FROZEN.with(Cell::get);
+    let repairing = REPAIR.with(|repair| *repair.borrow() == Repair::Running);
+    // Windows' frozen audio service stops every sound: it goes first. Then a missing prerequisite,
+    // which explains the rest.
+    let audio = REPAIR.with(|repair| audio_banner(frozen, &repair.borrow(), Instant::now()));
+    let (banner, banner_tone) = match (audio, PREREQUISITE.with(|slot| *slot.borrow())) {
+        (Some(line), _) => line,
+        (None, Some((text, tone))) => (tr(text).to_string(), tone),
+        (None, None) => banner(view),
     };
     // A running daemon's message only says what it is doing: no warning box for it.
     let detail = if view.phase == Phase::Running { String::new() } else { view.detail.clone() };
@@ -626,11 +727,16 @@ fn daemon_state(view: &DaemonView) -> DaemonState {
         summary: view.summary.as_str().into(),
         detail: detail.into(),
         microphone: view.microphone.as_str().into(),
-        can_start: view.can_start,
-        can_stop: view.can_stop,
+        // A freeze said by a daemon that is gone may have ended since: "Démarrer" stays offered
+        // beside the service's restart. Nothing else starts or stops Platinum during that restart,
+        // which stops and starts it itself.
+        can_start: view.can_start && !repairing,
+        can_stop: view.can_stop && !repairing,
         restarts_on_mic_change: view.restarts_on_mic_change,
         banner: banner.into(),
         banner_tone,
+        audio_frozen: frozen && !repairing,
+        repairing_audio: repairing,
         remote: if view.remote.is_empty() { SharedString::new() } else { trf!("{sentence}. Tout revient sur vos sorties à la fin de la session.", sentence = remote_sentence(&view.remote)).into() },
     }
 }
@@ -2506,6 +2612,13 @@ fn connect_daemon(app: &App) {
         send(Command::SetStartWithWindows(on));
     });
 
+    let weak = app.as_weak();
+    backend.on_repair_audio(move || {
+        if let Some(app) = weak.upgrade() {
+            repair_audio(&app);
+        }
+    });
+
     // Asked once the user was told the sound cuts for a few seconds.
     let weak = app.as_weak();
     backend.on_restart_daemon(move || {
@@ -2719,7 +2832,9 @@ fn log_panics(capture: Option<&Path>) {
 /// filter n: type from 0 in `presets::FILTER_TYPES`, Q). For the header's "Tester" row:
 /// `test-playing` (the open tab's first sound playing), `test-missing` (GG's sounds absent:
 /// generated ones play, and the note says so), `test-no-output` (its sounds dimmed, with the
-/// reason), `prerequisite` (the banner of a missing Sonar driver), `mic-recording`, `mic-recorded`, `mic-playing` (the microphone
+/// reason), `prerequisite` (the banner of a missing Sonar driver), `audio-frozen` (Windows' audio
+/// service frozen, with "Relancer le son de Windows"), `audio-repair` (its restart under way),
+/// `audio-repair-failed` (the restart refused at Windows' prompt), `mic-recording`, `mic-recorded`, `mic-playing` (the microphone
 /// test's states), `mic-note` (one of its errors) and `mic-not-relayed` (the daemon relaying no
 /// microphone: "Enregistrer" dimmed, with the reason). For the preset per game, on Gaming:
 /// `game-active` (Gaming's preset put there by a running game, "Activé par DELTARUNE"),
@@ -2769,6 +2884,19 @@ fn preview(app: &App) {
             .unwrap_or_default(),
             "remote" => app.set_daemon(daemon_state(&DaemonView { remote: "Steam Streaming Speakers".into(), ..daemon(Phase::Running, "Son et micro actifs, avec effets", "") })),
             "prerequisite" => set_prerequisite(app, Some((i18n::mark("Le pilote Sonar n'est pas installé : lancez Platinum-Setup.exe pour l'installer."), 2))),
+            "audio-frozen" => {
+                AUDIO_FROZEN.with(|frozen| frozen.set(true));
+                refresh_daemon(app);
+            }
+            "audio-repair" => {
+                REPAIR.with(|repair| *repair.borrow_mut() = Repair::Running);
+                refresh_daemon(app);
+            }
+            "audio-repair-failed" => {
+                AUDIO_FROZEN.with(|frozen| frozen.set(true));
+                REPAIR.with(|repair| *repair.borrow_mut() = Repair::Failed(tr("relance annulée : Windows n'a pas reçu l'accord administrateur").into(), Instant::now()));
+                refresh_daemon(app);
+            }
             "notices" => {
                 let notices = vec![
                     NoticeView { id: 1, text: "Sortie de Gaming non changée".into(), detail: "IStore::OpenSetting failed (HRESULT 0x80070005)".into() },
@@ -3113,6 +3241,7 @@ fn main() -> Result<(), slint::PlatformError> {
     }
     refresh_crashes(&app);
     if !read_only {
+        watch_audio_service(&app);
         if let Ok(folder) = crash::folder() {
             crash::prune(&folder, crash::KEEP);
         }
@@ -3134,6 +3263,11 @@ fn shut_down(engine: Option<std::thread::JoinHandle<()>>) {
     // A test sound or the microphone test stops with the window (the recording goes with it).
     TESTER.with(|tester| tester.borrow_mut().take());
     COMMANDS.with(|commands| commands.borrow_mut().take());
+    // A restart of Windows' sound under way restarts Platinum at its end: it is let finish.
+    let started = Instant::now();
+    while REPAIRING.load(std::sync::atomic::Ordering::SeqCst) && started.elapsed() < REPAIR_LIMIT {
+        std::thread::sleep(Duration::from_millis(50));
+    }
     let Some(engine) = engine else { return };
     let limit = background::STOP_TIMEOUT + background::START_TIMEOUT + Duration::from_secs(5);
     let started = Instant::now();
@@ -3202,6 +3336,36 @@ mod tests {
         let failed = banner(&view(Phase::Failed, "platinum-start.exe est introuvable"));
         assert_eq!(failed, ("Le son ne passe pas par Platinum — platinum-start.exe est introuvable".to_string(), 2));
         assert_eq!(banner(&view(Phase::Waiting, "Aucun micro choisi")).0, "Aucun micro choisi");
+    }
+
+    #[test]
+    fn a_frozen_audio_service_is_said_first_and_offers_its_restart() {
+        let now = Instant::now();
+        assert_eq!(audio_banner(false, &Repair::Idle, now), None);
+        let frozen = audio_banner(true, &Repair::Idle, now).unwrap();
+        assert_eq!(frozen, ("Le service Audio de Windows ne répond plus : le son de tous les programmes est figé.".to_string(), 2));
+        assert_eq!(audio_banner(true, &Repair::Running, now).map(|(_, tone)| tone), Some(0));
+        assert_eq!(audio_banner(false, &Repair::Running, now).map(|(_, tone)| tone), Some(0));
+        // A failure stays said while the service is frozen, and for a while once it answers.
+        let failed = Repair::Failed("relance annulée".into(), now);
+        assert_eq!(audio_banner(true, &failed, now + Duration::from_secs(600)), Some(("Relance du son de Windows non aboutie : relance annulée".to_string(), 2)));
+        assert!(audio_banner(false, &failed, now + Duration::from_secs(5)).is_some());
+        assert_eq!(audio_banner(false, &failed, now + REPAIR_FAILURE_SHOWN), None);
+        // The window's state: the banner wins over the rest, its button replaces "Démarrer".
+        let stopped = DaemonView { can_start: true, ..view(Phase::Stopped, "") };
+        AUDIO_FROZEN.with(|cell| cell.set(true));
+        let state = daemon_state(&stopped);
+        AUDIO_FROZEN.with(|cell| cell.set(false));
+        assert_eq!((state.banner.as_str(), state.banner_tone), (frozen.0.as_str(), 2));
+        // A daemon that is gone: "Démarrer" stays beside the restart, the freeze may have ended.
+        assert!(state.audio_frozen && !state.repairing_audio && state.can_start);
+        let state = daemon_state(&stopped);
+        assert!(!state.audio_frozen && state.can_start);
+        // During the restart, nothing else starts or stops Platinum.
+        REPAIR.with(|repair| *repair.borrow_mut() = Repair::Running);
+        let running = daemon_state(&DaemonView { can_stop: true, ..view(Phase::Running, "") });
+        REPAIR.with(|repair| *repair.borrow_mut() = Repair::Idle);
+        assert!(running.repairing_audio && !running.audio_frozen && !running.can_stop && !running.can_start);
     }
 
     #[test]

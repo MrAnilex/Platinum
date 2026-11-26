@@ -93,6 +93,13 @@ replacing GG's Sonar (GG must be closed):
                                             driver and devices, effects engine, VC++ runtime, GG,
                                             presets) and what to do about each problem; reads only
 
+Windows' audio service:
+  platinum audio-restart [--log <file>]     end Windows' audio service (Audiosrv) and start it again,
+                                            for when it no longer answers and every program's sound is
+                                            stuck (the daemon logs it and the window offers it); all
+                                            sound stops for a few seconds. Needs administrator rights.
+                                            --log adds its steps to that file
+
 crash reports (written on this PC when a Platinum program crashes; Platinum never sends anything):
   platinum crashes                          the recent crash reports, newest first; reads only
   platinum crashes --show <n>               report n, anonymised as it would be sent from the window
@@ -247,6 +254,8 @@ fn run(args: &[String]) -> Result<(), String> {
             platinum::doctor::print(&platinum::doctor::run());
             Ok(())
         }
+        [platinum::audioservice::SUBCOMMAND] => platinum::audioservice::run(None),
+        [platinum::audioservice::SUBCOMMAND, "--log", file] => platinum::audioservice::run(Some(std::path::Path::new(file))),
         ["crashes"] => list_crashes(),
         ["crashes", "--show", number] => show_crash(number),
         _ => Err(format!("unrecognised arguments\n\n{USAGE}")),

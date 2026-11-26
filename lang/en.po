@@ -460,3 +460,39 @@ msgstr "The Sonar effects engine cannot be found: run Platinum-Setup.exe again t
 #: src/doctor.rs
 msgid "Le runtime Visual C++ manque : les effets du micro ne peuvent pas démarrer. Relancez Platinum-Setup.exe."
 msgstr "The Visual C++ runtime is missing: the microphone effects cannot start. Run Platinum-Setup.exe again."
+
+#: src/status.rs
+msgid "Le service Audio de Windows ne répond plus : le son est figé"
+msgstr "Windows Audio service is not answering: the sound is frozen"
+
+#: src/daemon.rs
+msgid "Arrêt forcé : le son de Windows ne répondait plus, périphériques par défaut non remis en place"
+msgstr "Forced stop: Windows sound was not answering, default devices not put back"
+
+#: src/audioservice.rs
+msgid "platinum.exe est introuvable"
+msgstr "platinum.exe cannot be found"
+
+#: src/audioservice.rs
+msgid "relance annulée : Windows n'a pas reçu l'accord administrateur"
+msgstr "restart cancelled: Windows did not get administrator approval"
+
+#: src/audioservice.rs
+msgid "la relance n'a pas pu être lancée (erreur Windows {code})"
+msgstr "the restart could not be launched (Windows error {code})"
+
+#: src/audioservice.rs
+msgid "la relance n'a pas pu être suivie"
+msgstr "the restart could not be followed"
+
+#: src/audioservice.rs
+msgid "la relance du service Audio ne s'est pas terminée"
+msgstr "the restart of the Audio service did not finish"
+
+#: src/audioservice.rs
+msgid "la relance du service Audio a échoué (détails dans {file})"
+msgstr "the restart of the Audio service failed (details in {file})"
+
+#: src/daemon.rs
+msgid "Arrêt forcé : la tâche de fond restait bloquée, périphériques par défaut non remis en place"
+msgstr "Forced stop: the background task was stuck, default devices not put back"

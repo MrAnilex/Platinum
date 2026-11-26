@@ -291,6 +291,8 @@ export global Backend {
     callback stop-daemon();
     // Stops and starts the daemon again, once the user confirmed it (the sound cuts a few seconds).
     callback restart-daemon();
+    // Restarts Windows' frozen audio service as administrator, then the daemon (the banner's button).
+    callback repair-audio();
     callback set-start-with-windows(bool);
     callback dismiss(int);
     // Presets (channel key first).

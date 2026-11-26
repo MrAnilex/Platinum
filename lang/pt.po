@@ -460,3 +460,39 @@ msgstr "O motor de efeitos Sonar não foi encontrado: execute novamente o Platin
 #: src/doctor.rs
 msgid "Le runtime Visual C++ manque : les effets du micro ne peuvent pas démarrer. Relancez Platinum-Setup.exe."
 msgstr "Falta o runtime do Visual C++: os efeitos do microfone não podem iniciar. Execute novamente o Platinum-Setup.exe."
+
+#: src/status.rs
+msgid "Le service Audio de Windows ne répond plus : le son est figé"
+msgstr "O serviço de áudio do Windows não responde: o som está bloqueado"
+
+#: src/daemon.rs
+msgid "Arrêt forcé : le son de Windows ne répondait plus, périphériques par défaut non remis en place"
+msgstr "Encerramento forçado: o som do Windows não respondia, dispositivos padrão não repostos"
+
+#: src/audioservice.rs
+msgid "platinum.exe est introuvable"
+msgstr "platinum.exe não foi encontrado"
+
+#: src/audioservice.rs
+msgid "relance annulée : Windows n'a pas reçu l'accord administrateur"
+msgstr "reinício cancelado: o Windows não recebeu a autorização de administrador"
+
+#: src/audioservice.rs
+msgid "la relance n'a pas pu être lancée (erreur Windows {code})"
+msgstr "não foi possível iniciar o reinício (erro do Windows {code})"
+
+#: src/audioservice.rs
+msgid "la relance n'a pas pu être suivie"
+msgstr "não foi possível acompanhar o reinício"
+
+#: src/audioservice.rs
+msgid "la relance du service Audio ne s'est pas terminée"
+msgstr "o reinício do serviço de áudio não terminou"
+
+#: src/audioservice.rs
+msgid "la relance du service Audio a échoué (détails dans {file})"
+msgstr "o reinício do serviço de áudio falhou (detalhes em {file})"
+
+#: src/daemon.rs
+msgid "Arrêt forcé : la tâche de fond restait bloquée, périphériques par défaut non remis en place"
+msgstr "Encerramento forçado: a tarefa em segundo plano ficou bloqueada, dispositivos padrão não repostos"

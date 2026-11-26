@@ -3,6 +3,8 @@
 //! `platinum-ui.exe` (the window) are both built on it.
 
 pub mod apo;
+pub mod audioservice;
+pub mod audiowatch;
 pub mod autostart;
 pub mod com;
 pub mod config;

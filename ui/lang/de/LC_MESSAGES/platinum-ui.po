@@ -2284,3 +2284,19 @@ msgstr "Der Bericht war zu lang für einen Link: Er wurde gekürzt, und der voll
 #: ui/src/settings.rs
 msgid "La page de GitHub s'ouvre dans votre navigateur : relisez l'issue, puis envoyez-la vous-même si vous le voulez."
 msgstr "Die GitHub-Seite öffnet sich in Ihrem Browser: Lesen Sie das Issue durch und senden Sie es selbst ab, wenn Sie möchten."
+
+#: ui/ui/app.slint
+msgid "Relancer le son de Windows"
+msgstr "Windows-Sound neu starten"
+
+#: ui/src/main.rs
+msgid "Le service Audio de Windows ne répond plus : le son de tous les programmes est figé."
+msgstr "Der Windows-Audiodienst reagiert nicht mehr: der Sound aller Programme hängt."
+
+#: ui/src/main.rs
+msgid "Relance du son de Windows… Windows demande l'accord administrateur."
+msgstr "Windows-Sound wird neu gestartet… Windows fragt nach der Administratorfreigabe."
+
+#: ui/src/main.rs
+msgid "Relance du son de Windows non aboutie : {error}"
+msgstr "Neustart des Windows-Sounds nicht gelungen: {error}"

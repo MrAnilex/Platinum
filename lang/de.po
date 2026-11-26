@@ -461,3 +461,39 @@ msgstr "Die Sonar-Effekt-Engine wurde nicht gefunden: Starten Sie Platinum-Setup
 #: src/doctor.rs
 msgid "Le runtime Visual C++ manque : les effets du micro ne peuvent pas démarrer. Relancez Platinum-Setup.exe."
 msgstr "Die Visual-C++-Laufzeit fehlt: Die Mikrofoneffekte können nicht starten. Starten Sie Platinum-Setup.exe erneut."
+
+#: src/status.rs
+msgid "Le service Audio de Windows ne répond plus : le son est figé"
+msgstr "Der Windows-Audiodienst reagiert nicht mehr: der Sound hängt"
+
+#: src/daemon.rs
+msgid "Arrêt forcé : le son de Windows ne répondait plus, périphériques par défaut non remis en place"
+msgstr "Erzwungenes Beenden: der Windows-Sound reagierte nicht mehr, Standardgeräte nicht wiederhergestellt"
+
+#: src/audioservice.rs
+msgid "platinum.exe est introuvable"
+msgstr "platinum.exe wurde nicht gefunden"
+
+#: src/audioservice.rs
+msgid "relance annulée : Windows n'a pas reçu l'accord administrateur"
+msgstr "Neustart abgebrochen: Windows hat keine Administratorfreigabe erhalten"
+
+#: src/audioservice.rs
+msgid "la relance n'a pas pu être lancée (erreur Windows {code})"
+msgstr "der Neustart konnte nicht gestartet werden (Windows-Fehler {code})"
+
+#: src/audioservice.rs
+msgid "la relance n'a pas pu être suivie"
+msgstr "der Neustart konnte nicht verfolgt werden"
+
+#: src/audioservice.rs
+msgid "la relance du service Audio ne s'est pas terminée"
+msgstr "der Neustart des Audiodienstes wurde nicht abgeschlossen"
+
+#: src/audioservice.rs
+msgid "la relance du service Audio a échoué (détails dans {file})"
+msgstr "der Neustart des Audiodienstes ist fehlgeschlagen (Details in {file})"
+
+#: src/daemon.rs
+msgid "Arrêt forcé : la tâche de fond restait bloquée, périphériques par défaut non remis en place"
+msgstr "Erzwungenes Beenden: der Hintergrunddienst hing fest, Standardgeräte nicht wiederhergestellt"

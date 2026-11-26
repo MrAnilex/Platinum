@@ -2283,3 +2283,19 @@ msgstr "O relatório era longo demais para um link: ele foi cortado, e o texto c
 #: ui/src/settings.rs
 msgid "La page de GitHub s'ouvre dans votre navigateur : relisez l'issue, puis envoyez-la vous-même si vous le voulez."
 msgstr "A página do GitHub se abre no seu navegador: releia a issue e envie-a você mesmo, se quiser."
+
+#: ui/ui/app.slint
+msgid "Relancer le son de Windows"
+msgstr "Reiniciar o som do Windows"
+
+#: ui/src/main.rs
+msgid "Le service Audio de Windows ne répond plus : le son de tous les programmes est figé."
+msgstr "O serviço de áudio do Windows não responde: o som de todos os programas está bloqueado."
+
+#: ui/src/main.rs
+msgid "Relance du son de Windows… Windows demande l'accord administrateur."
+msgstr "A reiniciar o som do Windows… o Windows pede a autorização de administrador."
+
+#: ui/src/main.rs
+msgid "Relance du son de Windows non aboutie : {error}"
+msgstr "O reinício do som do Windows não foi concluído: {error}"

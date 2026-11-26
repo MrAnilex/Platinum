@@ -79,18 +79,33 @@ fn changes(wanted: &[String], open: &[&str]) -> (Vec<String>, Vec<String>) {
 /// The devices wanted, and why the ones left out are closed (for the log).
 type Wanted = (Vec<String>, &'static str);
 
-/// The keep-alive thread. Dropping it closes every stream and waits for the thread.
+/// How long dropping the keep-alive waits for its thread. Opening a stream on a device that is
+/// coming back can wait on Windows' audio service for as long as the service is frozen (26/11/2026:
+/// minutes); the daemon's stop must not wait with it.
+const JOIN_WAIT: Duration = Duration::from_secs(3);
+
+/// The keep-alive thread. Dropping it closes every stream and waits for the thread, at most
+/// `JOIN_WAIT`: a thread stuck in a call to Windows is left behind, and ends when the call does.
 pub struct KeepAlive {
     commands: Option<Sender<Wanted>>,
     thread: Option<std::thread::JoinHandle<()>>,
+    /// Closed by the thread when it ends.
+    ended: Receiver<()>,
 }
 
 impl KeepAlive {
     /// Starts the thread, with no stream open yet.
     pub fn start() -> Result<KeepAlive, String> {
         let (commands, received) = std::sync::mpsc::channel();
-        let thread = std::thread::Builder::new().name("keep-alive".into()).spawn(move || serve(&received)).map_err(|e| format!("cannot start the keep-alive thread: {e}"))?;
-        Ok(KeepAlive { commands: Some(commands), thread: Some(thread) })
+        let (ending, ended) = std::sync::mpsc::channel::<()>();
+        let thread = std::thread::Builder::new()
+            .name("keep-alive".into())
+            .spawn(move || {
+                serve(&received);
+                drop(ending);
+            })
+            .map_err(|e| format!("cannot start the keep-alive thread: {e}"))?;
+        Ok(KeepAlive { commands: Some(commands), thread: Some(thread), ended })
     }
 
     /// Keeps a stream open on each of `devices` (identifiers) and on no other; `why` says, for the
@@ -106,8 +121,13 @@ impl Drop for KeepAlive {
     fn drop(&mut self) {
         // The thread ends when its channel closes, after closing its streams.
         self.commands = None;
-        if let Some(thread) = self.thread.take() {
-            let _ = thread.join();
+        let Some(thread) = self.thread.take() else { return };
+        match self.ended.recv_timeout(JOIN_WAIT) {
+            Err(RecvTimeoutError::Timeout) => log(format!("keep-alive: its thread is still in a call to Windows' audio service after {} s; left behind", JOIN_WAIT.as_secs())),
+            // Ended (or panicked): joining is immediate.
+            Ok(()) | Err(RecvTimeoutError::Disconnected) => {
+                let _ = thread.join();
+            }
         }
     }
 }

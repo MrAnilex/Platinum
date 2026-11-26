@@ -2283,3 +2283,19 @@ msgstr "The report was too long for a link: it was cut, and the full anonymised 
 #: ui/src/settings.rs
 msgid "La page de GitHub s'ouvre dans votre navigateur : relisez l'issue, puis envoyez-la vous-même si vous le voulez."
 msgstr "GitHub's page opens in your browser: read the issue through, then send it yourself if you wish."
+
+#: ui/ui/app.slint
+msgid "Relancer le son de Windows"
+msgstr "Restart Windows sound"
+
+#: ui/src/main.rs
+msgid "Le service Audio de Windows ne répond plus : le son de tous les programmes est figé."
+msgstr "Windows Audio service is not answering: every program's sound is frozen."
+
+#: ui/src/main.rs
+msgid "Relance du son de Windows… Windows demande l'accord administrateur."
+msgstr "Restarting Windows sound… Windows asks for administrator approval."
+
+#: ui/src/main.rs
+msgid "Relance du son de Windows non aboutie : {error}"
+msgstr "Windows sound restart did not work out: {error}"

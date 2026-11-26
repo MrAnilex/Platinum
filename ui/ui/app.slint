@@ -86,6 +86,10 @@ export struct DaemonState {
     banner: string,
     // 0 information, 1 warning, 2 error.
     banner-tone: int,
+    // Windows' audio service no longer answers: the banner offers to restart it.
+    audio-frozen: bool,
+    // That restart is under way.
+    repairing-audio: bool,
     // What the popover says while the daemon follows a remote streaming session; empty otherwise.
     remote: string,
 }
@@ -1480,6 +1484,15 @@ export component App inherits Window {
                     text: @tr("Démarrer");
                     primary: true;
                     clicked => { Backend.start-daemon(); }
+                }
+                // Windows asks for an administrator's approval, then the sound stops a few seconds.
+                if root.daemon.audio-frozen: Button {
+                    y: (parent.height - self.height) / 2;
+                    width: 220px;
+                    horizontal-stretch: 0;
+                    text: @tr("Relancer le son de Windows");
+                    primary: true;
+                    clicked => { Backend.repair-audio(); }
                 }
             }
         }

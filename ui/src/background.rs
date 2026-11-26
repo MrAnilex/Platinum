@@ -178,6 +178,15 @@ fn run(kind: Kind, job: &SharedJob) -> Result<(), String> {
     start()
 }
 
+/// Stops the daemon and starts it again, on the caller's thread: after Windows' audio service was
+/// restarted (`main::repair_audio`), every stream the daemon held is gone with the old service.
+/// That job runs outside the engine, whose thread may still be stuck in a call to the old service.
+pub fn restart_now() -> Result<(), String> {
+    stop()?;
+    std::thread::sleep(SETTLE);
+    start()
+}
+
 fn stop() -> Result<(), String> {
     if !daemon::is_running() {
         return Ok(());
@@ -370,7 +379,7 @@ mod tests {
     use super::*;
 
     fn status(state: State, microphone: &str, message: &str) -> Status {
-        Status { state, pid: 1, microphone: microphone.into(), effects: true, message: message.into(), remote: String::new(), worker: 0, replaced: String::new(), updated: String::new(), vanished: false }
+        Status { state, pid: 1, microphone: microphone.into(), effects: true, message: message.into(), remote: String::new(), worker: 0, replaced: String::new(), audio_frozen: String::new(), updated: String::new(), vanished: false }
     }
 
     fn seen(status: Option<Status>, running: bool, sonar: bool) -> Seen {
